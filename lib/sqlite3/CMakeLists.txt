@@ -3,7 +3,8 @@
 ########################################
 
 FetchContent_Declare(SQLite3
-    URL "https://www.sqlite.org/2024/sqlite-amalgamation-3470000.zip"
+    # URL "https://www.sqlite.org/2024/sqlite-amalgamation-3470000.zip"
+    URL "file://${DRAMSYS_3RDPARTY_DIR}/sqlite-amalgamation-3470000.zip"
     OVERRIDE_FIND_PACKAGE
 )
 

@@ -92,6 +92,7 @@ set(DRAMSYS_LIBRARY_DIR     "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set(DRAMSYS_TESTS_DIR       "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 set(DRAMSYS_RESOURCE_DIR    "${CMAKE_CURRENT_SOURCE_DIR}/configs")
 set(DRAMSYS_EXTENSIONS_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/extensions")
+set(DRAMSYS_3RDPARTY_DIR    "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty")
 
 ###############################################
 ###           Library Settings              ###
@@ -102,7 +103,8 @@ if (DRAMSYS_USE_FETCH_CONTENT)
 
     if (DRAMSYS_USE_FETCH_CONTENT_NLOHMANN_JSON)
         FetchContent_Declare(nlohmann_json
-            URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+            # URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+            URL "file://${DRAMSYS_3RDPARTY_DIR}/json.tar.xz"
             OVERRIDE_FIND_PACKAGE
         )
 
@@ -118,7 +120,8 @@ if (DRAMSYS_USE_FETCH_CONTENT)
 
         FetchContent_Declare(
             SystemCLanguage
-            URL https://github.com/accellera-official/systemc/archive/refs/tags/2.3.4.tar.gz
+            # URL https://github.com/accellera-official/systemc/archive/refs/tags/2.3.4.tar.gz
+            URL "file://${DRAMSYS_3RDPARTY_DIR}/systemc-2.3.4.tar.gz"
             OVERRIDE_FIND_PACKAGE
         )
 
@@ -134,7 +137,8 @@ if (DRAMSYS_USE_FETCH_CONTENT)
     if (DRAMSYS_USE_FETCH_CONTENT_INTERNAL)
         FetchContent_Declare(
             DRAMPower
-            GIT_REPOSITORY https://github.com/tukl-msd/DRAMPower
+            # GIT_REPOSITORY https://github.com/tukl-msd/DRAMPower
+            GIT_REPOSITORY https://gitee.com/masa-laboratory/DRAMPower
             GIT_TAG ebd9ff7
             OVERRIDE_FIND_PACKAGE
         )

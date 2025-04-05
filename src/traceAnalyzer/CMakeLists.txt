@@ -44,7 +44,8 @@ if (DRAMSYS_USE_FETCH_CONTENT)
     if (DRAMSYS_USE_FETCH_CONTENT_PYBIND)
         FetchContent_Declare(
             pybind11
-            URL https://github.com/pybind/pybind11/archive/refs/tags/v2.13.6.tar.gz
+            # URL https://github.com/pybind/pybind11/archive/refs/tags/v2.13.6.tar.gz
+            URL "file://${DRAMSYS_3RDPARTY_DIR}/pybind11-2.13.6.tar.gz"
             OVERRIDE_FIND_PACKAGE
         )
         
