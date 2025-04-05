@@ -44,25 +44,19 @@
 #include <QColor>
 #include <qwt_plot_item.h>
 
-class MarkerPlotItem : public QwtPlotItem
-{
+class MarkerPlotItem : public QwtPlotItem {
 private:
-    traceTime time;
-    int width;
-    QColor color;
+  traceTime time;
+  int width;
+  QColor color;
 
 public:
-    MarkerPlotItem(traceTime time, int width = 4, QColor color = QColor(Qt::black)) :
-        time(time),
-        width(width),
-        color(color)
-    {
-    }
-    virtual int rtti() const;
-    virtual void draw(QPainter* painter,
-                      const QwtScaleMap& xMap,
-                      const QwtScaleMap& yMap,
-                      const QRectF& canvasRect) const;
+  MarkerPlotItem(traceTime time, int width = 4,
+                 QColor color = QColor(Qt::black))
+      : time(time), width(width), color(color) {}
+  virtual int rtti() const;
+  virtual void draw(QPainter *painter, const QwtScaleMap &xMap,
+                    const QwtScaleMap &yMap, const QRectF &canvasRect) const;
 };
 
-#endif // MARKERPLOTITEM_H
+#endif  // MARKERPLOTITEM_H

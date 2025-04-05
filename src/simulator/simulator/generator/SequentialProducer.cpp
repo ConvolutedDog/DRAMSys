@@ -36,44 +36,41 @@
 #include "SequentialProducer.h"
 #include "definitions.h"
 
-SequentialProducer::SequentialProducer(uint64_t numRequests,
-                                       std::optional<uint64_t> seed,
-                                       double rwRatio,
-                                       std::optional<uint64_t> addressIncrement,
-                                       std::optional<uint64_t> minAddress,
-                                       std::optional<uint64_t> maxAddress,
-                                       uint64_t memorySize,
-                                       unsigned int dataLength) :
-    numberOfRequests(numRequests),
-    addressIncrement(addressIncrement.value_or(dataLength)),
-    minAddress(minAddress.value_or(DEFAULT_MIN_ADDRESS)),
-    maxAddress(maxAddress.value_or(memorySize - 1)),
-    seed(seed.value_or(DEFAULT_SEED)),
-    rwRatio(rwRatio),
-    dataLength(dataLength),
-    randomGenerator(this->seed)
-{
-    if (minAddress > memorySize - 1)
-        SC_REPORT_FATAL("TrafficGenerator", "minAddress is out of range.");
+SequentialProducer::SequentialProducer(
+    uint64_t numRequests, std::optional<uint64_t> seed, double rwRatio,
+    std::optional<uint64_t> addressIncrement,
+    std::optional<uint64_t> minAddress, std::optional<uint64_t> maxAddress,
+    uint64_t memorySize, unsigned int dataLength)
+    : numberOfRequests(numRequests),
+      addressIncrement(addressIncrement.value_or(dataLength)),
+      minAddress(minAddress.value_or(DEFAULT_MIN_ADDRESS)),
+      maxAddress(maxAddress.value_or(memorySize - 1)),
+      seed(seed.value_or(DEFAULT_SEED)), rwRatio(rwRatio),
+      dataLength(dataLength), randomGenerator(this->seed) {
+  if (minAddress > memorySize - 1)
+    SC_REPORT_FATAL("TrafficGenerator", "minAddress is out of range.");
 
-    if (maxAddress > memorySize - 1)
-        SC_REPORT_FATAL("TrafficGenerator", "maxAddress is out of range.");
+  if (maxAddress > memorySize - 1)
+    SC_REPORT_FATAL("TrafficGenerator", "maxAddress is out of range.");
 
-    if (maxAddress < minAddress)
-        SC_REPORT_FATAL("TrafficGenerator", "maxAddress is smaller than minAddress.");
+  if (maxAddress < minAddress)
+    SC_REPORT_FATAL("TrafficGenerator",
+                    "maxAddress is smaller than minAddress.");
 
-    rwRatio = std::clamp(rwRatio, 0.0, 1.0);
+  rwRatio = std::clamp(rwRatio, 0.0, 1.0);
 }
 
-Request SequentialProducer::nextRequest()
-{
-    Request request;
-    request.address = generatedRequests * addressIncrement % (maxAddress - minAddress) + minAddress;
-    request.command = readWriteDistribution(randomGenerator) < rwRatio ? Request::Command::Read
-                                                                       : Request::Command::Write;
-    request.length = dataLength;
-    request.delay = sc_core::SC_ZERO_TIME;
+Request SequentialProducer::nextRequest() {
+  Request request;
+  request.address =
+      generatedRequests * addressIncrement % (maxAddress - minAddress) +
+      minAddress;
+  request.command = readWriteDistribution(randomGenerator) < rwRatio
+                        ? Request::Command::Read
+                        : Request::Command::Write;
+  request.length = dataLength;
+  request.delay = sc_core::SC_ZERO_TIME;
 
-    generatedRequests++;
-    return request;
+  generatedRequests++;
+  return request;
 }

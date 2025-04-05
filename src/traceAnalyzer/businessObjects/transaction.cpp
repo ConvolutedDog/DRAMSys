@@ -44,53 +44,34 @@ using namespace std;
 
 unsigned int Transaction::mSNumTransactions = 0;
 
-Transaction::Transaction(ID id,
-                         QString command,
-                         unsigned int address,
-                         unsigned int dataLength,
-                         unsigned int thread,
-                         unsigned int channel,
-                         Timespan span,
-                         traceTime clk) :
-    clk(clk),
-    command(std::move(command)),
-    address(address),
-    dataLength(dataLength),
-    thread(thread),
-    channel(channel),
-    span(span),
-    id(id)
-{
+Transaction::Transaction(ID id, QString command, unsigned int address,
+                         unsigned int dataLength, unsigned int thread,
+                         unsigned int channel, Timespan span, traceTime clk)
+    : clk(clk), command(std::move(command)), address(address),
+      dataLength(dataLength), thread(thread), channel(channel), span(span),
+      id(id) {}
+
+void Transaction::addPhase(const shared_ptr<Phase> &phase) {
+  phases.push_back(phase);
 }
 
-void Transaction::addPhase(const shared_ptr<Phase>& phase)
-{
-    phases.push_back(phase);
-}
-
-void Transaction::draw(QPainter* painter,
-                       const QwtScaleMap& xMap,
-                       const QwtScaleMap& yMap,
-                       const QRectF& canvasRect,
+void Transaction::draw(QPainter *painter, const QwtScaleMap &xMap,
+                       const QwtScaleMap &yMap, const QRectF &canvasRect,
                        bool highlight,
-                       const TraceDrawingProperties& drawingProperties) const
-{
-    for (const shared_ptr<Phase>& phase : phases)
-        phase->draw(painter, xMap, yMap, canvasRect, highlight, drawingProperties);
+                       const TraceDrawingProperties &drawingProperties) const {
+  for (const shared_ptr<Phase> &phase : phases)
+    phase->draw(painter, xMap, yMap, canvasRect, highlight, drawingProperties);
 }
 
-bool Transaction::isSelected(Timespan timespan,
-                             double yVal,
-                             const TraceDrawingProperties& drawingproperties) const
-{
-    if (span.overlaps(timespan))
-    {
-        for (const shared_ptr<Phase>& phase : phases)
-        {
-            if (phase->isSelected(timespan, yVal, drawingproperties))
-                return true;
-        }
+bool Transaction::isSelected(
+    Timespan timespan, double yVal,
+    const TraceDrawingProperties &drawingproperties) const {
+  if (span.overlaps(timespan)) {
+    for (const shared_ptr<Phase> &phase : phases) {
+      if (phase->isSelected(timespan, yVal, drawingproperties))
+        return true;
     }
+  }
 
-    return false;
+  return false;
 }

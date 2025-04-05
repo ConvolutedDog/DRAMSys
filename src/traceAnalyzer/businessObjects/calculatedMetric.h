@@ -40,10 +40,9 @@
 #define METRIC_H
 #include <QString>
 
-struct CalculatedMetric
-{
-    std::string name;
-    double value;
+struct CalculatedMetric {
+  std::string name;
+  double value;
 };
 
-#endif // METRIC_H
+#endif  // METRIC_H

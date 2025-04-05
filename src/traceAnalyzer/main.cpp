@@ -47,55 +47,50 @@
 #include <iostream>
 #include <pybind11/embed.h>
 
-int main(int argc, char* argv[])
-{
-    QApplication a(argc, argv);
+int main(int argc, char *argv[]) {
+  QApplication a(argc, argv);
 
-    QIcon icon(QStringLiteral(":/icon"));
-    QApplication::setWindowIcon(icon);
-    QApplication::setApplicationName(QStringLiteral("TraceAnalyzer"));
-    QApplication::setApplicationDisplayName(QStringLiteral("Trace Analyzer"));
+  QIcon icon(QStringLiteral(":/icon"));
+  QApplication::setWindowIcon(icon);
+  QApplication::setApplicationName(QStringLiteral("TraceAnalyzer"));
+  QApplication::setApplicationDisplayName(QStringLiteral("Trace Analyzer"));
 
-    std::filesystem::path extensionDir = DRAMSYS_TRACE_ANALYZER_EXTENSION_DIR;
-    std::filesystem::path modulesDir = extensionDir / "scripts";
+  std::filesystem::path extensionDir = DRAMSYS_TRACE_ANALYZER_EXTENSION_DIR;
+  std::filesystem::path modulesDir = extensionDir / "scripts";
 
-    pybind11::scoped_interpreter guard;
+  pybind11::scoped_interpreter guard;
 
-    // Add scripts directory to local module search path
-    pybind11::module_ sys = pybind11::module_::import("sys");
-    pybind11::list path = sys.attr("path");
-    path.append(modulesDir.c_str());
+  // Add scripts directory to local module search path
+  pybind11::module_ sys = pybind11::module_::import("sys");
+  pybind11::list path = sys.attr("path");
+  path.append(modulesDir.c_str());
 
-    if (argc > 1)
-    {
-        QSet<QString> arguments;
-        for (int i = 1; i < argc; ++i)
-            arguments.insert(QString(argv[i]));
+  if (argc > 1) {
+    QSet<QString> arguments;
+    for (int i = 1; i < argc; ++i)
+      arguments.insert(QString(argv[i]));
 
-        QString openFolderFlag("-f");
-        if (arguments.contains(openFolderFlag))
-        {
-            arguments.remove(openFolderFlag);
-            QStringList nameFilter("*.tdb");
-            QSet<QString> paths = arguments;
-            arguments.clear();
-            for (QString path : paths)
-            {
-                QDir directory(path);
-                QStringList files = directory.entryList(nameFilter);
-                for (QString& file : files)
-                {
-                    arguments.insert(path.append("/") + file);
-                }
-            }
+    QString openFolderFlag("-f");
+    if (arguments.contains(openFolderFlag)) {
+      arguments.remove(openFolderFlag);
+      QStringList nameFilter("*.tdb");
+      QSet<QString> paths = arguments;
+      arguments.clear();
+      for (QString path : paths) {
+        QDir directory(path);
+        QStringList files = directory.entryList(nameFilter);
+        for (QString &file : files) {
+          arguments.insert(path.append("/") + file);
         }
-
-        TraceAnalyzer analyzer(arguments);
-        analyzer.show();
-        return QApplication::exec();
+      }
     }
 
-    TraceAnalyzer analyzer;
+    TraceAnalyzer analyzer(arguments);
     analyzer.show();
     return QApplication::exec();
+  }
+
+  TraceAnalyzer analyzer;
+  analyzer.show();
+  return QApplication::exec();
 }

@@ -40,192 +40,160 @@
 
 #include <optional>
 
-namespace DRAMSys::Config
-{
+namespace DRAMSys::Config {
 
-enum class PagePolicyType
-{
-    Open,
-    OpenAdaptive,
-    Closed,
-    ClosedAdaptive,
-    Invalid = -1
+enum class PagePolicyType {
+  Open,
+  OpenAdaptive,
+  Closed,
+  ClosedAdaptive,
+  Invalid = -1
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(PagePolicyType,
                              {
-                                 {PagePolicyType::Invalid, nullptr},
-                                 {PagePolicyType::Open, "Open"},
-                                 {PagePolicyType::OpenAdaptive, "OpenAdaptive"},
-                                 {PagePolicyType::Closed, "Closed"},
-                                 {PagePolicyType::ClosedAdaptive, "ClosedAdaptive"},
-                             })
+                                 {PagePolicyType::Invalid,        nullptr       },
+                                 {PagePolicyType::Open,           "Open"        },
+                                 {PagePolicyType::OpenAdaptive,   "OpenAdaptive"},
+                                 {PagePolicyType::Closed,         "Closed"      },
+                                 {PagePolicyType::ClosedAdaptive,
+                                  "ClosedAdaptive"                              },
+})
 
-enum class SchedulerType
-{
-    Fifo,
-    FrFcfs,
-    FrFcfsGrp,
-    GrpFrFcfs,
-    GrpFrFcfsWm,
-    Invalid = -1
+enum class SchedulerType {
+  Fifo,
+  FrFcfs,
+  FrFcfsGrp,
+  GrpFrFcfs,
+  GrpFrFcfsWm,
+  Invalid = -1
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(SchedulerType,
-                             {{SchedulerType::Invalid, nullptr},
-                              {SchedulerType::Fifo, "Fifo"},
-                              {SchedulerType::FrFcfs, "FrFcfs"},
-                              {SchedulerType::FrFcfsGrp, "FrFcfsGrp"},
-                              {SchedulerType::GrpFrFcfs, "GrpFrFcfs"},
-                              {SchedulerType::GrpFrFcfsWm, "GrpFrFcfsWm"}})
+                             {
+                                 {SchedulerType::Invalid,     nullptr      },
+                                 {SchedulerType::Fifo,        "Fifo"       },
+                                 {SchedulerType::FrFcfs,      "FrFcfs"     },
+                                 {SchedulerType::FrFcfsGrp,   "FrFcfsGrp"  },
+                                 {SchedulerType::GrpFrFcfs,   "GrpFrFcfs"  },
+                                 {SchedulerType::GrpFrFcfsWm, "GrpFrFcfsWm"}
+})
 
-enum class SchedulerBufferType
-{
-    Bankwise,
-    ReadWrite,
-    Shared,
-    Invalid = -1
-};
+enum class SchedulerBufferType { Bankwise, ReadWrite, Shared, Invalid = -1 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(SchedulerBufferType,
-                             {{SchedulerBufferType::Invalid, nullptr},
-                              {SchedulerBufferType::Bankwise, "Bankwise"},
-                              {SchedulerBufferType::ReadWrite, "ReadWrite"},
-                              {SchedulerBufferType::Shared, "Shared"}})
+                             {
+                                 {SchedulerBufferType::Invalid,   nullptr    },
+                                 {SchedulerBufferType::Bankwise,  "Bankwise" },
+                                 {SchedulerBufferType::ReadWrite, "ReadWrite"},
+                                 {SchedulerBufferType::Shared,    "Shared"   }
+})
 
-enum class CmdMuxType
-{
-    Oldest,
-    Strict,
-    Invalid = -1
-};
+enum class CmdMuxType { Oldest, Strict, Invalid = -1 };
 
-NLOHMANN_JSON_SERIALIZE_ENUM(CmdMuxType,
-                             {{CmdMuxType::Invalid, nullptr},
-                              {CmdMuxType::Oldest, "Oldest"},
-                              {CmdMuxType::Strict, "Strict"}})
+NLOHMANN_JSON_SERIALIZE_ENUM(CmdMuxType, {
+                                             {CmdMuxType::Invalid, nullptr },
+                                             {CmdMuxType::Oldest,  "Oldest"},
+                                             {CmdMuxType::Strict,  "Strict"}
+})
 
-enum class RespQueueType
-{
-    Fifo,
-    Reorder,
-    Invalid = -1
-};
+enum class RespQueueType { Fifo, Reorder, Invalid = -1 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(RespQueueType,
-                             {{RespQueueType::Invalid, nullptr},
-                              {RespQueueType::Fifo, "Fifo"},
-                              {RespQueueType::Reorder, "Reorder"}})
+                             {
+                                 {RespQueueType::Invalid, nullptr  },
+                                 {RespQueueType::Fifo,    "Fifo"   },
+                                 {RespQueueType::Reorder, "Reorder"}
+})
 
-enum class RefreshPolicyType
-{
-    NoRefresh,
-    AllBank,
-    PerBank,
-    Per2Bank,
-    SameBank,
-    Invalid = -1
+enum class RefreshPolicyType {
+  NoRefresh,
+  AllBank,
+  PerBank,
+  Per2Bank,
+  SameBank,
+  Invalid = -1
 };
 
-NLOHMANN_JSON_SERIALIZE_ENUM(RefreshPolicyType,
-                             {{RefreshPolicyType::Invalid, nullptr},
-                              {RefreshPolicyType::NoRefresh, "NoRefresh"},
-                              {RefreshPolicyType::AllBank, "AllBank"},
-                              {RefreshPolicyType::PerBank, "PerBank"},
-                              {RefreshPolicyType::Per2Bank, "Per2Bank"},
-                              {RefreshPolicyType::SameBank, "SameBank"},
+NLOHMANN_JSON_SERIALIZE_ENUM(
+    RefreshPolicyType,
+    {
+        {RefreshPolicyType::Invalid,   nullptr    },
+        {RefreshPolicyType::NoRefresh, "NoRefresh"},
+        {RefreshPolicyType::AllBank,   "AllBank"  },
+        {RefreshPolicyType::PerBank,   "PerBank"  },
+        {RefreshPolicyType::Per2Bank,  "Per2Bank" },
+        {RefreshPolicyType::SameBank,  "SameBank" },
 
-                              // Alternative conversions to provide backwards-compatibility
-                              // when deserializing. Will not be used for serializing.
-                              {RefreshPolicyType::AllBank, "Rankwise"},
-                              {RefreshPolicyType::PerBank, "Bankwise"},
-                              {RefreshPolicyType::SameBank, "Groupwise"}})
+        // Alternative conversions to provide backwards-compatibility
+        // when deserializing. Will not be used for serializing.
+        {RefreshPolicyType::AllBank,   "Rankwise" },
+        {RefreshPolicyType::PerBank,   "Bankwise" },
+        {RefreshPolicyType::SameBank,  "Groupwise"}
+})
 
-enum class PowerDownPolicyType
-{
-    NoPowerDown,
-    Staggered,
-    Invalid = -1
-};
+enum class PowerDownPolicyType { NoPowerDown, Staggered, Invalid = -1 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(PowerDownPolicyType,
-                             {{PowerDownPolicyType::Invalid, nullptr},
-                              {PowerDownPolicyType::NoPowerDown, "NoPowerDown"},
-                              {PowerDownPolicyType::Staggered, "Staggered"}})
+                             {
+                                 {PowerDownPolicyType::Invalid,     nullptr    },
+                                 {PowerDownPolicyType::NoPowerDown,
+                                  "NoPowerDown"                                },
+                                 {PowerDownPolicyType::Staggered,   "Staggered"}
+})
 
-enum class ArbiterType
-{
-    Simple,
-    Fifo,
-    Reorder,
-    Invalid = -1
-};
+enum class ArbiterType { Simple, Fifo, Reorder, Invalid = -1 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(ArbiterType,
-                             {{ArbiterType::Invalid, nullptr},
-                              {ArbiterType::Simple, "Simple"},
-                              {ArbiterType::Fifo, "Fifo"},
-                              {ArbiterType::Reorder, "Reorder"}})
+                             {
+                                 {ArbiterType::Invalid, nullptr  },
+                                 {ArbiterType::Simple,  "Simple" },
+                                 {ArbiterType::Fifo,    "Fifo"   },
+                                 {ArbiterType::Reorder, "Reorder"}
+})
 
-struct McConfig
-{
-    static constexpr std::string_view KEY = "mcconfig";
-    static constexpr std::string_view SUB_DIR = "mcconfig";
+struct McConfig {
+  static constexpr std::string_view KEY = "mcconfig";
+  static constexpr std::string_view SUB_DIR = "mcconfig";
 
-    std::optional<PagePolicyType> PagePolicy;
-    std::optional<SchedulerType> Scheduler;
-    std::optional<unsigned int> HighWatermark;
-    std::optional<unsigned int> LowWatermark;
-    std::optional<SchedulerBufferType> SchedulerBuffer;
-    std::optional<unsigned int> RequestBufferSize;
-    std::optional<unsigned int> RequestBufferSizeRead;
-    std::optional<unsigned int> RequestBufferSizeWrite;
-    std::optional<CmdMuxType> CmdMux;
-    std::optional<RespQueueType> RespQueue;
-    std::optional<RefreshPolicyType> RefreshPolicy;
-    std::optional<unsigned int> RefreshMaxPostponed;
-    std::optional<unsigned int> RefreshMaxPulledin;
-    std::optional<PowerDownPolicyType> PowerDownPolicy;
-    std::optional<ArbiterType> Arbiter;
-    std::optional<unsigned int> MaxActiveTransactions;
-    std::optional<bool> RefreshManagement;
-    std::optional<unsigned int> ArbitrationDelayFw;
-    std::optional<unsigned int> ArbitrationDelayBw;
-    std::optional<unsigned int> ThinkDelayFw;
-    std::optional<unsigned int> ThinkDelayBw;
-    std::optional<unsigned int> PhyDelayFw;
-    std::optional<unsigned int> PhyDelayBw;
-    std::optional<unsigned int> BlockingReadDelay;
-    std::optional<unsigned int> BlockingWriteDelay;
+  std::optional<PagePolicyType> PagePolicy;
+  std::optional<SchedulerType> Scheduler;
+  std::optional<unsigned int> HighWatermark;
+  std::optional<unsigned int> LowWatermark;
+  std::optional<SchedulerBufferType> SchedulerBuffer;
+  std::optional<unsigned int> RequestBufferSize;
+  std::optional<unsigned int> RequestBufferSizeRead;
+  std::optional<unsigned int> RequestBufferSizeWrite;
+  std::optional<CmdMuxType> CmdMux;
+  std::optional<RespQueueType> RespQueue;
+  std::optional<RefreshPolicyType> RefreshPolicy;
+  std::optional<unsigned int> RefreshMaxPostponed;
+  std::optional<unsigned int> RefreshMaxPulledin;
+  std::optional<PowerDownPolicyType> PowerDownPolicy;
+  std::optional<ArbiterType> Arbiter;
+  std::optional<unsigned int> MaxActiveTransactions;
+  std::optional<bool> RefreshManagement;
+  std::optional<unsigned int> ArbitrationDelayFw;
+  std::optional<unsigned int> ArbitrationDelayBw;
+  std::optional<unsigned int> ThinkDelayFw;
+  std::optional<unsigned int> ThinkDelayBw;
+  std::optional<unsigned int> PhyDelayFw;
+  std::optional<unsigned int> PhyDelayBw;
+  std::optional<unsigned int> BlockingReadDelay;
+  std::optional<unsigned int> BlockingWriteDelay;
 };
 
-NLOHMANN_JSONIFY_ALL_THINGS(McConfig,
-                            PagePolicy,
-                            Scheduler,
-                            HighWatermark,
-                            LowWatermark,
-                            SchedulerBuffer,
-                            RequestBufferSize,
-                            RequestBufferSizeRead,
-                            RequestBufferSizeWrite,
-                            CmdMux,
-                            RespQueue,
-                            RefreshPolicy,
-                            RefreshMaxPostponed,
-                            RefreshMaxPulledin,
-                            PowerDownPolicy,
-                            Arbiter,
-                            MaxActiveTransactions,
-                            RefreshManagement,
-                            ArbitrationDelayFw,
-                            ArbitrationDelayBw,
-                            ThinkDelayFw,
-                            ThinkDelayBw,
-                            PhyDelayFw,
-                            PhyDelayBw,
-                            BlockingReadDelay,
+NLOHMANN_JSONIFY_ALL_THINGS(McConfig, PagePolicy, Scheduler, HighWatermark,
+                            LowWatermark, SchedulerBuffer, RequestBufferSize,
+                            RequestBufferSizeRead, RequestBufferSizeWrite,
+                            CmdMux, RespQueue, RefreshPolicy,
+                            RefreshMaxPostponed, RefreshMaxPulledin,
+                            PowerDownPolicy, Arbiter, MaxActiveTransactions,
+                            RefreshManagement, ArbitrationDelayFw,
+                            ArbitrationDelayBw, ThinkDelayFw, ThinkDelayBw,
+                            PhyDelayFw, PhyDelayBw, BlockingReadDelay,
                             BlockingWriteDelay)
 
-} // namespace DRAMSys::Config
+}  // namespace DRAMSys::Config
 
-#endif // DRAMSYSCONFIGURATION_MCCONFIG_H
+#endif  // DRAMSYSCONFIGURATION_MCCONFIG_H

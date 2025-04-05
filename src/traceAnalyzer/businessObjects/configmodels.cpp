@@ -38,263 +38,229 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-McConfigModel::McConfigModel(const TraceDB& traceFile, QObject* parent) :
-    QAbstractTableModel(parent)
-{
-    QSqlDatabase db = traceFile.getDatabase();
-    QString query = "SELECT MCconfig FROM GeneralInfo";
-    QSqlQuery sqlQuery = db.exec(query);
+McConfigModel::McConfigModel(const TraceDB &traceFile, QObject *parent)
+    : QAbstractTableModel(parent) {
+  QSqlDatabase db = traceFile.getDatabase();
+  QString query = "SELECT MCconfig FROM GeneralInfo";
+  QSqlQuery sqlQuery = db.exec(query);
 
-    // The whole configuration is stored in a single cell.
-    sqlQuery.next();
-    QString mcConfigJson = sqlQuery.value(0).toString();
+  // The whole configuration is stored in a single cell.
+  sqlQuery.next();
+  QString mcConfigJson = sqlQuery.value(0).toString();
 
-    addAdditionalInfos(traceFile.getGeneralInfo());
-    parseJson(mcConfigJson);
+  addAdditionalInfos(traceFile.getGeneralInfo());
+  parseJson(mcConfigJson);
 }
 
-void McConfigModel::parseJson(const QString& jsonString)
-{
-    QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonString.toUtf8());
-    QJsonObject mcConfigJson = jsonDocument.object()["mcconfig"].toObject();
+void McConfigModel::parseJson(const QString &jsonString) {
+  QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonString.toUtf8());
+  QJsonObject mcConfigJson = jsonDocument.object()["mcconfig"].toObject();
 
-    for (auto key : mcConfigJson.keys())
-    {
-        QJsonValue currentValue = mcConfigJson.value(key);
+  for (auto key : mcConfigJson.keys()) {
+    QJsonValue currentValue = mcConfigJson.value(key);
 
-        if (currentValue.isDouble())
-        {
-            entries.push_back({key, QString::number(currentValue.toDouble())});
-        }
-        else if (currentValue.isString())
-        {
-            entries.push_back({key, currentValue.toString()});
-        }
-        else if (currentValue.isBool())
-        {
-            entries.push_back({key, currentValue.toBool() ? "True" : "False"});
-        }
+    if (currentValue.isDouble()) {
+      entries.push_back({key, QString::number(currentValue.toDouble())});
+    } else if (currentValue.isString()) {
+      entries.push_back({key, currentValue.toString()});
+    } else if (currentValue.isBool()) {
+      entries.push_back({key, currentValue.toBool() ? "True" : "False"});
     }
+  }
 }
 
-void McConfigModel::addAdditionalInfos(const GeneralInfo& generalInfo)
-{
-    auto addEntry = [this](const QString& key, const QString& value) {
-        entries.push_back({key, value});
-    };
+void McConfigModel::addAdditionalInfos(const GeneralInfo &generalInfo) {
+  auto addEntry = [this](const QString &key, const QString &value) {
+    entries.push_back({key, value});
+  };
 
-    addEntry("Number of Transactions", QString::number(generalInfo.numberOfTransactions));
-    addEntry("Clock period",
-             QString::number(generalInfo.clkPeriod) + " " + generalInfo.unitOfTime.toLower());
-    addEntry("Length of trace", prettyFormatTime(generalInfo.span.End()));
-    addEntry("Window size", QString::number(generalInfo.windowSize));
+  addEntry("Number of Transactions",
+           QString::number(generalInfo.numberOfTransactions));
+  addEntry("Clock period", QString::number(generalInfo.clkPeriod) + " " +
+                               generalInfo.unitOfTime.toLower());
+  addEntry("Length of trace", prettyFormatTime(generalInfo.span.End()));
+  addEntry("Window size", QString::number(generalInfo.windowSize));
 }
 
-int McConfigModel::rowCount(const QModelIndex& parent) const
-{
-    Q_UNUSED(parent)
+int McConfigModel::rowCount(const QModelIndex &parent) const {
+  Q_UNUSED(parent)
 
-    return entries.size();
+  return entries.size();
 }
 
-int McConfigModel::columnCount(const QModelIndex& parent) const
-{
-    Q_UNUSED(parent)
+int McConfigModel::columnCount(const QModelIndex &parent) const {
+  Q_UNUSED(parent)
 
-    return 2;
+  return 2;
 }
 
-QVariant McConfigModel::data(const QModelIndex& index, int role) const
-{
-    if (!index.isValid())
-        return QVariant();
-
-    if (role != Qt::DisplayRole)
-        return QVariant();
-
-    auto entry = entries.at(index.row());
-
-    if (index.column() == 0)
-        return entry.first;
-    else if (index.column() == 1)
-        return entry.second;
-
+QVariant McConfigModel::data(const QModelIndex &index, int role) const {
+  if (!index.isValid())
     return QVariant();
+
+  if (role != Qt::DisplayRole)
+    return QVariant();
+
+  auto entry = entries.at(index.row());
+
+  if (index.column() == 0)
+    return entry.first;
+  else if (index.column() == 1)
+    return entry.second;
+
+  return QVariant();
 }
 
-QVariant McConfigModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if (role != Qt::DisplayRole)
-        return QVariant();
+QVariant McConfigModel::headerData(int section, Qt::Orientation orientation,
+                                   int role) const {
+  if (role != Qt::DisplayRole)
+    return QVariant();
 
-    if (orientation == Qt::Horizontal)
-    {
-        switch (section)
-        {
-        case 0:
-            return "Field";
-        case 1:
-            return "Value";
-        default:
-            break;
-        }
+  if (orientation == Qt::Horizontal) {
+    switch (section) {
+      case 0: return "Field";
+      case 1: return "Value";
+      default: break;
     }
+  }
 
-    return QVariant();
+  return QVariant();
 }
 
-MemSpecModel::MemSpecModel(const TraceDB& traceFile, QObject* parent) : QAbstractItemModel(parent)
-{
-    QSqlDatabase db = traceFile.getDatabase();
-    QString query = "SELECT Memspec FROM GeneralInfo";
-    QSqlQuery sqlQuery = db.exec(query);
+MemSpecModel::MemSpecModel(const TraceDB &traceFile, QObject *parent)
+    : QAbstractItemModel(parent) {
+  QSqlDatabase db = traceFile.getDatabase();
+  QString query = "SELECT Memspec FROM GeneralInfo";
+  QSqlQuery sqlQuery = db.exec(query);
 
-    // The whole configuration is stored in a single cell.
-    sqlQuery.next();
-    QString memSpecJson = sqlQuery.value(0).toString();
+  // The whole configuration is stored in a single cell.
+  sqlQuery.next();
+  QString memSpecJson = sqlQuery.value(0).toString();
 
-    parseJson(memSpecJson);
+  parseJson(memSpecJson);
 }
 
-int MemSpecModel::Node::getRow() const
-{
-    if (!parent)
-        return 0;
+int MemSpecModel::Node::getRow() const {
+  if (!parent)
+    return 0;
 
-    const auto& siblings = parent->children;
-    const auto siblingsIt =
-        std::find_if(siblings.begin(),
-                     siblings.end(),
-                     [this](const std::unique_ptr<Node>& node) { return node.get() == this; });
+  const auto &siblings = parent->children;
+  const auto siblingsIt = std::find_if(
+      siblings.begin(), siblings.end(),
+      [this](const std::unique_ptr<Node> &node) { return node.get() == this; });
 
-    Q_ASSERT(siblingsIt != siblings.end());
+  Q_ASSERT(siblingsIt != siblings.end());
 
-    return std::distance(siblings.begin(), siblingsIt);
+  return std::distance(siblings.begin(), siblingsIt);
 }
 
-void MemSpecModel::parseJson(const QString& jsonString)
-{
-    QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonString.toUtf8());
-    QJsonObject memSpecJson = jsonDocument.object()["memspec"].toObject();
+void MemSpecModel::parseJson(const QString &jsonString) {
+  QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonString.toUtf8());
+  QJsonObject memSpecJson = jsonDocument.object()["memspec"].toObject();
 
-    std::function<void(const QJsonObject&, std::unique_ptr<Node>&)> addNodes;
-    addNodes = [&addNodes](const QJsonObject& obj, std::unique_ptr<Node>& parentNode)
-    {
-        for (auto key : obj.keys())
-        {
-            QJsonValue currentValue = obj.value(key);
+  std::function<void(const QJsonObject &, std::unique_ptr<Node> &)> addNodes;
+  addNodes = [&addNodes](const QJsonObject &obj,
+                         std::unique_ptr<Node> &parentNode) {
+    for (auto key : obj.keys()) {
+      QJsonValue currentValue = obj.value(key);
 
-            QString value;
-            if (currentValue.isDouble())
-            {
-                value = QString::number(currentValue.toDouble());
-            }
-            else if (currentValue.isString())
-            {
-                value = currentValue.toString();
-            }
-            else if (currentValue.isBool())
-            {
-                value = currentValue.toBool() ? "True" : "False";
-            }
+      QString value;
+      if (currentValue.isDouble()) {
+        value = QString::number(currentValue.toDouble());
+      } else if (currentValue.isString()) {
+        value = currentValue.toString();
+      } else if (currentValue.isBool()) {
+        value = currentValue.toBool() ? "True" : "False";
+      }
 
-            std::unique_ptr<Node> node =
-                std::unique_ptr<Node>(new Node({key, value}, parentNode.get()));
-            addNodes(obj[key].toObject(), node);
+      std::unique_ptr<Node> node =
+          std::unique_ptr<Node>(new Node({key, value}, parentNode.get()));
+      addNodes(obj[key].toObject(), node);
 
-            parentNode->children.push_back(std::move(node));
-        }
-    };
-
-    addNodes(memSpecJson, rootNode);
-}
-
-int MemSpecModel::rowCount(const QModelIndex& parent) const
-{
-    if (parent.column() > 0)
-        return 0;
-
-    const Node* parentNode;
-
-    if (!parent.isValid())
-        parentNode = rootNode.get();
-    else
-        parentNode = static_cast<const Node*>(parent.internalPointer());
-
-    return parentNode->childCount();
-}
-
-int MemSpecModel::columnCount(const QModelIndex& parent) const
-{
-    Q_UNUSED(parent)
-
-    return 2;
-}
-
-QVariant MemSpecModel::data(const QModelIndex& index, int role) const
-{
-    if (!index.isValid())
-        return QVariant();
-
-    if (role != Qt::DisplayRole && role != Qt::ToolTipRole)
-        return QVariant();
-
-    auto* node = static_cast<const Node*>(index.internalPointer());
-
-    if (index.column() == 0)
-        return QVariant(node->data.first);
-    else
-        return QVariant(node->data.second);
-}
-
-QVariant MemSpecModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if (role != Qt::DisplayRole)
-        return QVariant();
-
-    if (orientation == Qt::Horizontal)
-    {
-        switch (section)
-        {
-        case 0:
-            return "Field";
-        case 1:
-            return "Value";
-        default:
-            break;
-        }
+      parentNode->children.push_back(std::move(node));
     }
+  };
 
+  addNodes(memSpecJson, rootNode);
+}
+
+int MemSpecModel::rowCount(const QModelIndex &parent) const {
+  if (parent.column() > 0)
+    return 0;
+
+  const Node *parentNode;
+
+  if (!parent.isValid())
+    parentNode = rootNode.get();
+  else
+    parentNode = static_cast<const Node *>(parent.internalPointer());
+
+  return parentNode->childCount();
+}
+
+int MemSpecModel::columnCount(const QModelIndex &parent) const {
+  Q_UNUSED(parent)
+
+  return 2;
+}
+
+QVariant MemSpecModel::data(const QModelIndex &index, int role) const {
+  if (!index.isValid())
     return QVariant();
+
+  if (role != Qt::DisplayRole && role != Qt::ToolTipRole)
+    return QVariant();
+
+  auto *node = static_cast<const Node *>(index.internalPointer());
+
+  if (index.column() == 0)
+    return QVariant(node->data.first);
+  else
+    return QVariant(node->data.second);
 }
 
-QModelIndex MemSpecModel::index(int row, int column, const QModelIndex& parent) const
-{
-    if (!hasIndex(row, column, parent))
-        return QModelIndex();
+QVariant MemSpecModel::headerData(int section, Qt::Orientation orientation,
+                                  int role) const {
+  if (role != Qt::DisplayRole)
+    return QVariant();
 
-    const Node* parentNode;
+  if (orientation == Qt::Horizontal) {
+    switch (section) {
+      case 0: return "Field";
+      case 1: return "Value";
+      default: break;
+    }
+  }
 
-    if (!parent.isValid())
-        parentNode = rootNode.get();
-    else
-        parentNode = static_cast<const Node*>(parent.internalPointer());
-
-    const Node* node = parentNode->children[row].get();
-
-    return createIndex(row, column, const_cast<Node*>(node));
+  return QVariant();
 }
 
-QModelIndex MemSpecModel::parent(const QModelIndex& index) const
-{
-    if (!index.isValid())
-        return QModelIndex();
+QModelIndex MemSpecModel::index(int row, int column,
+                                const QModelIndex &parent) const {
+  if (!hasIndex(row, column, parent))
+    return QModelIndex();
 
-    const Node* childNode = static_cast<const Node*>(index.internalPointer());
-    const Node* parentNode = childNode->parent;
+  const Node *parentNode;
 
-    if (!parentNode || parentNode == rootNode.get())
-        return QModelIndex();
+  if (!parent.isValid())
+    parentNode = rootNode.get();
+  else
+    parentNode = static_cast<const Node *>(parent.internalPointer());
 
-    return createIndex(parentNode->getRow(), 0, const_cast<Node*>(parentNode));
+  const Node *node = parentNode->children[row].get();
+
+  return createIndex(row, column, const_cast<Node *>(node));
+}
+
+QModelIndex MemSpecModel::parent(const QModelIndex &index) const {
+  if (!index.isValid())
+    return QModelIndex();
+
+  const Node *childNode = static_cast<const Node *>(index.internalPointer());
+  const Node *parentNode = childNode->parent;
+
+  if (!parentNode || parentNode == rootNode.get())
+    return QModelIndex();
+
+  return createIndex(parentNode->getRow(), 0, const_cast<Node *>(parentNode));
 }

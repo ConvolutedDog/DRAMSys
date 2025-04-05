@@ -38,53 +38,44 @@
 #include "../businessObjects/traceplotlinemodel.h"
 #include "util/customlabelscaledraw.h"
 
-TraceDrawingProperties::TraceDrawingProperties(bool drawText,
-                                               bool drawBorder,
-                                               DependencyOptions drawDependenciesOption,
-                                               ColorGrouping colorGrouping) :
-    drawText(drawText),
-    drawBorder(drawBorder),
-    drawDependenciesOption(drawDependenciesOption),
-    colorGrouping(colorGrouping)
-{
+TraceDrawingProperties::TraceDrawingProperties(
+    bool drawText, bool drawBorder, DependencyOptions drawDependenciesOption,
+    ColorGrouping colorGrouping)
+    : drawText(drawText), drawBorder(drawBorder),
+      drawDependenciesOption(drawDependenciesOption),
+      colorGrouping(colorGrouping) {}
+
+void TraceDrawingProperties::init(
+    TracePlotLineDataSource *tracePlotLineDataSource) {
+  this->tracePlotLineDataSource = tracePlotLineDataSource;
+
+  updateLabels();
 }
 
-void TraceDrawingProperties::init(TracePlotLineDataSource* tracePlotLineDataSource)
-{
-    this->tracePlotLineDataSource = tracePlotLineDataSource;
+void TraceDrawingProperties::updateLabels() {
+  // Clear hash table, because otherwise not all old values will be overwritten.
+  labels->clear();
 
-    updateLabels();
+  // The lowest line starts at the y value of 0.
+  int yVal = 0;
+
+  for (auto it = tracePlotLineDataSource->getTracePlotLines().rbegin();
+       it != tracePlotLineDataSource->getTracePlotLines().rend(); ++it) {
+    auto line = *it;
+
+    labels->operator[](yVal) = line->data.label;
+    line->data.yVal = yVal;
+
+    yVal++;
+  }
+
+  emit labelsUpdated();
 }
 
-void TraceDrawingProperties::updateLabels()
-{
-    // Clear hash table, because otherwise not all old values will be overwritten.
-    labels->clear();
-
-    // The lowest line starts at the y value of 0.
-    int yVal = 0;
-
-    for (auto it = tracePlotLineDataSource->getTracePlotLines().rbegin();
-         it != tracePlotLineDataSource->getTracePlotLines().rend();
-         ++it)
-    {
-        auto line = *it;
-
-        labels->operator[](yVal) = line->data.label;
-        line->data.yVal = yVal;
-
-        yVal++;
-    }
-
-    emit labelsUpdated();
+std::shared_ptr<QHash<int, QString>> TraceDrawingProperties::getLabels() const {
+  return labels;
 }
 
-std::shared_ptr<QHash<int, QString>> TraceDrawingProperties::getLabels() const
-{
-    return labels;
-}
-
-unsigned int TraceDrawingProperties::getNumberOfDisplayedLines() const
-{
-    return tracePlotLineDataSource->getTracePlotLines().size();
+unsigned int TraceDrawingProperties::getNumberOfDisplayedLines() const {
+  return tracePlotLineDataSource->getTracePlotLines().size();
 }

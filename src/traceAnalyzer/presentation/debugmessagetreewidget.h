@@ -46,35 +46,31 @@
 #include <QTreeWidget>
 #include <vector>
 
-class DebugMessageTreeWidget : public QTreeWidget
-{
-    Q_OBJECT
+class DebugMessageTreeWidget : public QTreeWidget {
+  Q_OBJECT
 
 public:
-    DebugMessageTreeWidget(QWidget* parent = 0) :
-        QTreeWidget(parent),
-        isInitialized(false),
+  DebugMessageTreeWidget(QWidget *parent = 0)
+      : QTreeWidget(parent), isInitialized(false),
         timeAnnotationMatcher(QString("@[0-9]+ n?s")),
-        hexAdressMatcher(QString("0x[0-9,a-f]+"))
-    {
-    }
-    void init(TraceNavigator* navigator, TracePlot* traceplot);
+        hexAdressMatcher(QString("0x[0-9,a-f]+")) {}
+  void init(TraceNavigator *navigator, TracePlot *traceplot);
 
-    void showDebugMessages(const std::vector<CommentModel::Comment>& comments);
-    void arrangeUiSettings();
+  void showDebugMessages(const std::vector<CommentModel::Comment> &comments);
+  void arrangeUiSettings();
 
 public Q_SLOTS:
-    void currentTraceTimeChanged();
-    void selectedTransactionChanged();
+  void currentTraceTimeChanged();
+  void selectedTransactionChanged();
 
 private:
-    bool isInitialized;
-    TracePlot* traceplot;
-    TraceNavigator* navigator;
-    QRegularExpression timeAnnotationMatcher;
-    QRegularExpression hexAdressMatcher;
-    QString formatDebugMessage(const QString& message);
-    void mousePressEvent(QMouseEvent* event);
+  bool isInitialized;
+  TracePlot *traceplot;
+  TraceNavigator *navigator;
+  QRegularExpression timeAnnotationMatcher;
+  QRegularExpression hexAdressMatcher;
+  QString formatDebugMessage(const QString &message);
+  void mousePressEvent(QMouseEvent *event);
 };
 
-#endif // DEBUGMESSAGELISTWIDGET_H
+#endif  // DEBUGMESSAGELISTWIDGET_H

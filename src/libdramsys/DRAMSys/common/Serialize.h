@@ -38,23 +38,21 @@
 
 #include <ostream>
 
-namespace DRAMSys
-{
-class Serialize
-{
+namespace DRAMSys {
+class Serialize {
 protected:
-    Serialize() = default;
-    Serialize(const Serialize&) = default;
-    Serialize(Serialize&&) = default;
-    Serialize& operator=(const Serialize&) = default;
-    Serialize& operator=(Serialize&&) = default;
+  Serialize() = default;
+  Serialize(const Serialize &) = default;
+  Serialize(Serialize &&) = default;
+  Serialize &operator=(const Serialize &) = default;
+  Serialize &operator=(Serialize &&) = default;
 
 public:
-    virtual ~Serialize() = default;
+  virtual ~Serialize() = default;
 
-    virtual void serialize(std::ostream& stream) const = 0;
+  virtual void serialize(std::ostream &stream) const = 0;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
 #endif

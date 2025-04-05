@@ -51,314 +51,270 @@
 #include <fstream>
 
 TraceFileTab::TraceFileTab(std::string_view traceFilePath,
-                           PythonCaller& pythonCaller,
-                           QWidget* parent) :
-    QWidget(parent),
-    traceFilePath(traceFilePath),
-    ui(new Ui::TraceFileTab),
-    commentModel(new CommentModel(this)),
-    navigator(new TraceNavigator(traceFilePath.data(), commentModel, this)),
-    mcConfigModel(new McConfigModel(navigator->TraceFile(), this)),
-    memSpecModel(new MemSpecModel(navigator->TraceFile(), this)),
-    availableRowsModel(new AvailableTracePlotLineModel(navigator->GeneralTraceInfo(), this)),
-    selectedRowsModel(new SelectedTracePlotLineModel(navigator->GeneralTraceInfo(), this)),
-    tracePlotLineDataSource(new TracePlotLineDataSource(selectedRowsModel, this)),
+                           PythonCaller &pythonCaller, QWidget *parent)
+    : QWidget(parent), traceFilePath(traceFilePath), ui(new Ui::TraceFileTab),
+      commentModel(new CommentModel(this)),
+      navigator(new TraceNavigator(traceFilePath.data(), commentModel, this)),
+      mcConfigModel(new McConfigModel(navigator->TraceFile(), this)),
+      memSpecModel(new MemSpecModel(navigator->TraceFile(), this)),
+      availableRowsModel(
+          new AvailableTracePlotLineModel(navigator->GeneralTraceInfo(), this)),
+      selectedRowsModel(
+          new SelectedTracePlotLineModel(navigator->GeneralTraceInfo(), this)),
+      tracePlotLineDataSource(
+          new TracePlotLineDataSource(selectedRowsModel, this)),
 #ifdef EXTENSION_ENABLED
-    depInfosView(new DependencyInfosModel(navigator->TraceFile(), this)),
+      depInfosView(new DependencyInfosModel(navigator->TraceFile(), this)),
 #endif
-    pythonCaller(pythonCaller),
-    savingChangesToDB(false)
-{
-    ui->setupUi(this);
+      pythonCaller(pythonCaller), savingChangesToDB(false) {
+  ui->setupUi(this);
 
-    std::cout << "Opening new tab for \"" << traceFilePath << "\"" << std::endl;
+  std::cout << "Opening new tab for \"" << traceFilePath << "\"" << std::endl;
 
-    ui->mcConfigView->setModel(mcConfigModel);
-    ui->mcConfigView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  ui->mcConfigView->setModel(mcConfigModel);
+  ui->mcConfigView->horizontalHeader()->setSectionResizeMode(
+      QHeaderView::ResizeToContents);
 
-    ui->memSpecView->setModel(memSpecModel);
-    ui->memSpecView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  ui->memSpecView->setModel(memSpecModel);
+  ui->memSpecView->header()->setSectionResizeMode(
+      QHeaderView::ResizeToContents);
 
 #ifdef EXTENSION_ENABLED
-    ui->depInfosView->setModel(depInfosView);
-    ui->depInfosView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  ui->depInfosView->setModel(depInfosView);
+  ui->depInfosView->header()->setSectionResizeMode(
+      QHeaderView::ResizeToContents);
 #endif
 
-    setUpTraceSelector();
-    initNavigatorAndItsDependentWidgets();
-    setUpFileWatcher(traceFilePath.data());
-    setUpTraceplotScrollbar();
-    setUpCommentView();
+  setUpTraceSelector();
+  initNavigatorAndItsDependentWidgets();
+  setUpFileWatcher(traceFilePath.data());
+  setUpTraceplotScrollbar();
+  setUpCommentView();
 
 #ifdef EXTENSION_ENABLED
-        setUpPossiblePhases();
+  setUpPossiblePhases();
 #else
-        addDisclaimer();
+  addDisclaimer();
 #endif
 
-    tracefileChanged();
+  tracefileChanged();
 }
 
-TraceFileTab::~TraceFileTab()
-{
-    delete ui;
+TraceFileTab::~TraceFileTab() { delete ui; }
+
+void TraceFileTab::commitChangesToDB() {
+  savingChangesToDB = true;
+  navigator->commitChangesToDB();
 }
 
-void TraceFileTab::commitChangesToDB()
-{
-    savingChangesToDB = true;
-    navigator->commitChangesToDB();
+void TraceFileTab::exportAsVCD() {
+  std::string filename = QFileDialog::getSaveFileName(this, "Export to VCD", "",
+                                                      "VCD files (*.vcd)")
+                             .toStdString();
+
+  auto dump = PythonCaller::dumpVcd(traceFilePath);
+
+  std::ofstream file(filename);
+  file << dump;
+
+  Q_EMIT statusChanged(QString("VCD export finished."));
 }
 
-void TraceFileTab::exportAsVCD()
-{
-    std::string filename =
-        QFileDialog::getSaveFileName(this, "Export to VCD", "", "VCD files (*.vcd)").toStdString();
+void TraceFileTab::setUpTraceSelector() {
+  ui->availableTreeView->setModel(availableRowsModel);
+  ui->availableTreeView->setSelectionModel(
+      availableRowsModel->selectionModel());
+  ui->availableTreeView->installEventFilter(availableRowsModel);
 
-    auto dump = PythonCaller::dumpVcd(traceFilePath);
+  ui->selectedTreeView->setModel(selectedRowsModel);
+  ui->selectedTreeView->setSelectionModel(selectedRowsModel->selectionModel());
+  ui->selectedTreeView->installEventFilter(selectedRowsModel);
 
-    std::ofstream file(filename);
-    file << dump;
+  connect(availableRowsModel, &AvailableTracePlotLineModel::returnPressed,
+          selectedRowsModel,
+          &SelectedTracePlotLineModel::addIndexesFromAvailableModel);
 
-    Q_EMIT statusChanged(QString("VCD export finished."));
+  connect(ui->availableTreeView, &QAbstractItemView::doubleClicked,
+          availableRowsModel, &AvailableTracePlotLineModel::itemsDoubleClicked);
+  connect(ui->selectedTreeView, &QAbstractItemView::doubleClicked,
+          selectedRowsModel, &SelectedTracePlotLineModel::itemsDoubleClicked);
+
+  connect(selectedRowsModel, &QAbstractItemModel::dataChanged,
+          tracePlotLineDataSource, &TracePlotLineDataSource::updateModel);
+  connect(selectedRowsModel, &QAbstractItemModel::rowsInserted,
+          tracePlotLineDataSource, &TracePlotLineDataSource::updateModel);
+  connect(selectedRowsModel, &QAbstractItemModel::rowsRemoved,
+          tracePlotLineDataSource, &TracePlotLineDataSource::updateModel);
 }
 
-void TraceFileTab::setUpTraceSelector()
-{
-    ui->availableTreeView->setModel(availableRowsModel);
-    ui->availableTreeView->setSelectionModel(availableRowsModel->selectionModel());
-    ui->availableTreeView->installEventFilter(availableRowsModel);
-
-    ui->selectedTreeView->setModel(selectedRowsModel);
-    ui->selectedTreeView->setSelectionModel(selectedRowsModel->selectionModel());
-    ui->selectedTreeView->installEventFilter(selectedRowsModel);
-
-    connect(availableRowsModel,
-            &AvailableTracePlotLineModel::returnPressed,
-            selectedRowsModel,
-            &SelectedTracePlotLineModel::addIndexesFromAvailableModel);
-
-    connect(ui->availableTreeView,
-            &QAbstractItemView::doubleClicked,
-            availableRowsModel,
-            &AvailableTracePlotLineModel::itemsDoubleClicked);
-    connect(ui->selectedTreeView,
-            &QAbstractItemView::doubleClicked,
-            selectedRowsModel,
-            &SelectedTracePlotLineModel::itemsDoubleClicked);
-
-    connect(selectedRowsModel,
-            &QAbstractItemModel::dataChanged,
-            tracePlotLineDataSource,
-            &TracePlotLineDataSource::updateModel);
-    connect(selectedRowsModel,
-            &QAbstractItemModel::rowsInserted,
-            tracePlotLineDataSource,
-            &TracePlotLineDataSource::updateModel);
-    connect(selectedRowsModel,
-            &QAbstractItemModel::rowsRemoved,
-            tracePlotLineDataSource,
-            &TracePlotLineDataSource::updateModel);
+void TraceFileTab::setUpTraceplotScrollbar() {
+  QObject::connect(ui->traceplotScrollbar, SIGNAL(valueChanged(int)),
+                   ui->traceplot, SLOT(verticalScrollbarChanged(int)));
 }
 
-void TraceFileTab::setUpTraceplotScrollbar()
-{
-    QObject::connect(ui->traceplotScrollbar,
-                     SIGNAL(valueChanged(int)),
-                     ui->traceplot,
-                     SLOT(verticalScrollbarChanged(int)));
+void TraceFileTab::initNavigatorAndItsDependentWidgets() {
+  ui->traceplot->init(navigator, ui->traceplotScrollbar,
+                      tracePlotLineDataSource, commentModel);
+
+  ui->traceScroller->init(navigator, ui->traceplot, tracePlotLineDataSource);
+  connect(this, SIGNAL(colorGroupingChanged(ColorGrouping)), ui->traceScroller,
+          SLOT(colorGroupingChanged(ColorGrouping)));
+
+  ui->selectedTransactionTree->init(navigator);
+  // ui->debugMessages->init(navigator,ui->traceplot);
+
+  ui->bandwidthPlot->canvas()->installEventFilter(this);
+  ui->powerPlot->canvas()->installEventFilter(this);
+  ui->bufferPlot->canvas()->installEventFilter(this);
 }
 
-void TraceFileTab::initNavigatorAndItsDependentWidgets()
-{
-    ui->traceplot->init(navigator, ui->traceplotScrollbar, tracePlotLineDataSource, commentModel);
-
-    ui->traceScroller->init(navigator, ui->traceplot, tracePlotLineDataSource);
-    connect(this,
-            SIGNAL(colorGroupingChanged(ColorGrouping)),
-            ui->traceScroller,
-            SLOT(colorGroupingChanged(ColorGrouping)));
-
-    ui->selectedTransactionTree->init(navigator);
-    // ui->debugMessages->init(navigator,ui->traceplot);
-
-    ui->bandwidthPlot->canvas()->installEventFilter(this);
-    ui->powerPlot->canvas()->installEventFilter(this);
-    ui->bufferPlot->canvas()->installEventFilter(this);
+void TraceFileTab::setUpFileWatcher(QString path) {
+  fileWatcher = new QFileSystemWatcher(QStringList(path), this);
+  QObject::connect(fileWatcher, SIGNAL(fileChanged(QString)), this,
+                   SLOT(tracefileChanged()));
 }
 
-void TraceFileTab::setUpFileWatcher(QString path)
-{
-    fileWatcher = new QFileSystemWatcher(QStringList(path), this);
-    QObject::connect(fileWatcher, SIGNAL(fileChanged(QString)), this, SLOT(tracefileChanged()));
+void TraceFileTab::setUpCommentView() {
+  ui->commentView->setModel(commentModel);
+  ui->commentView->setSelectionModel(commentModel->selectionModel());
+  ui->commentView->installEventFilter(commentModel);
+  ui->commentView->setContextMenuPolicy(Qt::CustomContextMenu);
+
+  QObject::connect(ui->commentView, &QTableView::customContextMenuRequested,
+                   commentModel, &CommentModel::openContextMenu);
+
+  QObject::connect(commentModel, &CommentModel::editTriggered, ui->commentView,
+                   [=](const QModelIndex &index) {
+                     ui->tabWidget->setCurrentWidget(ui->tabComments);
+                     ui->commentView->edit(index);
+                     ui->commentView->scrollTo(index);
+                   });
+
+  QObject::connect(ui->commentView, &QTableView::doubleClicked, commentModel,
+                   &CommentModel::rowDoubleClicked);
 }
 
-void TraceFileTab::setUpCommentView()
-{
-    ui->commentView->setModel(commentModel);
-    ui->commentView->setSelectionModel(commentModel->selectionModel());
-    ui->commentView->installEventFilter(commentModel);
-    ui->commentView->setContextMenuPolicy(Qt::CustomContextMenu);
+void TraceFileTab::addDisclaimer() {
+  // Latency analysis
+  auto *latencyDisclaimerLabel = disclaimerLabel();
+  ui->latencyLayout->insertWidget(0, latencyDisclaimerLabel);
 
-    QObject::connect(ui->commentView,
-                     &QTableView::customContextMenuRequested,
-                     commentModel,
-                     &CommentModel::openContextMenu);
+  ui->latencyAnalysisProgressBar->setEnabled(false);
+  ui->startLatencyAnalysis->setEnabled(false);
+  ui->latencyPlot->setEnabled(false);
+  ui->latencyTreeView->setEnabled(false);
 
-    QObject::connect(commentModel,
-                     &CommentModel::editTriggered,
-                     ui->commentView,
-                     [=](const QModelIndex& index)
-                     {
-                         ui->tabWidget->setCurrentWidget(ui->tabComments);
-                         ui->commentView->edit(index);
-                         ui->commentView->scrollTo(index);
-                     });
+  // Power analysis
+  auto *powerDisclaimerLabel = disclaimerLabel();
+  ui->powerLayout->insertWidget(0, powerDisclaimerLabel);
 
-    QObject::connect(
-        ui->commentView, &QTableView::doubleClicked, commentModel, &CommentModel::rowDoubleClicked);
+  ui->startPowerAnalysis->setEnabled(false);
+  ui->powerBox->setEnabled(false);
+  ui->bandwidthBox->setEnabled(false);
+  ui->bufferBox->setEnabled(false);
+
+  // Dependencies
+  auto *dependenciesDisclaimerLabel = disclaimerLabel();
+  ui->verticalLayout_depInfos->insertWidget(0, dependenciesDisclaimerLabel);
+
+  ui->depInfoLabel->setEnabled(false);
+  ui->depInfosView->setEnabled(false);
+  ui->depTabPossiblePhases->setEnabled(false);
+  ui->calculateDependencies->setEnabled(false);
 }
 
-void TraceFileTab::addDisclaimer()
-{
-    // Latency analysis
-    auto* latencyDisclaimerLabel = disclaimerLabel();
-    ui->latencyLayout->insertWidget(0, latencyDisclaimerLabel);
-
-    ui->latencyAnalysisProgressBar->setEnabled(false);
-    ui->startLatencyAnalysis->setEnabled(false);
-    ui->latencyPlot->setEnabled(false);
-    ui->latencyTreeView->setEnabled(false);
-
-    // Power analysis
-    auto* powerDisclaimerLabel = disclaimerLabel();
-    ui->powerLayout->insertWidget(0, powerDisclaimerLabel);
-
-    ui->startPowerAnalysis->setEnabled(false);
-    ui->powerBox->setEnabled(false);
-    ui->bandwidthBox->setEnabled(false);
-    ui->bufferBox->setEnabled(false);
-
-    // Dependencies
-    auto* dependenciesDisclaimerLabel = disclaimerLabel();
-    ui->verticalLayout_depInfos->insertWidget(0, dependenciesDisclaimerLabel);
-
-    ui->depInfoLabel->setEnabled(false);
-    ui->depInfosView->setEnabled(false);
-    ui->depTabPossiblePhases->setEnabled(false);
-    ui->calculateDependencies->setEnabled(false);
+void TraceFileTab::tracefileChanged() {
+  if (savingChangesToDB == true) {
+    // Database has changed due to user action (e.g., saving comments).
+    // No need to disable the "Save changes to DB" menu.
+    savingChangesToDB = false;
+    Q_EMIT statusChanged(QString("Changes saved "));
+  } else {
+    // External event changed the database file (e.g., the database file
+    // was overwritten when running a new test).
+    // The "Save changes to DB" menu must be disabled to avoid saving
+    // changes to a corrupted or inconsistent file.
+    Q_EMIT statusChanged(QString("At least one database has changed on disk "));
+  }
+  navigator->refreshData();
 }
 
-void TraceFileTab::tracefileChanged()
-{
-    if (savingChangesToDB == true)
-    {
-        // Database has changed due to user action (e.g., saving comments).
-        // No need to disable the "Save changes to DB" menu.
-        savingChangesToDB = false;
-        Q_EMIT statusChanged(QString("Changes saved "));
-    }
-    else
-    {
-        // External event changed the database file (e.g., the database file
-        // was overwritten when running a new test).
-        // The "Save changes to DB" menu must be disabled to avoid saving
-        // changes to a corrupted or inconsistent file.
-        Q_EMIT statusChanged(QString("At least one database has changed on disk "));
-    }
-    navigator->refreshData();
-}
+void TraceFileTab::closeEvent(QCloseEvent *event) {
+  if (navigator->existChangesToCommit()) {
+    QMessageBox saveDialog;
+    saveDialog.setWindowTitle(QFileInfo(traceFilePath.data()).baseName());
+    saveDialog.setText("The trace file has been modified.");
+    saveDialog.setInformativeText(
+        "Do you want to save your changes?<br><b>Unsaved changes will be "
+        "lost.</b>");
+    saveDialog.setStandardButtons(QMessageBox::Save | QMessageBox::Discard |
+                                  QMessageBox::Cancel);
+    saveDialog.setDefaultButton(QMessageBox::Save);
+    saveDialog.setIcon(QMessageBox::Warning);
+    int returnCode = saveDialog.exec();
 
-void TraceFileTab::closeEvent(QCloseEvent* event)
-{
-    if (navigator->existChangesToCommit())
-    {
-        QMessageBox saveDialog;
-        saveDialog.setWindowTitle(QFileInfo(traceFilePath.data()).baseName());
-        saveDialog.setText("The trace file has been modified.");
-        saveDialog.setInformativeText(
-            "Do you want to save your changes?<br><b>Unsaved changes will be lost.</b>");
-        saveDialog.setStandardButtons(QMessageBox::Save | QMessageBox::Discard |
-                                      QMessageBox::Cancel);
-        saveDialog.setDefaultButton(QMessageBox::Save);
-        saveDialog.setIcon(QMessageBox::Warning);
-        int returnCode = saveDialog.exec();
-
-        switch (returnCode)
-        {
-        case QMessageBox::Cancel:
-            event->ignore();
-            break;
-        case QMessageBox::Discard:
-            event->accept();
-            break;
-        case QMessageBox::Save:
-            commitChangesToDB();
-            event->accept();
-            break;
-        };
-    }
-    else
+    switch (returnCode) {
+      case QMessageBox::Cancel: event->ignore(); break;
+      case QMessageBox::Discard: event->accept(); break;
+      case QMessageBox::Save:
+        commitChangesToDB();
         event->accept();
+        break;
+    };
+  } else
+    event->accept();
 }
 
-traceTime TraceFileTab::getCurrentTraceTime() const
-{
-    return navigator->CurrentTraceTime();
+traceTime TraceFileTab::getCurrentTraceTime() const {
+  return navigator->CurrentTraceTime();
 }
 
-void TraceFileTab::navigateToTime(traceTime time)
-{
-    navigator->navigateToTime(time);
+void TraceFileTab::navigateToTime(traceTime time) {
+  navigator->navigateToTime(time);
 }
 
-traceTime TraceFileTab::getZoomLevel() const
-{
-    TracePlot* traceplot = static_cast<TracePlot*>(ui->traceplot);
-    return traceplot->ZoomLevel();
+traceTime TraceFileTab::getZoomLevel() const {
+  TracePlot *traceplot = static_cast<TracePlot *>(ui->traceplot);
+  return traceplot->ZoomLevel();
 }
 
-void TraceFileTab::setZoomLevel(traceTime zoomLevel)
-{
-    TracePlot* traceplot = static_cast<TracePlot*>(ui->traceplot);
-    TraceScroller* tracescroller = static_cast<TraceScroller*>(ui->traceScroller);
-    traceplot->setZoomLevel(zoomLevel);
-    tracescroller->tracePlotZoomChanged();
+void TraceFileTab::setZoomLevel(traceTime zoomLevel) {
+  TracePlot *traceplot = static_cast<TracePlot *>(ui->traceplot);
+  TraceScroller *tracescroller =
+      static_cast<TraceScroller *>(ui->traceScroller);
+  traceplot->setZoomLevel(zoomLevel);
+  tracescroller->tracePlotZoomChanged();
 }
 
-std::shared_ptr<AbstractTracePlotLineModel::Node> TraceFileTab::saveTraceSelectorState() const
-{
-    return selectedRowsModel->getClonedRootNode();
+std::shared_ptr<AbstractTracePlotLineModel::Node>
+TraceFileTab::saveTraceSelectorState() const {
+  return selectedRowsModel->getClonedRootNode();
 }
 
 void TraceFileTab::restoreTraceSelectorState(
-    std::shared_ptr<AbstractTracePlotLineModel::Node> rootNode)
-{
-    selectedRowsModel->setRootNode(std::move(rootNode));
+    std::shared_ptr<AbstractTracePlotLineModel::Node> rootNode) {
+  selectedRowsModel->setRootNode(std::move(rootNode));
 }
 
-bool TraceFileTab::eventFilter(QObject* object, QEvent* event)
-{
-    if (auto canvas = qobject_cast<QwtPlotCanvas*>(object))
-    {
-        if (event->type() == QEvent::MouseButtonDblClick)
-        {
-            QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+bool TraceFileTab::eventFilter(QObject *object, QEvent *event) {
+  if (auto canvas = qobject_cast<QwtPlotCanvas *>(object)) {
+    if (event->type() == QEvent::MouseButtonDblClick) {
+      QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
 
-            if (mouseEvent->button() != Qt::LeftButton)
-                return false;
+      if (mouseEvent->button() != Qt::LeftButton)
+        return false;
 
-            QwtPlot* plot = canvas->plot();
+      QwtPlot *plot = canvas->plot();
 
-            double realTime = plot->invTransform(QwtPlot::xBottom, mouseEvent->x());
+      double realTime = plot->invTransform(QwtPlot::xBottom, mouseEvent->x());
 
-            // Convert from seconds to picoseconds
-            traceTime time = realTime * 1000 * 1000 * 1000 * 1000;
+      // Convert from seconds to picoseconds
+      traceTime time = realTime * 1000 * 1000 * 1000 * 1000;
 
-            navigator->navigateToTime(time);
-            return true;
-        }
+      navigator->navigateToTime(time);
+      return true;
     }
+  }
 
-    return QWidget::eventFilter(object, event);
+  return QWidget::eventFilter(object, event);
 }

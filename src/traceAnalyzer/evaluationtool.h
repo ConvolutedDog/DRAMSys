@@ -52,51 +52,49 @@
 #include <QWidget>
 #include <vector>
 
-namespace Ui
-{
+namespace Ui {
 class EvaluationTool;
 }
 
-class EvaluationTool : public QWidget
-{
-    Q_OBJECT
+class EvaluationTool : public QWidget {
+  Q_OBJECT
 
 public:
-    explicit EvaluationTool(PythonCaller& pythonCaller, QWidget* parent = nullptr);
-    ~EvaluationTool();
+  explicit EvaluationTool(PythonCaller &pythonCaller,
+                          QWidget *parent = nullptr);
+  ~EvaluationTool();
 
-    void showForFiles(QList<QString> paths);
-    void showAndEvaluateMetrics(QList<QString> paths);
+  void showForFiles(QList<QString> paths);
+  void showAndEvaluateMetrics(QList<QString> paths);
 
 private Q_SLOTS:
-    void on_btn_calculateMetrics_clicked();
-    void on_btn_exportCSV_clicked();
-    void on_btn_genPlots_clicked();
-    void getSelectedMetrics();
+  void on_btn_calculateMetrics_clicked();
+  void on_btn_exportCSV_clicked();
+  void on_btn_genPlots_clicked();
+  void getSelectedMetrics();
 
 private:
-    void fillFileList(QList<QString> paths);
-    void cleanUpUI();
-    void genPlots();
-    void calculateMetrics(std::vector<long> selectedMetrics);
-    std::vector<std::string> getMetrics();
+  void fillFileList(QList<QString> paths);
+  void cleanUpUI();
+  void genPlots();
+  void calculateMetrics(std::vector<long> selectedMetrics);
+  std::vector<std::string> getMetrics();
 
-    Ui::EvaluationTool* ui;
-    QStandardItemModel* traceFilesModel;
-    std::vector<TraceCalculatedMetrics> calculatedMetrics;
-    SelectMetrics* selectMetrics;
+  Ui::EvaluationTool *ui;
+  QStandardItemModel *traceFilesModel;
+  std::vector<TraceCalculatedMetrics> calculatedMetrics;
+  SelectMetrics *selectMetrics;
 
-    PythonCaller& pythonCaller;
+  PythonCaller &pythonCaller;
 
-    class TraceFileItem : public QStandardItem
-    {
-    public:
-        TraceFileItem(const QString& path);
-        QString getPath() { return path; }
+  class TraceFileItem : public QStandardItem {
+  public:
+    TraceFileItem(const QString &path);
+    QString getPath() { return path; }
 
-    private:
-        QString path;
-    };
+  private:
+    QString path;
+  };
 };
 
-#endif // EVALUATIONTOOL_H
+#endif  // EVALUATIONTOOL_H

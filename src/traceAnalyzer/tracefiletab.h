@@ -61,87 +61,87 @@ class McConfigModel;
 class MemSpecModel;
 class PythonCaller;
 
-class TraceFileTab : public QWidget
-{
-    Q_OBJECT
+class TraceFileTab : public QWidget {
+  Q_OBJECT
 
 public:
-    explicit TraceFileTab(std::string_view traceFilePath,
-                          PythonCaller& pythonCaller,
-                          QWidget* parent);
-    ~TraceFileTab();
+  explicit TraceFileTab(std::string_view traceFilePath,
+                        PythonCaller &pythonCaller, QWidget *parent);
+  ~TraceFileTab();
 
-    void setUpFileWatcher(QString filename);
-    void setUpTraceplotScrollbar();
-    void setUpCommentView();
-    void setUpTraceSelector();
-    void addDisclaimer();
+  void setUpFileWatcher(QString filename);
+  void setUpTraceplotScrollbar();
+  void setUpCommentView();
+  void setUpTraceSelector();
+  void addDisclaimer();
 
 #ifdef EXTENSION_ENABLED
-    void setUpPossiblePhases();
+  void setUpPossiblePhases();
 #endif
 
-    void initNavigatorAndItsDependentWidgets();
-    QString getPathToTraceFile() { return traceFilePath.data(); }
-    void commitChangesToDB();
-    void exportAsVCD();
+  void initNavigatorAndItsDependentWidgets();
+  QString getPathToTraceFile() { return traceFilePath.data(); }
+  void commitChangesToDB();
+  void exportAsVCD();
 
-    traceTime getCurrentTraceTime() const;
-    void navigateToTime(traceTime time);
-    traceTime getZoomLevel() const;
-    void setZoomLevel(traceTime zoomLevel);
+  traceTime getCurrentTraceTime() const;
+  void navigateToTime(traceTime time);
+  traceTime getZoomLevel() const;
+  void setZoomLevel(traceTime zoomLevel);
 
-    std::shared_ptr<AbstractTracePlotLineModel::Node> saveTraceSelectorState() const;
-    void restoreTraceSelectorState(std::shared_ptr<AbstractTracePlotLineModel::Node> rootNode);
+  std::shared_ptr<AbstractTracePlotLineModel::Node>
+  saveTraceSelectorState() const;
+  void restoreTraceSelectorState(
+      std::shared_ptr<AbstractTracePlotLineModel::Node> rootNode);
 
 protected:
-    void closeEvent(QCloseEvent* event) override;
+  void closeEvent(QCloseEvent *event) override;
 
-    /**
-     * Used to respond to double click events in the analysis
-     * plots to navigate quickly to the corresponding tracetime.
-     * May be moved into a seperate class at a later point in time.
-     */
-    bool eventFilter(QObject* object, QEvent* event) override;
+  /**
+   * Used to respond to double click events in the analysis
+   * plots to navigate quickly to the corresponding tracetime.
+   * May be moved into a seperate class at a later point in time.
+   */
+  bool eventFilter(QObject *object, QEvent *event) override;
 
 private:
-    std::string traceFilePath;
-    Ui::TraceFileTab* ui;
-    QFileSystemWatcher* fileWatcher;
+  std::string traceFilePath;
+  Ui::TraceFileTab *ui;
+  QFileSystemWatcher *fileWatcher;
 
-    CommentModel* commentModel;
-    TraceNavigator* navigator;
+  CommentModel *commentModel;
+  TraceNavigator *navigator;
 
-    McConfigModel* mcConfigModel;
-    MemSpecModel* memSpecModel;
+  McConfigModel *mcConfigModel;
+  MemSpecModel *memSpecModel;
 
-    AvailableTracePlotLineModel* availableRowsModel;
-    SelectedTracePlotLineModel* selectedRowsModel;
-    TracePlotLineDataSource* tracePlotLineDataSource;
+  AvailableTracePlotLineModel *availableRowsModel;
+  SelectedTracePlotLineModel *selectedRowsModel;
+  TracePlotLineDataSource *tracePlotLineDataSource;
 
 #ifdef EXTENSION_ENABLED
-    QAbstractItemModel* depInfosView;
+  QAbstractItemModel *depInfosView;
 #endif
 
-    PythonCaller& pythonCaller;
+  PythonCaller &pythonCaller;
 
-    void setUpQueryEditor(QString path);
-    bool savingChangesToDB;
+  void setUpQueryEditor(QString path);
+  bool savingChangesToDB;
 
 public Q_SLOTS:
-    void tracefileChanged();
+  void tracefileChanged();
 
 Q_SIGNALS:
-    void statusChanged(const QString& message);
-    void colorGroupingChanged(ColorGrouping colorgrouping);
+  void statusChanged(const QString &message);
+  void colorGroupingChanged(ColorGrouping colorgrouping);
 
 private Q_SLOTS:
 #ifdef EXTENSION_ENABLED
-    void on_latencyTreeView_doubleClicked(const QModelIndex& index);
-    void on_calculateDependencies_clicked();
-    void on_startLatencyAnalysis_clicked();
-    void on_startPowerAnalysis_clicked();
+  void on_latencyTreeView_doubleClicked(const QModelIndex &index);
+  void on_calculateDependencies_clicked();
+  void on_startLatencyAnalysis_clicked();
+  void on_startPowerAnalysis_clicked();
 #endif
 };
 
-#endif // TRACEFILETAB_H
+#endif  // TRACEFILETAB_H

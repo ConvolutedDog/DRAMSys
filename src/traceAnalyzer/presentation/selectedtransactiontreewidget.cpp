@@ -37,38 +37,30 @@
 
 #include "selectedtransactiontreewidget.h"
 
-void SelectedTransactionTreeWidget::selectedTransactionsChanged()
-{
-    this->clear();
-    for (const auto& transaction : navigator->SelectedTransactions())
-    {
-        AppendTransaction(transaction);
+void SelectedTransactionTreeWidget::selectedTransactionsChanged() {
+  this->clear();
+  for (const auto &transaction : navigator->SelectedTransactions()) {
+    AppendTransaction(transaction);
+  }
+  expandAll();
+
+  for (int k = 0; k < topLevelItemCount(); k++) {
+    auto node = topLevelItem(k);
+    for (int i = 0; i < node->childCount(); i++) {
+      if (node->child(i)->text(0) == "Phases") {
+        auto phaseNode = node->child(i);
+
+        for (int j = 0; j < phaseNode->childCount(); j++)
+          phaseNode->child(j)->setExpanded(false);
+      }
     }
-    expandAll();
+  }
 
-    for (int k = 0; k < topLevelItemCount(); k++)
-    {
-        auto node = topLevelItem(k);
-        for (int i = 0; i < node->childCount(); i++)
-        {
-            if (node->child(i)->text(0) == "Phases")
-            {
-                auto phaseNode = node->child(i);
-
-                for (int j = 0; j < phaseNode->childCount(); j++)
-                    phaseNode->child(j)->setExpanded(false);
-            }
-        }
-    }
-
-    resizeColumnToContents(0);
+  resizeColumnToContents(0);
 }
 
-void SelectedTransactionTreeWidget::init(TraceNavigator* navigator)
-{
-    TransactionTreeWidget::init(navigator);
-    QObject::connect(navigator,
-                     SIGNAL(selectedTransactionsChanged()),
-                     this,
-                     SLOT(selectedTransactionsChanged()));
+void SelectedTransactionTreeWidget::init(TraceNavigator *navigator) {
+  TransactionTreeWidget::init(navigator);
+  QObject::connect(navigator, SIGNAL(selectedTransactionsChanged()), this,
+                   SLOT(selectedTransactionsChanged()));
 }

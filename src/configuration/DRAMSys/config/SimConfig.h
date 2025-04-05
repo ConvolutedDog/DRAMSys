@@ -40,56 +40,42 @@
 
 #include <optional>
 
-namespace DRAMSys::Config
-{
+namespace DRAMSys::Config {
 
-enum class StoreModeType
-{
-    NoStorage,
-    Store,
-    Invalid = -1
-};
+enum class StoreModeType { NoStorage, Store, Invalid = -1 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(StoreModeType,
-                             {{StoreModeType::Invalid, nullptr},
-                              {StoreModeType::NoStorage, "NoStorage"},
-                              {StoreModeType::Store, "Store"}})
+                             {
+                                 {StoreModeType::Invalid,   nullptr    },
+                                 {StoreModeType::NoStorage, "NoStorage"},
+                                 {StoreModeType::Store,     "Store"    }
+})
 
-struct SimConfig
-{
-    static constexpr std::string_view KEY = "simconfig";
-    static constexpr std::string_view SUB_DIR = "simconfig";
+struct SimConfig {
+  static constexpr std::string_view KEY = "simconfig";
+  static constexpr std::string_view SUB_DIR = "simconfig";
 
-    std::optional<uint64_t> AddressOffset;
-    std::optional<bool> CheckTLM2Protocol;
-    std::optional<bool> DatabaseRecording;
-    std::optional<bool> Debug;
-    std::optional<bool> EnableWindowing;
-    std::optional<bool> PowerAnalysis;
-    std::optional<std::string> SimulationName;
-    std::optional<bool> SimulationProgressBar;
-    std::optional<StoreModeType> StoreMode;
-    std::optional<bool> ThermalSimulation;
-    std::optional<bool> UseMalloc;
-    std::optional<unsigned int> WindowSize;
-    std::optional<double> SimulationTime;
+  std::optional<uint64_t> AddressOffset;
+  std::optional<bool> CheckTLM2Protocol;
+  std::optional<bool> DatabaseRecording;
+  std::optional<bool> Debug;
+  std::optional<bool> EnableWindowing;
+  std::optional<bool> PowerAnalysis;
+  std::optional<std::string> SimulationName;
+  std::optional<bool> SimulationProgressBar;
+  std::optional<StoreModeType> StoreMode;
+  std::optional<bool> ThermalSimulation;
+  std::optional<bool> UseMalloc;
+  std::optional<unsigned int> WindowSize;
+  std::optional<double> SimulationTime;
 };
 
-NLOHMANN_JSONIFY_ALL_THINGS(SimConfig,
-                            AddressOffset,
-                            CheckTLM2Protocol,
-                            DatabaseRecording,
-                            Debug,
-                            EnableWindowing,
-                            PowerAnalysis,
-                            SimulationName,
-                            SimulationProgressBar,
-                            StoreMode,
-                            ThermalSimulation,
-                            UseMalloc,
-                            WindowSize,
-                            SimulationTime)
+NLOHMANN_JSONIFY_ALL_THINGS(SimConfig, AddressOffset, CheckTLM2Protocol,
+                            DatabaseRecording, Debug, EnableWindowing,
+                            PowerAnalysis, SimulationName,
+                            SimulationProgressBar, StoreMode, ThermalSimulation,
+                            UseMalloc, WindowSize, SimulationTime)
 
-} // namespace DRAMSys::Config
+}  // namespace DRAMSys::Config
 
-#endif // DRAMSYSCONFIGURATION_SIMCONFIG_H
+#endif  // DRAMSYSCONFIGURATION_SIMCONFIG_H

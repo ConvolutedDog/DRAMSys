@@ -39,30 +39,22 @@
 #include "colorgenerator.h"
 #include <exception>
 
-QColor ColorGenerator::getColor(unsigned int i, ColorName color)
-{
-    switch (color)
-    {
-    case ColorName::Default:
-        return cDefault.getColor(i);
-    case ColorName::HSV15:
-        return cHSV15.getColor(i);
-    }
+QColor ColorGenerator::getColor(unsigned int i, ColorName color) {
+  switch (color) {
+    case ColorName::Default: return cDefault.getColor(i);
+    case ColorName::HSV15: return cHSV15.getColor(i);
+  }
 
-    return {0, 0, 0};
+  return {0, 0, 0};
 }
 
-QColor ColorGenerator::getRainbowColored(unsigned int i, ColorName color)
-{
-    switch (color)
-    {
-    case ColorName::Default:
-        return cDefault.getRainbowColored(i);
-    case ColorName::HSV15:
-        return cHSV15.getRainbowColored(i);
-    }
+QColor ColorGenerator::getRainbowColored(unsigned int i, ColorName color) {
+  switch (color) {
+    case ColorName::Default: return cDefault.getRainbowColored(i);
+    case ColorName::HSV15: return cHSV15.getRainbowColored(i);
+  }
 
-    return {0, 0, 0};
+  return {0, 0, 0};
 }
 
 ColorDefault ColorGenerator::cDefault;

@@ -40,33 +40,29 @@
 #include <optional>
 #include <random>
 
-class SequentialProducer : public RequestProducer
-{
+class SequentialProducer : public RequestProducer {
 public:
-    SequentialProducer(uint64_t numRequests,
-                       std::optional<uint64_t> seed,
-                       double rwRatio,
-                       std::optional<uint64_t> addressIncrement,
-                       std::optional<uint64_t> minAddress,
-                       std::optional<uint64_t> maxAddress,
-                       uint64_t memorySize,
-                       unsigned int dataLength);
+  SequentialProducer(uint64_t numRequests, std::optional<uint64_t> seed,
+                     double rwRatio, std::optional<uint64_t> addressIncrement,
+                     std::optional<uint64_t> minAddress,
+                     std::optional<uint64_t> maxAddress, uint64_t memorySize,
+                     unsigned int dataLength);
 
-    Request nextRequest() override;
+  Request nextRequest() override;
 
-    uint64_t totalRequests() override { return numberOfRequests; }
-    void reset() override { generatedRequests = 0; }
+  uint64_t totalRequests() override { return numberOfRequests; }
+  void reset() override { generatedRequests = 0; }
 
-    const uint64_t numberOfRequests;
-    const uint64_t addressIncrement;
-    const uint64_t minAddress;
-    const uint64_t maxAddress;
-    const uint64_t seed;
-    const double rwRatio;
-    const unsigned int dataLength;
+  const uint64_t numberOfRequests;
+  const uint64_t addressIncrement;
+  const uint64_t minAddress;
+  const uint64_t maxAddress;
+  const uint64_t seed;
+  const double rwRatio;
+  const unsigned int dataLength;
 
-    std::default_random_engine randomGenerator;
-    std::uniform_real_distribution<double> readWriteDistribution{0.0, 1.0};
+  std::default_random_engine randomGenerator;
+  std::uniform_real_distribution<double> readWriteDistribution{0.0, 1.0};
 
-    uint64_t generatedRequests = 0;
+  uint64_t generatedRequests = 0;
 };

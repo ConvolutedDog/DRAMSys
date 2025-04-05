@@ -35,24 +35,18 @@
 
 #include "customlabelscaledraw.h"
 
-CustomLabelScaleDraw::CustomLabelScaleDraw(std::shared_ptr<QHash<int, QString>> labels) :
-    QObject(nullptr),
-    labels(labels)
-{
+CustomLabelScaleDraw::CustomLabelScaleDraw(
+    std::shared_ptr<QHash<int, QString>> labels)
+    : QObject(nullptr), labels(labels) {}
+
+QwtText CustomLabelScaleDraw::label(double v) const {
+  return QwtText((*labels)[static_cast<int>(v)]);
 }
 
-QwtText CustomLabelScaleDraw::label(double v) const
-{
-    return QwtText((*labels)[static_cast<int>(v)]);
+void CustomLabelScaleDraw::draw(QPainter *painter,
+                                const QPalette &palette) const {
+  emit scaleRedraw();
+  QwtScaleDraw::draw(painter, palette);
 }
 
-void CustomLabelScaleDraw::draw(QPainter* painter, const QPalette& palette) const
-{
-    emit scaleRedraw();
-    QwtScaleDraw::draw(painter, palette);
-}
-
-void CustomLabelScaleDraw::clearCache()
-{
-    invalidateCache();
-}
+void CustomLabelScaleDraw::clearCache() { invalidateCache(); }

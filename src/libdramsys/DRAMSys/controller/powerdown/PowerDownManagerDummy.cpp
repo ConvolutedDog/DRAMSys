@@ -37,12 +37,10 @@
 using namespace sc_core;
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-CommandTuple::Type PowerDownManagerDummy::getNextCommand()
-{
-    return {Command::NOP, nullptr, SC_ZERO_TIME};
+CommandTuple::Type PowerDownManagerDummy::getNextCommand() {
+  return {Command::NOP, nullptr, SC_ZERO_TIME};
 }
 
-} // namespace DRAMSys
+}  // namespace DRAMSys

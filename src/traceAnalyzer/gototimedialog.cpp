@@ -39,28 +39,21 @@
 #include "ui_gototimedialog.h"
 #include <QMessageBox>
 
-GoToTimeDialog::GoToTimeDialog(double* goToSecond, QWidget* parent) :
-    QDialog(parent),
-    goToSecond(goToSecond),
-    ui(new Ui::GoToTimeDialog)
-{
-    ui->setupUi(this);
+GoToTimeDialog::GoToTimeDialog(double *goToSecond, QWidget *parent)
+    : QDialog(parent), goToSecond(goToSecond), ui(new Ui::GoToTimeDialog) {
+  ui->setupUi(this);
 }
 
-GoToTimeDialog::~GoToTimeDialog()
-{
-    delete ui;
-}
+GoToTimeDialog::~GoToTimeDialog() { delete ui; }
 
-void GoToTimeDialog::on_pushButton_clicked()
-{
-    QLocale c(QLocale::C);
-    bool validNumber;
-    *goToSecond = c.toDouble(ui->timeEdit->text(), &validNumber);
-    if (validNumber)
-        accept();
-    else
-    {
-        QMessageBox::warning(this, "Invalid number", "Please enter a valid floating point number");
-    }
+void GoToTimeDialog::on_pushButton_clicked() {
+  QLocale c(QLocale::C);
+  bool validNumber;
+  *goToSecond = c.toDouble(ui->timeEdit->text(), &validNumber);
+  if (validNumber)
+    accept();
+  else {
+    QMessageBox::warning(this, "Invalid number",
+                         "Please enter a valid floating point number");
+  }
 }

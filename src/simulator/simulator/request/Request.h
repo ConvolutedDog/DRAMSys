@@ -38,16 +38,10 @@
 #include <cstdint>
 #include <systemc>
 
-struct Request
-{
-    enum class Command
-    {
-        Read,
-        Write,
-        Stop
-    } command;
-    uint64_t address{};
-    std::size_t length{};
-    sc_core::sc_time delay{};
-    std::vector<unsigned char> data{};
+struct Request {
+  enum class Command { Read, Write, Stop } command;
+  uint64_t address{};
+  std::size_t length{};
+  sc_core::sc_time delay{};
+  std::vector<unsigned char> data{};
 };

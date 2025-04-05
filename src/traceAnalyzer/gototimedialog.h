@@ -39,27 +39,25 @@
 #define GOTOTIMEDIALOG_H
 #include <QDialog>
 
-namespace Ui
-{
+namespace Ui {
 class GoToTimeDialog;
 }
 
-class GoToTimeDialog : public QDialog
-{
-    Q_OBJECT
+class GoToTimeDialog : public QDialog {
+  Q_OBJECT
 
 public:
-    explicit GoToTimeDialog(double* goToSecond, QWidget* parent = 0);
-    ~GoToTimeDialog();
+  explicit GoToTimeDialog(double *goToSecond, QWidget *parent = 0);
+  ~GoToTimeDialog();
 
 private:
-    double* goToSecond;
+  double *goToSecond;
 
 private Q_SLOTS:
-    void on_pushButton_clicked();
+  void on_pushButton_clicked();
 
 private:
-    Ui::GoToTimeDialog* ui;
+  Ui::GoToTimeDialog *ui;
 };
 
-#endif // GOTOTIMEDIALOG_H
+#endif  // GOTOTIMEDIALOG_H

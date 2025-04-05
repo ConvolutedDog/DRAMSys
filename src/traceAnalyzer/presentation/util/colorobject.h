@@ -40,31 +40,28 @@
 
 #include <QColor>
 
-class ColorObject
-{
+class ColorObject {
 protected:
-    int numberOfColors = 0;
+  int numberOfColors = 0;
 
-    std::vector<int> r;
-    std::vector<int> g;
-    std::vector<int> b;
-    // std::vector<int> a;
+  std::vector<int> r;
+  std::vector<int> g;
+  std::vector<int> b;
+  // std::vector<int> a;
 
-    ColorObject(){};
+  ColorObject() {};
 
 public:
-    virtual QColor getColor(unsigned int i);
-    virtual QColor getRainbowColored(unsigned int i);
+  virtual QColor getColor(unsigned int i);
+  virtual QColor getRainbowColored(unsigned int i);
 };
 
-class ColorDefault : public ColorObject
-{
+class ColorDefault : public ColorObject {
 public:
-    ColorDefault();
+  ColorDefault();
 };
 
-class ColorHSV15 : public ColorObject
-{
+class ColorHSV15 : public ColorObject {
 public:
-    ColorHSV15();
+  ColorHSV15();
 };

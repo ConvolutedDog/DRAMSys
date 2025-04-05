@@ -48,14 +48,15 @@
 #include "businessObjects/tracecalculatedmetrics.h"
 #include <string>
 
-class PythonCaller
-{
+class PythonCaller {
 public:
-    static std::vector<std::string> availableMetrics(std::string_view pathToTrace);
-    static TraceCalculatedMetrics evaluateMetrics(std::string_view pathToTrace,
-                                                  std::vector<long> selectedMetrics);
-    static std::string generatePlots(std::string_view pathToTrace);
-    static std::string dumpVcd(std::string_view pathToTrace);
+  static std::vector<std::string>
+  availableMetrics(std::string_view pathToTrace);
+  static TraceCalculatedMetrics
+  evaluateMetrics(std::string_view pathToTrace,
+                  std::vector<long> selectedMetrics);
+  static std::string generatePlots(std::string_view pathToTrace);
+  static std::string dumpVcd(std::string_view pathToTrace);
 };
 
-#endif // PYTHONCALLER_H
+#endif  // PYTHONCALLER_H

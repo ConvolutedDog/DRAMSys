@@ -46,88 +46,88 @@
 #include <utility>
 #include <vector>
 
-class McConfigModel : public QAbstractTableModel
-{
-    Q_OBJECT
+class McConfigModel : public QAbstractTableModel {
+  Q_OBJECT
 
 public:
-    explicit McConfigModel(const TraceDB& traceFile, QObject* parent = nullptr);
+  explicit McConfigModel(const TraceDB &traceFile, QObject *parent = nullptr);
 
 protected:
-    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-    QVariant
-    headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+  QVariant data(const QModelIndex &index,
+                int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const override;
 
 private:
-    /**
-     * Parses the json file and adds json entries to the entries vector.
-     * In case of failure, nothing is added and therefore the model
-     * will stay empty.
-     */
-    void parseJson(const QString& jsonString);
+  /**
+   * Parses the json file and adds json entries to the entries vector.
+   * In case of failure, nothing is added and therefore the model
+   * will stay empty.
+   */
+  void parseJson(const QString &jsonString);
 
-    /**
-     * Add additional infos about the tracefile which were
-     * previously displayed in the fileDescription widget.
-     */
-    void addAdditionalInfos(const GeneralInfo& generalInfo);
+  /**
+   * Add additional infos about the tracefile which were
+   * previously displayed in the fileDescription widget.
+   */
+  void addAdditionalInfos(const GeneralInfo &generalInfo);
 
-    std::vector<std::pair<QString, QString>> entries;
+  std::vector<std::pair<QString, QString>> entries;
 };
 
-class MemSpecModel : public QAbstractItemModel
-{
-    Q_OBJECT
+class MemSpecModel : public QAbstractItemModel {
+  Q_OBJECT
 
 public:
-    explicit MemSpecModel(const TraceDB& traceFile, QObject* parent = nullptr);
+  explicit MemSpecModel(const TraceDB &traceFile, QObject *parent = nullptr);
 
 protected:
-    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex& parent) const override;
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex &parent) const override;
 
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-    QVariant
-    headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+  QVariant data(const QModelIndex &index,
+                int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const override;
 
-    QModelIndex index(int row, int column, const QModelIndex& parent) const override;
-    QModelIndex parent(const QModelIndex& index) const override;
+  QModelIndex index(int row, int column,
+                    const QModelIndex &parent) const override;
+  QModelIndex parent(const QModelIndex &index) const override;
 
 private:
+  /**
+   * Parses the json file and adds json entries to the entries vector.
+   * In case of failure, nothing is added and therefore the model
+   * will stay empty.
+   */
+  void parseJson(const QString &jsonString);
+
+  struct Node {
+    using NodeData = std::pair<QString, QString>;
+
     /**
-     * Parses the json file and adds json entries to the entries vector.
-     * In case of failure, nothing is added and therefore the model
-     * will stay empty.
+     * Constructor only used for the root node that does not contain any data.
      */
-    void parseJson(const QString& jsonString);
+    Node() = default;
 
-    struct Node
-    {
-        using NodeData = std::pair<QString, QString>;
+    Node(NodeData data, const Node *parent) : data(data), parent(parent) {}
 
-        /**
-         * Constructor only used for the root node that does not contain any data.
-         */
-        Node() = default;
+    /**
+     * Gets the row relative to its parent.
+     */
+    int getRow() const;
+    int childCount() const { return children.size(); }
 
-        Node(NodeData data, const Node* parent) : data(data), parent(parent) {}
+    NodeData data;
 
-        /**
-         * Gets the row relative to its parent.
-         */
-        int getRow() const;
-        int childCount() const { return children.size(); }
+    const Node *parent = nullptr;
+    std::vector<std::unique_ptr<Node>> children;
+  };
 
-        NodeData data;
-
-        const Node* parent = nullptr;
-        std::vector<std::unique_ptr<Node>> children;
-    };
-
-    std::unique_ptr<Node> rootNode = std::unique_ptr<Node>(new Node);
+  std::unique_ptr<Node> rootNode = std::unique_ptr<Node>(new Node);
 };
 
-#endif // CONFIGMODELS_H
+#endif  // CONFIGMODELS_H

@@ -53,56 +53,56 @@
 
 class libDRAMPower;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class Dram : public sc_core::sc_module, public Serialize, public Deserialize
-{
+class Dram : public sc_core::sc_module, public Serialize, public Deserialize {
 protected:
-    const MemSpec& memSpec;
+  const MemSpec &memSpec;
 
-    // Data Storage:
-    const Config::StoreModeType storeMode;
-    const bool powerAnalysis;
-    unsigned char* memory;
-    const uint64_t channelSize;
-    const bool useMalloc;
+  // Data Storage:
+  const Config::StoreModeType storeMode;
+  const bool powerAnalysis;
+  unsigned char *memory;
+  const uint64_t channelSize;
+  const bool useMalloc;
 
 #ifdef DRAMPOWER
-    std::unique_ptr<libDRAMPower> DRAMPower;
+  std::unique_ptr<libDRAMPower> DRAMPower;
 #endif
 
-    virtual tlm::tlm_sync_enum nb_transport_fw(tlm::tlm_generic_payload& trans,
-                                               tlm::tlm_phase& phase,
-                                               sc_core::sc_time& delay);
-    virtual void b_transport(tlm::tlm_generic_payload& trans, sc_core::sc_time& delay);
-    virtual unsigned int transport_dbg(tlm::tlm_generic_payload& trans);
+  virtual tlm::tlm_sync_enum nb_transport_fw(tlm::tlm_generic_payload &trans,
+                                             tlm::tlm_phase &phase,
+                                             sc_core::sc_time &delay);
+  virtual void b_transport(tlm::tlm_generic_payload &trans,
+                           sc_core::sc_time &delay);
+  virtual unsigned int transport_dbg(tlm::tlm_generic_payload &trans);
 
-    void executeRead(tlm::tlm_generic_payload& trans) const;
-    void executeWrite(const tlm::tlm_generic_payload& trans);
+  void executeRead(tlm::tlm_generic_payload &trans) const;
+  void executeWrite(const tlm::tlm_generic_payload &trans);
 
 public:
-    Dram(const sc_core::sc_module_name& name, const SimConfig& simConfig, const MemSpec& memSpec);
-    SC_HAS_PROCESS(Dram);
+  Dram(const sc_core::sc_module_name &name, const SimConfig &simConfig,
+       const MemSpec &memSpec);
+  SC_HAS_PROCESS(Dram);
 
-    Dram(const Dram&) = delete;
-    Dram(Dram&&) = delete;
-    Dram& operator=(const Dram&) = delete;
-    Dram& operator=(Dram&&) = delete;
-    ~Dram() override;
+  Dram(const Dram &) = delete;
+  Dram(Dram &&) = delete;
+  Dram &operator=(const Dram &) = delete;
+  Dram &operator=(Dram &&) = delete;
+  ~Dram() override;
 
-    static constexpr std::string_view BLOCKING_WARNING =
-        "Use the blocking mode of DRAMSys with caution! "
-        "The simulated timings do not reflect the real system!";
+  static constexpr std::string_view BLOCKING_WARNING =
+      "Use the blocking mode of DRAMSys with caution! "
+      "The simulated timings do not reflect the real system!";
 
-    tlm_utils::simple_target_socket<Dram> tSocket{"tSocket"};
+  tlm_utils::simple_target_socket<Dram> tSocket{"tSocket"};
 
-    virtual void reportPower();
+  virtual void reportPower();
 
-    void serialize(std::ostream& stream) const override;
-    void deserialize(std::istream& stream) override;
+  void serialize(std::ostream &stream) const override;
+  void deserialize(std::istream &stream) override;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // DRAM_H
+#endif  // DRAM_H

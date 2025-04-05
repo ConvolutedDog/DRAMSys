@@ -45,78 +45,73 @@
 class QAction;
 class QItemSelectionModel;
 
-class CommentModel : public QAbstractTableModel
-{
-    Q_OBJECT
+class CommentModel : public QAbstractTableModel {
+  Q_OBJECT
 
 public:
-    explicit CommentModel(QObject* parent = nullptr);
+  explicit CommentModel(QObject *parent = nullptr);
 
-    struct Comment
-    {
-        traceTime time;
-        QString text;
-    };
+  struct Comment {
+    traceTime time;
+    QString text;
+  };
 
-    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-    QVariant
-    headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+  QVariant data(const QModelIndex &index,
+                int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const override;
 
-    Qt::ItemFlags flags(const QModelIndex& index) const override;
+  Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    enum class Column
-    {
-        Time = 0,
-        Comment,
-        COLUMNCOUNT
-    };
+  enum class Column { Time = 0, Comment, COLUMNCOUNT };
 
-    void openContextMenu();
+  void openContextMenu();
 
-    QItemSelectionModel* selectionModel() const;
+  QItemSelectionModel *selectionModel() const;
 
-    void addComment(traceTime time);
-    void addComment(traceTime time, QString text);
+  void addComment(traceTime time);
+  void addComment(traceTime time, QString text);
 
-    void removeComment(traceTime time);
-    void removeComment(const QModelIndex& index);
+  void removeComment(traceTime time);
+  void removeComment(const QModelIndex &index);
 
-    const std::vector<Comment>& getComments() const;
+  const std::vector<Comment> &getComments() const;
 
-    traceTime getTimeFromIndex(const QModelIndex& index) const;
+  traceTime getTimeFromIndex(const QModelIndex &index) const;
 
-    QModelIndex hoveredComment(Timespan timespan) const;
+  QModelIndex hoveredComment(Timespan timespan) const;
 
 public Q_SLOTS:
-    void rowDoubleClicked(const QModelIndex& index);
+  void rowDoubleClicked(const QModelIndex &index);
 
 protected:
-    bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
+  bool setData(const QModelIndex &index, const QVariant &value,
+               int role = Qt::EditRole) override;
 
-    /**
-     * The eventFilter is used to delete comments using the delete key.
-     */
-    bool eventFilter(QObject* object, QEvent* event) override;
+  /**
+   * The eventFilter is used to delete comments using the delete key.
+   */
+  bool eventFilter(QObject *object, QEvent *event) override;
 
 Q_SIGNALS:
-    void editTriggered(const QModelIndex& index);
-    void gotoCommentTriggered(const QModelIndex& index);
+  void editTriggered(const QModelIndex &index);
+  void gotoCommentTriggered(const QModelIndex &index);
 
 private:
-    void setUpActions();
+  void setUpActions();
 
-    std::vector<Comment> comments;
+  std::vector<Comment> comments;
 
-    QAction* gotoAction;
-    QAction* editAction;
-    QAction* deleteAction;
-    QAction* selectAllAction;
-    QAction* deselectAllAction;
+  QAction *gotoAction;
+  QAction *editAction;
+  QAction *deleteAction;
+  QAction *selectAllAction;
+  QAction *deselectAllAction;
 
-    QItemSelectionModel* internalSelectionModel;
+  QItemSelectionModel *internalSelectionModel;
 };
 
-#endif // COMMENTMODEL_H
+#endif  // COMMENTMODEL_H

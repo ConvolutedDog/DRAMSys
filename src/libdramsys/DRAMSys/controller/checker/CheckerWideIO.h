@@ -41,41 +41,41 @@
 #include <queue>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class CheckerWideIO final : public CheckerIF
-{
+class CheckerWideIO final : public CheckerIF {
 public:
-    explicit CheckerWideIO(const MemSpecWideIO& memSpec);
-    [[nodiscard]] sc_core::sc_time
-    timeToSatisfyConstraints(Command command,
-                             const tlm::tlm_generic_payload& payload) const override;
-    void insert(Command command, const tlm::tlm_generic_payload& payload) override;
+  explicit CheckerWideIO(const MemSpecWideIO &memSpec);
+  [[nodiscard]] sc_core::sc_time timeToSatisfyConstraints(
+      Command command, const tlm::tlm_generic_payload &payload) const override;
+  void insert(Command command,
+              const tlm::tlm_generic_payload &payload) override;
 
 private:
-    const MemSpecWideIO& memSpec;
+  const MemSpecWideIO &memSpec;
 
-    std::vector<ControllerVector<Bank, sc_core::sc_time>> lastScheduledByCommandAndBank;
-    std::vector<ControllerVector<Rank, sc_core::sc_time>> lastScheduledByCommandAndRank;
-    std::vector<sc_core::sc_time> lastScheduledByCommand;
-    sc_core::sc_time lastCommandOnBus;
+  std::vector<ControllerVector<Bank, sc_core::sc_time>>
+      lastScheduledByCommandAndBank;
+  std::vector<ControllerVector<Rank, sc_core::sc_time>>
+      lastScheduledByCommandAndRank;
+  std::vector<sc_core::sc_time> lastScheduledByCommand;
+  sc_core::sc_time lastCommandOnBus;
 
-    // Four activate window
-    ControllerVector<Rank, std::queue<sc_core::sc_time>> last2Activates;
+  // Four activate window
+  ControllerVector<Rank, std::queue<sc_core::sc_time>> last2Activates;
 
-    const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
-    sc_core::sc_time tBURST;
-    sc_core::sc_time tRDWR;
-    sc_core::sc_time tRDWR_R;
-    sc_core::sc_time tWRPRE;
-    sc_core::sc_time tWRRD;
-    sc_core::sc_time tWRRD_R;
-    sc_core::sc_time tRDPDEN;
-    sc_core::sc_time tWRPDEN;
-    sc_core::sc_time tWRAPDEN;
+  const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
+  sc_core::sc_time tBURST;
+  sc_core::sc_time tRDWR;
+  sc_core::sc_time tRDWR_R;
+  sc_core::sc_time tWRPRE;
+  sc_core::sc_time tWRRD;
+  sc_core::sc_time tWRRD_R;
+  sc_core::sc_time tRDPDEN;
+  sc_core::sc_time tWRPDEN;
+  sc_core::sc_time tWRAPDEN;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // CHECKERWIDEIO_H
+#endif  // CHECKERWIDEIO_H

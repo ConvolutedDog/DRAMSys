@@ -41,23 +41,23 @@
 #include <QString>
 #include <cstdlib>
 
-class Timespan
-{
-    traceTime begin;
-    traceTime end;
+class Timespan {
+  traceTime begin;
+  traceTime end;
 
 public:
-    explicit Timespan(traceTime begin = 0, traceTime end = 0) : begin(begin), end(end) {}
-    traceTime timeCovered() const { return std::abs(End() - Begin()); }
-    traceTime Begin() const { return begin; }
-    void setBegin(traceTime time) { begin = time; }
-    traceTime End() const { return end; }
-    traceTime Middle() const { return (begin + end) / 2; }
-    void setEnd(traceTime time) { end = time; }
-    bool contains(traceTime time) const;
-    bool contains(const Timespan& other) const;
-    bool overlaps(const Timespan& other) const;
-    void shift(traceTime offset);
+  explicit Timespan(traceTime begin = 0, traceTime end = 0)
+      : begin(begin), end(end) {}
+  traceTime timeCovered() const { return std::abs(End() - Begin()); }
+  traceTime Begin() const { return begin; }
+  void setBegin(traceTime time) { begin = time; }
+  traceTime End() const { return end; }
+  traceTime Middle() const { return (begin + end) / 2; }
+  void setEnd(traceTime time) { end = time; }
+  bool contains(traceTime time) const;
+  bool contains(const Timespan &other) const;
+  bool overlaps(const Timespan &other) const;
+  void shift(traceTime offset);
 };
 
-#endif // TIMESPAN_H
+#endif  // TIMESPAN_H

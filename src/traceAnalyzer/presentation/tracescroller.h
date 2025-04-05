@@ -48,46 +48,44 @@
 
 class TracePlotLineDataSource;
 
-class TraceScroller : public QwtPlot
-{
-    Q_OBJECT
+class TraceScroller : public QwtPlot {
+  Q_OBJECT
 private:
-    std::vector<std::shared_ptr<Transaction>> transactions;
-    bool isInitialized;
-    TraceNavigator* navigator;
-    TracePlot* tracePlot;
-    TracePlotLineDataSource* tracePlotLineDataSource;
+  std::vector<std::shared_ptr<Transaction>> transactions;
+  bool isInitialized;
+  TraceNavigator *navigator;
+  TracePlot *tracePlot;
+  TracePlotLineDataSource *tracePlotLineDataSource;
 
-    Timespan loadedTimespan;
+  Timespan loadedTimespan;
 
-    constexpr static int tracePlotEnlargementFactor = 4;
-    void setUpTracePlotItem();
-    void setUpDrawingProperties();
-    void setUpAxis();
-    void connectNavigatorQ_SIGNALS();
+  constexpr static int tracePlotEnlargementFactor = 4;
+  void setUpTracePlotItem();
+  void setUpDrawingProperties();
+  void setUpAxis();
+  void connectNavigatorQ_SIGNALS();
 
-    void getAndDrawComments();
-    QwtPlotZoneItem* canvasClip;
-    traceTime zoomLevel;
-    bool eventFilter(QObject* object, QEvent* event);
-    TraceDrawingProperties drawingProperties;
+  void getAndDrawComments();
+  QwtPlotZoneItem *canvasClip;
+  traceTime zoomLevel;
+  bool eventFilter(QObject *object, QEvent *event);
+  TraceDrawingProperties drawingProperties;
 
 public:
-    TraceScroller(QWidget* parent = NULL);
-    void init(TraceNavigator* navigator,
-              TracePlot* tracePlot,
-              TracePlotLineDataSource* tracePlotLineDataSource);
-    Timespan GetCurrentTimespan();
+  TraceScroller(QWidget *parent = NULL);
+  void init(TraceNavigator *navigator, TracePlot *tracePlot,
+            TracePlotLineDataSource *tracePlotLineDataSource);
+  Timespan GetCurrentTimespan();
 
 public Q_SLOTS:
-    void currentTraceTimeChanged();
-    void commentsChanged();
-    void tracePlotZoomChanged();
-    void selectedTransactionsChanged();
-    void colorGroupingChanged(ColorGrouping colorgrouping);
+  void currentTraceTimeChanged();
+  void commentsChanged();
+  void tracePlotZoomChanged();
+  void selectedTransactionsChanged();
+  void colorGroupingChanged(ColorGrouping colorgrouping);
 
 private Q_SLOTS:
-    void updateAxis();
+  void updateAxis();
 };
 
-#endif // TraceScroller_H
+#endif  // TraceScroller_H

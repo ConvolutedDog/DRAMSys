@@ -43,21 +43,19 @@
 // time in picoseconds
 typedef long long traceTime;
 
-inline QString prettyFormatTime(traceTime time)
-{
-    return QString::number(time / 1000.0, 'f') + QString(" ns");
+inline QString prettyFormatTime(traceTime time) {
+  return QString::number(time / 1000.0, 'f') + QString(" ns");
 }
 
-inline QString formatInClks(traceTime time, unsigned int clkPeriod)
-{
-    long long numberOfClockCovered = time / clkPeriod;
-    QString suffix = (numberOfClockCovered != 1) ? QString(" clks") : QString(" clk");
-    return QString::number(numberOfClockCovered) + suffix;
+inline QString formatInClks(traceTime time, unsigned int clkPeriod) {
+  long long numberOfClockCovered = time / clkPeriod;
+  QString suffix =
+      (numberOfClockCovered != 1) ? QString(" clks") : QString(" clk");
+  return QString::number(numberOfClockCovered) + suffix;
 }
 
-inline traceTime alignToClk(traceTime time, unsigned int clkPeriod)
-{
-    return round(1.0 * time / clkPeriod) * clkPeriod;
+inline traceTime alignToClk(traceTime time, unsigned int clkPeriod) {
+  return round(1.0 * time / clkPeriod) * clkPeriod;
 }
 
-#endif // TRACETIME_H
+#endif  // TRACETIME_H

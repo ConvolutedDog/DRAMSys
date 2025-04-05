@@ -41,19 +41,15 @@
 #include "businessObjects/tracetime.h"
 #include <qwt_plot_grid.h>
 
-class ClkGrid : public QwtPlotGrid
-{
+class ClkGrid : public QwtPlotGrid {
 public:
-    virtual void updateScaleDiv(const QwtScaleDiv& xMap, const QwtScaleDiv& yMap);
-    ClkGrid(unsigned int clkPeriod, traceTime maxVisibility) :
-        clkPeriod(clkPeriod),
-        maxVisibility(maxVisibility)
-    {
-    }
+  virtual void updateScaleDiv(const QwtScaleDiv &xMap, const QwtScaleDiv &yMap);
+  ClkGrid(unsigned int clkPeriod, traceTime maxVisibility)
+      : clkPeriod(clkPeriod), maxVisibility(maxVisibility) {}
 
 private:
-    unsigned int clkPeriod;
-    double maxVisibility;
+  unsigned int clkPeriod;
+  double maxVisibility;
 };
 
-#endif // CLKGRID_H
+#endif  // CLKGRID_H

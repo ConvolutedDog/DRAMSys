@@ -41,88 +41,78 @@
 
 using namespace std;
 
-void DebugMessageTreeWidget::init(TraceNavigator* navigator, TracePlot* traceplot)
-{
-    Q_ASSERT(isInitialized == false);
-    isInitialized = true;
-    arrangeUiSettings();
-    connect(navigator, SIGNAL(currentTraceTimeChanged()), this, SLOT(currentTraceTimeChanged()));
-    connect(
-        navigator, SIGNAL(selectedTransactionsChanged()), this, SLOT(selectedTransactionChanged()));
-    this->traceplot = traceplot;
-    this->navigator = navigator;
-    currentTraceTimeChanged();
+void DebugMessageTreeWidget::init(TraceNavigator *navigator,
+                                  TracePlot *traceplot) {
+  Q_ASSERT(isInitialized == false);
+  isInitialized = true;
+  arrangeUiSettings();
+  connect(navigator, SIGNAL(currentTraceTimeChanged()), this,
+          SLOT(currentTraceTimeChanged()));
+  connect(navigator, SIGNAL(selectedTransactionsChanged()), this,
+          SLOT(selectedTransactionChanged()));
+  this->traceplot = traceplot;
+  this->navigator = navigator;
+  currentTraceTimeChanged();
 }
 
-void DebugMessageTreeWidget::arrangeUiSettings()
-{
-    QFont font = QGuiApplication::font();
-    font.setPointSize(10);
-    this->setFont(font);
-    setColumnCount(2);
-    setHeaderLabels(QStringList({"Time", "Message"}));
+void DebugMessageTreeWidget::arrangeUiSettings() {
+  QFont font = QGuiApplication::font();
+  font.setPointSize(10);
+  this->setFont(font);
+  setColumnCount(2);
+  setHeaderLabels(QStringList({"Time", "Message"}));
 }
 
-void DebugMessageTreeWidget::selectedTransactionChanged()
-{
-    if (navigator->hasSelectedTransactions())
-    {
-        Timespan span = navigator->getSpanCoveredBySelectedTransaction();
-        showDebugMessages(navigator->TraceFile().getDebugMessagesInTimespan(span));
+void DebugMessageTreeWidget::selectedTransactionChanged() {
+  if (navigator->hasSelectedTransactions()) {
+    Timespan span = navigator->getSpanCoveredBySelectedTransaction();
+    showDebugMessages(navigator->TraceFile().getDebugMessagesInTimespan(span));
+  } else {
+    showDebugMessages(navigator->TraceFile().getDebugMessagesInTimespan(
+        traceplot->GetCurrentTimespan()));
+  }
+}
+
+void DebugMessageTreeWidget::currentTraceTimeChanged() {
+  if (!navigator->hasSelectedTransactions())
+    showDebugMessages(navigator->TraceFile().getDebugMessagesInTimespan(
+        traceplot->GetCurrentTimespan()));
+}
+
+void DebugMessageTreeWidget::showDebugMessages(
+    const vector<CommentModel::Comment> &comments) {
+  clear();
+  if (comments.empty())
+    return;
+
+  traceTime currentTime = -1;
+  for (const auto &comment : comments) {
+    if (currentTime != comment.time) {
+      addTopLevelItem(new QTreeWidgetItem(
+          {prettyFormatTime(comment.time), formatDebugMessage(comment.text)}));
+      currentTime = comment.time;
+    } else {
+      addTopLevelItem(
+          new QTreeWidgetItem({"", formatDebugMessage(comment.text)}));
     }
-    else
-    {
-        showDebugMessages(
-            navigator->TraceFile().getDebugMessagesInTimespan(traceplot->GetCurrentTimespan()));
-    }
+  }
+
+  this->resizeColumnToContents(0);
+  this->scrollToTop();
 }
 
-void DebugMessageTreeWidget::currentTraceTimeChanged()
-{
-    if (!navigator->hasSelectedTransactions())
-        showDebugMessages(
-            navigator->TraceFile().getDebugMessagesInTimespan(traceplot->GetCurrentTimespan()));
+QString DebugMessageTreeWidget::formatDebugMessage(const QString &message) {
+  QString formattedMessage = message;
+  formattedMessage.replace(hexAdressMatcher, "");
+  formattedMessage.replace(timeAnnotationMatcher, "");
+  formattedMessage.replace("\t", " ");
+  return formattedMessage;
 }
 
-void DebugMessageTreeWidget::showDebugMessages(const vector<CommentModel::Comment>& comments)
-{
-    clear();
-    if (comments.empty())
-        return;
-
-    traceTime currentTime = -1;
-    for (const auto& comment : comments)
-    {
-        if (currentTime != comment.time)
-        {
-            addTopLevelItem(new QTreeWidgetItem(
-                {prettyFormatTime(comment.time), formatDebugMessage(comment.text)}));
-            currentTime = comment.time;
-        }
-        else
-        {
-            addTopLevelItem(new QTreeWidgetItem({"", formatDebugMessage(comment.text)}));
-        }
-    }
-
-    this->resizeColumnToContents(0);
-    this->scrollToTop();
-}
-
-QString DebugMessageTreeWidget::formatDebugMessage(const QString& message)
-{
-    QString formattedMessage = message;
-    formattedMessage.replace(hexAdressMatcher, "");
-    formattedMessage.replace(timeAnnotationMatcher, "");
-    formattedMessage.replace("\t", " ");
-    return formattedMessage;
-}
-
-void DebugMessageTreeWidget::mousePressEvent(QMouseEvent* event)
-{
-    QTreeWidgetItem* itemUnderCursor = itemAt(event->pos());
-    if (itemUnderCursor != NULL)
-    {
-        QToolTip::showText(this->mapToGlobal(event->pos()), itemUnderCursor->text(1));
-    }
+void DebugMessageTreeWidget::mousePressEvent(QMouseEvent *event) {
+  QTreeWidgetItem *itemUnderCursor = itemAt(event->pos());
+  if (itemUnderCursor != NULL) {
+    QToolTip::showText(this->mapToGlobal(event->pos()),
+                       itemUnderCursor->text(1));
+  }
 }

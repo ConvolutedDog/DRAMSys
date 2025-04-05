@@ -35,29 +35,26 @@
 
 #include "RowHammer.h"
 
-RowHammer::RowHammer(uint64_t numRequests, uint64_t rowIncrement, unsigned int dataLength) :
-    numberOfRequests(numRequests),
-    dataLength(dataLength),
-    rowIncrement(rowIncrement)
-{
-}
+RowHammer::RowHammer(uint64_t numRequests, uint64_t rowIncrement,
+                     unsigned int dataLength)
+    : numberOfRequests(numRequests), dataLength(dataLength),
+      rowIncrement(rowIncrement) {}
 
-Request RowHammer::nextRequest()
-{
-    if (generatedRequests >= numberOfRequests)
-        return Request{Request::Command::Stop};
+Request RowHammer::nextRequest() {
+  if (generatedRequests >= numberOfRequests)
+    return Request{Request::Command::Stop};
 
-    generatedRequests++;
+  generatedRequests++;
 
-    if (currentAddress == 0x00)
-        currentAddress = rowIncrement;
-    else
-        currentAddress = 0x00;
+  if (currentAddress == 0x00)
+    currentAddress = rowIncrement;
+  else
+    currentAddress = 0x00;
 
-    Request request;
-    request.address = currentAddress;
-    request.command = Request::Command::Read;
-    request.length = dataLength;
-    request.delay = sc_core::SC_ZERO_TIME;
-    return request;
+  Request request;
+  request.address = currentAddress;
+  request.command = Request::Command::Read;
+  request.length = dataLength;
+  request.delay = sc_core::SC_ZERO_TIME;
+  return request;
 }

@@ -52,45 +52,41 @@
 #include <thread>
 #include <vector>
 
-class StlPlayer : public RequestProducer
-{
+class StlPlayer : public RequestProducer {
 public:
-    enum class TraceType
-    {
-        Absolute,
-        Relative,
-    };
+  enum class TraceType {
+    Absolute,
+    Relative,
+  };
 
-    StlPlayer(std::string_view tracePath,
-              unsigned int clkMhz,
-              unsigned int defaultDataLength,
-              TraceType traceType,
-              bool storageEnabled);
+  StlPlayer(std::string_view tracePath, unsigned int clkMhz,
+            unsigned int defaultDataLength, TraceType traceType,
+            bool storageEnabled);
 
-    Request nextRequest() override;
+  Request nextRequest() override;
 
-    uint64_t totalRequests() override { return numberOfLines; }
+  uint64_t totalRequests() override { return numberOfLines; }
 
 private:
-    void parseTraceFile();
-    std::vector<Request>::const_iterator swapBuffers();
+  void parseTraceFile();
+  std::vector<Request>::const_iterator swapBuffers();
 
-    static constexpr std::size_t LINE_BUFFER_SIZE = 10000;
+  static constexpr std::size_t LINE_BUFFER_SIZE = 10000;
 
-    const TraceType traceType;
-    const bool storageEnabled;
-    const sc_core::sc_time playerPeriod;
-    const unsigned int defaultDataLength;
+  const TraceType traceType;
+  const bool storageEnabled;
+  const sc_core::sc_time playerPeriod;
+  const unsigned int defaultDataLength;
 
-    std::ifstream traceFile;
-    uint64_t currentLine = 0;
-    uint64_t numberOfLines = 0;
+  std::ifstream traceFile;
+  uint64_t currentLine = 0;
+  uint64_t numberOfLines = 0;
 
-    std::array<std::shared_ptr<std::vector<Request>>, 2> lineBuffers;
-    std::shared_ptr<std::vector<Request>> parseBuffer;
-    std::shared_ptr<std::vector<Request>> readoutBuffer;
+  std::array<std::shared_ptr<std::vector<Request>>, 2> lineBuffers;
+  std::shared_ptr<std::vector<Request>> parseBuffer;
+  std::shared_ptr<std::vector<Request>> readoutBuffer;
 
-    std::vector<Request>::const_iterator readoutIt;
+  std::vector<Request>::const_iterator readoutIt;
 
-    std::thread parserThread;
+  std::thread parserThread;
 };

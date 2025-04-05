@@ -37,18 +37,17 @@
 
 #include <tlm_utils/multi_socket_bases.h>
 
-class Initiator
-{
+class Initiator {
 protected:
-    Initiator(const Initiator&) = default;
-    Initiator(Initiator&&) = default;
-    Initiator& operator=(const Initiator&) = default;
-    Initiator& operator=(Initiator&&) = default;
+  Initiator(const Initiator &) = default;
+  Initiator(Initiator &&) = default;
+  Initiator &operator=(const Initiator &) = default;
+  Initiator &operator=(Initiator &&) = default;
 
 public:
-    Initiator() = default;
-    virtual ~Initiator() = default;
+  Initiator() = default;
+  virtual ~Initiator() = default;
 
-    virtual void bind(tlm_utils::multi_target_base<>& target) = 0;
-    virtual uint64_t totalRequests() = 0;
+  virtual void bind(tlm_utils::multi_target_base<> &target) = 0;
+  virtual uint64_t totalRequests() = 0;
 };

@@ -37,23 +37,21 @@
 
 #include "DRAMSys/controller/powerdown/PowerDownManagerIF.h"
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class PowerDownManagerDummy final : public PowerDownManagerIF
-{
+class PowerDownManagerDummy final : public PowerDownManagerIF {
 public:
-    PowerDownManagerDummy() = default;
+  PowerDownManagerDummy() = default;
 
-    void triggerEntry() override {}
-    void triggerExit() override {}
-    void triggerInterruption() override {}
+  void triggerEntry() override {}
+  void triggerExit() override {}
+  void triggerInterruption() override {}
 
-    CommandTuple::Type getNextCommand() override;
-    void update([[maybe_unused]] Command command) override {}
-    void evaluate() override {}
+  CommandTuple::Type getNextCommand() override;
+  void update([[maybe_unused]] Command command) override {}
+  void evaluate() override {}
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // POWERDOWNMANAGERDUMMY_H
+#endif  // POWERDOWNMANAGERDUMMY_H

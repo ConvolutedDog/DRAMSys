@@ -40,98 +40,106 @@
 #define QUERYTEXTS_H
 #include <QString>
 
-struct TransactionQueryTexts
-{
-    QString queryHead;
-    QString selectTransactionsByTimespan, selectTransactionById;
-    QString checkDependenciesExist, selectDependenciesByTimespan;
-    QString selectDependencyTypePercentages, selectTimeDependencyPercentages,
-        selectDelayedPhasePercentages, selectDependencyPhasePercentages;
+struct TransactionQueryTexts {
+  QString queryHead;
+  QString selectTransactionsByTimespan, selectTransactionById;
+  QString checkDependenciesExist, selectDependenciesByTimespan;
+  QString selectDependencyTypePercentages, selectTimeDependencyPercentages,
+      selectDelayedPhasePercentages, selectDependencyPhasePercentages;
 
-    TransactionQueryTexts()
-    {
-        queryHead = "SELECT Transactions.ID AS TransactionID, Ranges.begin, Ranges.end, Address, "
-                    "DataLength, Thread, Channel, Command, Phases.ID AS PhaseID, PhaseName, "
-                    "PhaseBegin, PhaseEnd, DataStrobeBegin, DataStrobeEnd, Rank, BankGroup, Bank, "
-                    "Row, Column, BurstLength "
-                    " FROM Transactions INNER JOIN Phases ON Phases.Transact = Transactions.ID "
-                    "INNER JOIN Ranges ON Transactions.Range = Ranges.ID ";
+  TransactionQueryTexts() {
+    queryHead = "SELECT Transactions.ID AS TransactionID, Ranges.begin, "
+                "Ranges.end, Address, "
+                "DataLength, Thread, Channel, Command, Phases.ID AS PhaseID, "
+                "PhaseName, "
+                "PhaseBegin, PhaseEnd, DataStrobeBegin, DataStrobeEnd, Rank, "
+                "BankGroup, Bank, "
+                "Row, Column, BurstLength "
+                " FROM Transactions INNER JOIN Phases ON Phases.Transact = "
+                "Transactions.ID "
+                "INNER JOIN Ranges ON Transactions.Range = Ranges.ID ";
 
-        selectTransactionsByTimespan =
-            queryHead + " WHERE Ranges.end >= :begin AND Ranges.begin <= :end";
-        selectTransactionById = queryHead + " WHERE Transactions.ID = :id";
+    selectTransactionsByTimespan =
+        queryHead + " WHERE Ranges.end >= :begin AND Ranges.begin <= :end";
+    selectTransactionById = queryHead + " WHERE Transactions.ID = :id";
 
-        checkDependenciesExist =
-            "SELECT CASE WHEN 0 < (SELECT count(*) FROM sqlite_master WHERE type = 'table' AND "
-            "name = 'DirectDependencies') THEN 1 ELSE 0 END AS result";
-        selectDependenciesByTimespan =
-            "WITH timespanTransactions AS (" + selectTransactionsByTimespan +
-            ") SELECT * from DirectDependencies WHERE DelayedPhaseID IN ("
-            " SELECT DirectDependencies.DelayedPhaseID FROM DirectDependencies JOIN "
-            "timespanTransactions "
-            " ON DirectDependencies.DelayedPhaseID = timespanTransactions.PhaseID ) ";
+    checkDependenciesExist =
+        "SELECT CASE WHEN 0 < (SELECT count(*) FROM sqlite_master WHERE type = "
+        "'table' AND "
+        "name = 'DirectDependencies') THEN 1 ELSE 0 END AS result";
+    selectDependenciesByTimespan =
+        "WITH timespanTransactions AS (" + selectTransactionsByTimespan +
+        ") SELECT * from DirectDependencies WHERE DelayedPhaseID IN ("
+        " SELECT DirectDependencies.DelayedPhaseID FROM DirectDependencies "
+        "JOIN "
+        "timespanTransactions "
+        " ON DirectDependencies.DelayedPhaseID = timespanTransactions.PhaseID "
+        ") ";
 
-        // For some reason I could not use a parameter for these below
-        selectDependencyTypePercentages =
-            "WITH TotalDeps (total) AS ( "
-            "SELECT COUNT(*) FROM DirectDependencies "
-            "), "
-            "DependencyTypeDeps (param, ndeps) AS ( "
-            "SELECT "
-            "DependencyType, "
-            "COUNT(*) "
-            "FROM DirectDependencies "
-            "GROUP BY \"DependencyType\" "
-            ") "
-            "SELECT param, ROUND(ndeps*100.0 / (SELECT total FROM TotalDeps), 3) as percentage "
-            "FROM DependencyTypeDeps "
-            "ORDER BY percentage DESC ;";
+    // For some reason I could not use a parameter for these below
+    selectDependencyTypePercentages =
+        "WITH TotalDeps (total) AS ( "
+        "SELECT COUNT(*) FROM DirectDependencies "
+        "), "
+        "DependencyTypeDeps (param, ndeps) AS ( "
+        "SELECT "
+        "DependencyType, "
+        "COUNT(*) "
+        "FROM DirectDependencies "
+        "GROUP BY \"DependencyType\" "
+        ") "
+        "SELECT param, ROUND(ndeps*100.0 / (SELECT total FROM TotalDeps), 3) "
+        "as percentage "
+        "FROM DependencyTypeDeps "
+        "ORDER BY percentage DESC ;";
 
-        selectTimeDependencyPercentages =
-            "WITH TotalDeps (total) AS ( "
-            "SELECT COUNT(*) FROM DirectDependencies "
-            "), "
-            "DependencyTypeDeps (param, ndeps) AS ( "
-            "SELECT "
-            "TimeDependency, "
-            "COUNT(*) "
-            "FROM DirectDependencies "
-            "GROUP BY \"TimeDependency\" "
-            ") "
-            "SELECT param, ROUND(ndeps*100.0 / (SELECT total FROM TotalDeps), 3) as percentage "
-            "FROM DependencyTypeDeps "
-            "ORDER BY percentage DESC ;";
+    selectTimeDependencyPercentages =
+        "WITH TotalDeps (total) AS ( "
+        "SELECT COUNT(*) FROM DirectDependencies "
+        "), "
+        "DependencyTypeDeps (param, ndeps) AS ( "
+        "SELECT "
+        "TimeDependency, "
+        "COUNT(*) "
+        "FROM DirectDependencies "
+        "GROUP BY \"TimeDependency\" "
+        ") "
+        "SELECT param, ROUND(ndeps*100.0 / (SELECT total FROM TotalDeps), 3) "
+        "as percentage "
+        "FROM DependencyTypeDeps "
+        "ORDER BY percentage DESC ;";
 
-        selectDelayedPhasePercentages =
-            "WITH TotalDeps (total) AS ( "
-            "SELECT COUNT(*) FROM DirectDependencies "
-            "), "
-            "DependencyTypeDeps (param, ndeps) AS ( "
-            "SELECT "
-            "DelayedPhaseName, "
-            "COUNT(*) "
-            "FROM DirectDependencies "
-            "GROUP BY \"DelayedPhaseName\" "
-            ") "
-            "SELECT param, ROUND(ndeps*100.0 / (SELECT total FROM TotalDeps), 3) as percentage "
-            "FROM DependencyTypeDeps "
-            "ORDER BY percentage DESC ;";
+    selectDelayedPhasePercentages = "WITH TotalDeps (total) AS ( "
+                                    "SELECT COUNT(*) FROM DirectDependencies "
+                                    "), "
+                                    "DependencyTypeDeps (param, ndeps) AS ( "
+                                    "SELECT "
+                                    "DelayedPhaseName, "
+                                    "COUNT(*) "
+                                    "FROM DirectDependencies "
+                                    "GROUP BY \"DelayedPhaseName\" "
+                                    ") "
+                                    "SELECT param, ROUND(ndeps*100.0 / (SELECT "
+                                    "total FROM TotalDeps), 3) as percentage "
+                                    "FROM DependencyTypeDeps "
+                                    "ORDER BY percentage DESC ;";
 
-        selectDependencyPhasePercentages =
-            "WITH TotalDeps (total) AS ( "
-            "SELECT COUNT(*) FROM DirectDependencies "
-            "), "
-            "DependencyTypeDeps (param, ndeps) AS ( "
-            "SELECT "
-            "DependencyPhaseName, "
-            "COUNT(*) "
-            "FROM DirectDependencies "
-            "GROUP BY \"DependencyPhaseName\" "
-            ") "
-            "SELECT param, ROUND(ndeps*100.0 / (SELECT total FROM TotalDeps), 3) as percentage "
-            "FROM DependencyTypeDeps "
-            "ORDER BY percentage DESC ;";
-    }
+    selectDependencyPhasePercentages =
+        "WITH TotalDeps (total) AS ( "
+        "SELECT COUNT(*) FROM DirectDependencies "
+        "), "
+        "DependencyTypeDeps (param, ndeps) AS ( "
+        "SELECT "
+        "DependencyPhaseName, "
+        "COUNT(*) "
+        "FROM DirectDependencies "
+        "GROUP BY \"DependencyPhaseName\" "
+        ") "
+        "SELECT param, ROUND(ndeps*100.0 / (SELECT total FROM TotalDeps), 3) "
+        "as percentage "
+        "FROM DependencyTypeDeps "
+        "ORDER BY percentage DESC ;";
+  }
 };
 
-#endif // QUERYTEXTS_H
+#endif  // QUERYTEXTS_H

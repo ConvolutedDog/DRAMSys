@@ -53,91 +53,90 @@
 #include <LibDRAMPower.h>
 #endif
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class MemSpec
-{
+class MemSpec {
 public:
-    MemSpec& operator=(const MemSpec&) = delete;
-    MemSpec& operator=(MemSpec&&) = delete;
-    virtual ~MemSpec() = default;
+  MemSpec &operator=(const MemSpec &) = delete;
+  MemSpec &operator=(MemSpec &&) = delete;
+  virtual ~MemSpec() = default;
 
-    const unsigned numberOfChannels;
-    const unsigned ranksPerChannel;
-    const unsigned banksPerRank;
-    const unsigned groupsPerRank;
-    const unsigned banksPerGroup;
-    const unsigned banksPerChannel;
-    const unsigned bankGroupsPerChannel;
-    const unsigned devicesPerRank;
-    const unsigned rowsPerBank;
-    const unsigned columnsPerRow;
-    const unsigned defaultBurstLength;
-    const unsigned maxBurstLength;
-    const unsigned dataRate;
-    const unsigned bitWidth;
-    const unsigned dataBusWidth;
-    const unsigned bytesPerBeat;
-    const unsigned defaultBytesPerBurst;
-    const unsigned maxBytesPerBurst;
+  const unsigned numberOfChannels;
+  const unsigned ranksPerChannel;
+  const unsigned banksPerRank;
+  const unsigned groupsPerRank;
+  const unsigned banksPerGroup;
+  const unsigned banksPerChannel;
+  const unsigned bankGroupsPerChannel;
+  const unsigned devicesPerRank;
+  const unsigned rowsPerBank;
+  const unsigned columnsPerRow;
+  const unsigned defaultBurstLength;
+  const unsigned maxBurstLength;
+  const unsigned dataRate;
+  const unsigned bitWidth;
+  const unsigned dataBusWidth;
+  const unsigned bytesPerBeat;
+  const unsigned defaultBytesPerBurst;
+  const unsigned maxBytesPerBurst;
 
-    // Clock
-    const sc_core::sc_time tCK;
+  // Clock
+  const sc_core::sc_time tCK;
 
-    const std::string memoryId;
-    const Config::MemoryType memoryType;
+  const std::string memoryId;
+  const Config::MemoryType memoryType;
 
-    [[nodiscard]] virtual sc_core::sc_time getRefreshIntervalAB() const;
-    [[nodiscard]] virtual sc_core::sc_time getRefreshIntervalPB() const;
-    [[nodiscard]] virtual sc_core::sc_time getRefreshIntervalP2B() const;
-    [[nodiscard]] virtual sc_core::sc_time getRefreshIntervalSB() const;
+  [[nodiscard]] virtual sc_core::sc_time getRefreshIntervalAB() const;
+  [[nodiscard]] virtual sc_core::sc_time getRefreshIntervalPB() const;
+  [[nodiscard]] virtual sc_core::sc_time getRefreshIntervalP2B() const;
+  [[nodiscard]] virtual sc_core::sc_time getRefreshIntervalSB() const;
 
-    [[nodiscard]] virtual unsigned getPer2BankOffset() const;
+  [[nodiscard]] virtual unsigned getPer2BankOffset() const;
 
-    [[nodiscard]] virtual unsigned getRAAIMT() const;
-    [[nodiscard]] virtual unsigned getRAAMMT() const;
-    [[nodiscard]] virtual unsigned getRAADEC() const;
+  [[nodiscard]] virtual unsigned getRAAIMT() const;
+  [[nodiscard]] virtual unsigned getRAAMMT() const;
+  [[nodiscard]] virtual unsigned getRAADEC() const;
 
-    [[nodiscard]] virtual bool hasRasAndCasBus() const;
-    [[nodiscard]] virtual bool pseudoChannelMode() const;
+  [[nodiscard]] virtual bool hasRasAndCasBus() const;
+  [[nodiscard]] virtual bool pseudoChannelMode() const;
 
-    [[nodiscard]] virtual sc_core::sc_time
-    getExecutionTime(Command command, const tlm::tlm_generic_payload& payload) const = 0;
-    [[nodiscard]] virtual TimeInterval
-    getIntervalOnDataStrobe(Command command, const tlm::tlm_generic_payload& payload) const = 0;
-    [[nodiscard]] virtual bool requiresMaskedWrite(const tlm::tlm_generic_payload& payload) const;
+  [[nodiscard]] virtual sc_core::sc_time
+  getExecutionTime(Command command,
+                   const tlm::tlm_generic_payload &payload) const = 0;
+  [[nodiscard]] virtual TimeInterval
+  getIntervalOnDataStrobe(Command command,
+                          const tlm::tlm_generic_payload &payload) const = 0;
+  [[nodiscard]] virtual bool
+  requiresMaskedWrite(const tlm::tlm_generic_payload &payload) const;
 
-    [[nodiscard]] sc_core::sc_time getCommandLength(Command command) const;
-    [[nodiscard]] double getCommandLengthInCycles(Command command) const;
-    [[nodiscard]] uint64_t getSimMemSizeInBytes() const;
+  [[nodiscard]] sc_core::sc_time getCommandLength(Command command) const;
+  [[nodiscard]] double getCommandLengthInCycles(Command command) const;
+  [[nodiscard]] uint64_t getSimMemSizeInBytes() const;
 
 #ifdef DRAMPOWER
-    [[nodiscard]] virtual DRAMPower::MemorySpecification toDramPowerMemSpec() const;
+  [[nodiscard]] virtual DRAMPower::MemorySpecification
+  toDramPowerMemSpec() const;
 #endif
 
 protected:
-    MemSpec(const Config::MemSpec& memSpec,
-            unsigned numberOfChannels,
-            unsigned ranksPerChannel,
-            unsigned banksPerRank,
-            unsigned groupsPerRank,
-            unsigned banksPerGroup,
-            unsigned banksPerChannel,
-            unsigned bankGroupsPerChannel,
-            unsigned devicesPerRank);
+  MemSpec(const Config::MemSpec &memSpec, unsigned numberOfChannels,
+          unsigned ranksPerChannel, unsigned banksPerRank,
+          unsigned groupsPerRank, unsigned banksPerGroup,
+          unsigned banksPerChannel, unsigned bankGroupsPerChannel,
+          unsigned devicesPerRank);
 
-    [[nodiscard]] static bool allBytesEnabled(const tlm::tlm_generic_payload& trans);
+  [[nodiscard]] static bool
+  allBytesEnabled(const tlm::tlm_generic_payload &trans);
 
-    MemSpec(const MemSpec&) = default;
-    MemSpec(MemSpec&&) = default;
+  MemSpec(const MemSpec &) = default;
+  MemSpec(MemSpec &&) = default;
 
-    // Command lengths in cycles on bus, usually one clock cycle
-    std::vector<double> commandLengthInCycles;
-    sc_core::sc_time burstDuration;
-    uint64_t memorySizeBytes = 0;
+  // Command lengths in cycles on bus, usually one clock cycle
+  std::vector<double> commandLengthInCycles;
+  sc_core::sc_time burstDuration;
+  uint64_t memorySizeBytes = 0;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // MEMSPEC_H
+#endif  // MEMSPEC_H

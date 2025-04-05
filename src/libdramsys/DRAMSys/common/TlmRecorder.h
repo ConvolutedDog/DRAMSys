@@ -58,153 +58,128 @@
 class sqlite3;
 class sqlite3_stmt;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class TlmRecorder
-{
+class TlmRecorder {
 public:
-    TlmRecorder(const std::string& name,
-                const SimConfig& simConfig,
-                const McConfig& mcConfig,
-                const MemSpec& memSpec,
-                const std::string& dbName,
-                const std::string& mcconfig,
-                const std::string& memspec,
-                const std::string& traces);
-    TlmRecorder(const TlmRecorder&) = delete;
-    TlmRecorder(TlmRecorder&&) = default;
-    TlmRecorder& operator=(const TlmRecorder&) = delete;
-    TlmRecorder& operator=(TlmRecorder&&) = delete;
-    ~TlmRecorder() = default;
+  TlmRecorder(const std::string &name, const SimConfig &simConfig,
+              const McConfig &mcConfig, const MemSpec &memSpec,
+              const std::string &dbName, const std::string &mcconfig,
+              const std::string &memspec, const std::string &traces);
+  TlmRecorder(const TlmRecorder &) = delete;
+  TlmRecorder(TlmRecorder &&) = default;
+  TlmRecorder &operator=(const TlmRecorder &) = delete;
+  TlmRecorder &operator=(TlmRecorder &&) = delete;
+  ~TlmRecorder() = default;
 
-    void recordPhase(tlm::tlm_generic_payload& trans,
-                     const tlm::tlm_phase& phase,
-                     const sc_core::sc_time& delay);
-    void recordPower(double timeInSeconds, double averagePower);
-    void recordBufferDepth(double timeInSeconds, const std::vector<double>& averageBufferDepth);
-    void recordBandwidth(double timeInSeconds, double averageBandwidth);
-    void recordDebugMessage(const std::string& message, const sc_core::sc_time& time);
-    void finalize();
+  void recordPhase(tlm::tlm_generic_payload &trans, const tlm::tlm_phase &phase,
+                   const sc_core::sc_time &delay);
+  void recordPower(double timeInSeconds, double averagePower);
+  void recordBufferDepth(double timeInSeconds,
+                         const std::vector<double> &averageBufferDepth);
+  void recordBandwidth(double timeInSeconds, double averageBandwidth);
+  void recordDebugMessage(const std::string &message,
+                          const sc_core::sc_time &time);
+  void finalize();
 
 private:
-    std::string name;
-    const SimConfig& simConfig;
-    const McConfig& mcConfig;
-    const MemSpec& memSpec;
+  std::string name;
+  const SimConfig &simConfig;
+  const McConfig &mcConfig;
+  const MemSpec &memSpec;
 
-    struct Transaction
-    {
-        Transaction(uint64_t id,
-                    uint64_t address,
-                    unsigned int dataLength,
-                    char cmd,
-                    const sc_core::sc_time& timeOfGeneration,
-                    Thread thread,
-                    Channel channel) :
-            id(id),
-            address(address),
-            dataLength(dataLength),
-            cmd(cmd),
-            timeOfGeneration(timeOfGeneration),
-            thread(thread),
-            channel(channel)
-        {
-        }
+  struct Transaction {
+    Transaction(uint64_t id, uint64_t address, unsigned int dataLength,
+                char cmd, const sc_core::sc_time &timeOfGeneration,
+                Thread thread, Channel channel)
+        : id(id), address(address), dataLength(dataLength), cmd(cmd),
+          timeOfGeneration(timeOfGeneration), thread(thread), channel(channel) {
+    }
 
-        uint64_t id = 0;
-        uint64_t address = 0;
-        unsigned int dataLength = 0;
-        char cmd = 'X';
-        sc_core::sc_time timeOfGeneration;
-        Thread thread;
-        Channel channel;
+    uint64_t id = 0;
+    uint64_t address = 0;
+    unsigned int dataLength = 0;
+    char cmd = 'X';
+    sc_core::sc_time timeOfGeneration;
+    Thread thread;
+    Channel channel;
 
-        struct Phase
-        {
-            // for BEGIN_REQ and BEGIN_RESP
-            Phase(std::string name, const sc_core::sc_time& begin) :
-                name(std::move(name)),
-                interval(begin, sc_core::SC_ZERO_TIME)
-            {
-            }
-            Phase(std::string name,
-                  TimeInterval interval,
-                  TimeInterval intervalOnDataStrobe,
-                  Rank rank,
-                  BankGroup bankGroup,
-                  Bank bank,
-                  Row row,
-                  Column column,
-                  unsigned int burstLength) :
-                name(std::move(name)),
-                interval(std::move(interval)),
-                intervalOnDataStrobe(std::move(intervalOnDataStrobe)),
-                rank(rank),
-                bankGroup(bankGroup),
-                bank(bank),
-                row(row),
-                column(column),
-                burstLength(burstLength)
-            {
-            }
-            std::string name;
-            TimeInterval interval;
-            TimeInterval intervalOnDataStrobe = {sc_core::SC_ZERO_TIME, sc_core::SC_ZERO_TIME};
-            Rank rank = Rank(0);
-            BankGroup bankGroup = BankGroup(0);
-            Bank bank = Bank(0);
-            Row row = Row(0);
-            Column column = Column(0);
-            unsigned int burstLength = 0;
-        };
-        std::vector<Phase> recordedPhases;
+    struct Phase {
+      // for BEGIN_REQ and BEGIN_RESP
+      Phase(std::string name, const sc_core::sc_time &begin)
+          : name(std::move(name)), interval(begin, sc_core::SC_ZERO_TIME) {}
+      Phase(std::string name, TimeInterval interval,
+            TimeInterval intervalOnDataStrobe, Rank rank, BankGroup bankGroup,
+            Bank bank, Row row, Column column, unsigned int burstLength)
+          : name(std::move(name)), interval(std::move(interval)),
+            intervalOnDataStrobe(std::move(intervalOnDataStrobe)), rank(rank),
+            bankGroup(bankGroup), bank(bank), row(row), column(column),
+            burstLength(burstLength) {}
+      std::string name;
+      TimeInterval interval;
+      TimeInterval intervalOnDataStrobe = {sc_core::SC_ZERO_TIME,
+                                           sc_core::SC_ZERO_TIME};
+      Rank rank = Rank(0);
+      BankGroup bankGroup = BankGroup(0);
+      Bank bank = Bank(0);
+      Row row = Row(0);
+      Column column = Column(0);
+      unsigned int burstLength = 0;
     };
+    std::vector<Phase> recordedPhases;
+  };
 
-    void prepareSqlStatements();
-    void executeInitialSqlCommand();
-    static void executeSqlStatement(sqlite3_stmt* statement);
+  void prepareSqlStatements();
+  void executeInitialSqlCommand();
+  static void executeSqlStatement(sqlite3_stmt *statement);
 
-    void openDB(const std::string& dbName);
-    void closeConnection();
+  void openDB(const std::string &dbName);
+  void closeConnection();
 
-    void introduceTransactionToSystem(tlm::tlm_generic_payload& trans);
-    void removeTransactionFromSystem(tlm::tlm_generic_payload& trans);
+  void introduceTransactionToSystem(tlm::tlm_generic_payload &trans);
+  void removeTransactionFromSystem(tlm::tlm_generic_payload &trans);
 
-    void terminateRemainingTransactions();
-    void commitRecordedDataToDB();
-    void insertGeneralInfo(const std::string& mcConfigString,
-                           const std::string& memSpecString,
-                           const std::string& traces);
-    void insertCommandLengths();
-    void insertTransactionInDB(const Transaction& recordingData);
-    void insertRangeInDB(uint64_t id, const sc_core::sc_time& begin, const sc_core::sc_time& end);
-    void insertPhaseInDB(const Transaction::Phase& phase, uint64_t transactionID);
-    void insertDebugMessageInDB(const std::string& message, const sc_core::sc_time& time);
+  void terminateRemainingTransactions();
+  void commitRecordedDataToDB();
+  void insertGeneralInfo(const std::string &mcConfigString,
+                         const std::string &memSpecString,
+                         const std::string &traces);
+  void insertCommandLengths();
+  void insertTransactionInDB(const Transaction &recordingData);
+  void insertRangeInDB(uint64_t id, const sc_core::sc_time &begin,
+                       const sc_core::sc_time &end);
+  void insertPhaseInDB(const Transaction::Phase &phase, uint64_t transactionID);
+  void insertDebugMessageInDB(const std::string &message,
+                              const sc_core::sc_time &time);
 
-    static constexpr unsigned transactionCommitRate = 8192;
-    std::array<std::vector<Transaction>, 2> recordingDataBuffer;
-    std::vector<Transaction>* currentDataBuffer;
-    std::vector<Transaction>* storageDataBuffer;
-    std::thread storageThread;
+  static constexpr unsigned transactionCommitRate = 8192;
+  std::array<std::vector<Transaction>, 2> recordingDataBuffer;
+  std::vector<Transaction> *currentDataBuffer;
+  std::vector<Transaction> *storageDataBuffer;
+  std::thread storageThread;
 
-    std::unordered_map<tlm::tlm_generic_payload*, Transaction> currentTransactionsInSystem;
+  std::unordered_map<tlm::tlm_generic_payload *, Transaction>
+      currentTransactionsInSystem;
 
-    uint64_t totalNumTransactions = 0;
-    sc_core::sc_time simulationTimeCoveredByRecording;
+  uint64_t totalNumTransactions = 0;
+  sc_core::sc_time simulationTimeCoveredByRecording;
 
-    sqlite3* db = nullptr;
-    sqlite3_stmt *insertTransactionStatement = nullptr, *insertRangeStatement = nullptr,
-                 *updateRangeStatement = nullptr, *insertPhaseStatement = nullptr,
-                 *updatePhaseStatement = nullptr, *insertGeneralInfoStatement = nullptr,
-                 *insertCommandLengthsStatement = nullptr, *insertDebugMessageStatement = nullptr,
-                 *insertPowerStatement = nullptr, *insertBufferDepthStatement = nullptr,
-                 *insertBandwidthStatement = nullptr;
-    std::string insertTransactionString, insertRangeString, updateRangeString, insertPhaseString,
-        updatePhaseString, insertGeneralInfoString, insertCommandLengthsString,
-        insertDebugMessageString, insertPowerString, insertBufferDepthString, insertBandwidthString;
+  sqlite3 *db = nullptr;
+  sqlite3_stmt *insertTransactionStatement = nullptr,
+               *insertRangeStatement = nullptr, *updateRangeStatement = nullptr,
+               *insertPhaseStatement = nullptr, *updatePhaseStatement = nullptr,
+               *insertGeneralInfoStatement = nullptr,
+               *insertCommandLengthsStatement = nullptr,
+               *insertDebugMessageStatement = nullptr,
+               *insertPowerStatement = nullptr,
+               *insertBufferDepthStatement = nullptr,
+               *insertBandwidthStatement = nullptr;
+  std::string insertTransactionString, insertRangeString, updateRangeString,
+      insertPhaseString, updatePhaseString, insertGeneralInfoString,
+      insertCommandLengthsString, insertDebugMessageString, insertPowerString,
+      insertBufferDepthString, insertBandwidthString;
 
-    std::string initialCommand = R"(
+  std::string initialCommand = R"(
         DROP TABLE IF EXISTS Phases;
         DROP TABLE IF EXISTS GeneralInfo;
         DROP TABLE IF EXISTS CommandLengths;
@@ -305,6 +280,6 @@ private:
     )";
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // TLMRECORDER_H
+#endif  // TLMRECORDER_H

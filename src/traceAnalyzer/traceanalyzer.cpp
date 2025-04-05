@@ -47,234 +47,218 @@
 #include <QFileInfo>
 #include <QMessageBox>
 
-void TraceAnalyzer::setUpStatusBar()
-{
-    statusLabel = new QLabel(this);
-    statusBar()->addWidget(statusLabel);
+void TraceAnalyzer::setUpStatusBar() {
+  statusLabel = new QLabel(this);
+  statusBar()->addWidget(statusLabel);
 }
 
-TraceAnalyzer::TraceAnalyzer(QWidget* parent) :
-    QMainWindow(parent),
-    evaluationTool(pythonCaller),
-    ui(new Ui::TraceAnalyzer)
-{
-    ui->setupUi(this);
-    setUpStatusBar();
-    ui->traceFileTabs->clear();
+TraceAnalyzer::TraceAnalyzer(QWidget *parent)
+    : QMainWindow(parent), evaluationTool(pythonCaller),
+      ui(new Ui::TraceAnalyzer) {
+  ui->setupUi(this);
+  setUpStatusBar();
+  ui->traceFileTabs->clear();
 
-    QObject::connect(ui->actionAbout_Qt, &QAction::triggered, qApp, &QApplication::aboutQt);
+  QObject::connect(ui->actionAbout_Qt, &QAction::triggered, qApp,
+                   &QApplication::aboutQt);
 }
 
-TraceAnalyzer::TraceAnalyzer(QSet<QString> paths, QWidget* parent) : TraceAnalyzer(parent)
-{
-    for (const QString& path : paths)
-        openTracefileTab(path);
+TraceAnalyzer::TraceAnalyzer(QSet<QString> paths, QWidget *parent)
+    : TraceAnalyzer(parent) {
+  for (const QString &path : paths)
+    openTracefileTab(path);
 }
 
-TraceAnalyzer::~TraceAnalyzer()
-{
-    delete ui;
+TraceAnalyzer::~TraceAnalyzer() { delete ui; }
+
+void TraceAnalyzer::on_actionOpen_triggered() {
+  QStringList paths = QFileDialog::getOpenFileNames(
+      this, tr("Open Tracefile"), "../simulator/", tr("Tracefile (*.tdb)"));
+  if (paths.isEmpty())
+    return;
+
+  for (const QString &path : paths)
+    openTracefileTab(path);
 }
 
-void TraceAnalyzer::on_actionOpen_triggered()
-{
-    QStringList paths = QFileDialog::getOpenFileNames(
-        this, tr("Open Tracefile"), "../simulator/", tr("Tracefile (*.tdb)"));
-    if (paths.isEmpty())
-        return;
+TraceFileTab *TraceAnalyzer::createTraceFileTab(const QString &path) {
+  auto *traceFileTab = new TraceFileTab(path.toStdString(), pythonCaller, this);
 
-    for (const QString& path : paths)
-        openTracefileTab(path);
+  connect(traceFileTab, &TraceFileTab::statusChanged, this,
+          &TraceAnalyzer::statusChanged);
+
+  return traceFileTab;
 }
 
-TraceFileTab* TraceAnalyzer::createTraceFileTab(const QString& path)
-{
-    auto* traceFileTab = new TraceFileTab(path.toStdString(), pythonCaller, this);
+void TraceAnalyzer::openTracefileTab(const QString &path) {
+  if (openedTraceFiles.contains(path))
+    return;
 
-    connect(traceFileTab, &TraceFileTab::statusChanged, this, &TraceAnalyzer::statusChanged);
+  TraceFileTab *traceFileTab = createTraceFileTab(path);
 
-    return traceFileTab;
+  ui->traceFileTabs->addTab(traceFileTab, QFileInfo(path).baseName());
+  openedTraceFiles.insert(path);
+
+  statusLabel->clear();
 }
 
-void TraceAnalyzer::openTracefileTab(const QString& path)
-{
-    if (openedTraceFiles.contains(path))
-        return;
+void TraceAnalyzer::on_menuFile_aboutToShow() {
+  ui->actionOpen->setEnabled(true);
+  ui->actionQuit->setEnabled(true);
 
-    TraceFileTab* traceFileTab = createTraceFileTab(path);
+  bool tabsOpen = ui->traceFileTabs->count() > 0;
 
-    ui->traceFileTabs->addTab(traceFileTab, QFileInfo(path).baseName());
-    openedTraceFiles.insert(path);
-
-    statusLabel->clear();
+  ui->actionSave->setEnabled(tabsOpen);
+  ui->actionSave_all->setEnabled(tabsOpen);
+  ui->actionReload->setEnabled(tabsOpen);
+  ui->actionReload_all->setEnabled(tabsOpen);
+  ui->actionExportAsVCD->setEnabled(tabsOpen);
+  ui->actionMetrics->setEnabled(tabsOpen);
+  ui->actionClose->setEnabled(tabsOpen);
+  ui->actionClose_all->setEnabled(tabsOpen);
 }
 
-void TraceAnalyzer::on_menuFile_aboutToShow()
-{
-    ui->actionOpen->setEnabled(true);
-    ui->actionQuit->setEnabled(true);
+void TraceAnalyzer::closeTab(int index) {
+  auto *traceFileTab =
+      dynamic_cast<TraceFileTab *>(ui->traceFileTabs->widget(index));
 
-    bool tabsOpen = ui->traceFileTabs->count() > 0;
-
-    ui->actionSave->setEnabled(tabsOpen);
-    ui->actionSave_all->setEnabled(tabsOpen);
-    ui->actionReload->setEnabled(tabsOpen);
-    ui->actionReload_all->setEnabled(tabsOpen);
-    ui->actionExportAsVCD->setEnabled(tabsOpen);
-    ui->actionMetrics->setEnabled(tabsOpen);
-    ui->actionClose->setEnabled(tabsOpen);
-    ui->actionClose_all->setEnabled(tabsOpen);
-}
-
-void TraceAnalyzer::closeTab(int index)
-{
-    auto* traceFileTab = dynamic_cast<TraceFileTab*>(ui->traceFileTabs->widget(index));
-
-    if (traceFileTab->close())
-    {
-        openedTraceFiles.remove(traceFileTab->getPathToTraceFile());
-        ui->traceFileTabs->removeTab(index);
-        delete traceFileTab;
-    }
-}
-
-void TraceAnalyzer::on_traceFileTabs_tabCloseRequested(int index)
-{
-    closeTab(index);
-}
-
-void TraceAnalyzer::on_actionClose_triggered()
-{
-    closeTab(ui->traceFileTabs->currentIndex());
-}
-
-void TraceAnalyzer::on_actionClose_all_triggered()
-{
-    for (unsigned int i = ui->traceFileTabs->count(); i--;)
-        closeTab(i);
-
-    statusLabel->clear();
-}
-
-void TraceAnalyzer::reloadTab(int index)
-{
-    auto* traceFileTab = dynamic_cast<TraceFileTab*>(ui->traceFileTabs->widget(index));
-
-    QString traceFile = traceFileTab->getPathToTraceFile();
-    traceTime time = traceFileTab->getCurrentTraceTime();
-    traceTime zoomLevel = traceFileTab->getZoomLevel();
-    auto rootNode = traceFileTab->saveTraceSelectorState();
-
-    if (!traceFileTab->close())
-        return;
-
+  if (traceFileTab->close()) {
+    openedTraceFiles.remove(traceFileTab->getPathToTraceFile());
     ui->traceFileTabs->removeTab(index);
     delete traceFileTab;
-
-    traceFileTab = createTraceFileTab(traceFile);
-    traceFileTab->setZoomLevel(zoomLevel);
-    traceFileTab->navigateToTime(time);
-    traceFileTab->restoreTraceSelectorState(std::move(rootNode));
-
-    ui->traceFileTabs->insertTab(index, traceFileTab, QFileInfo(traceFile).baseName());
-    ui->traceFileTabs->setCurrentIndex(index);
+  }
 }
 
-void TraceAnalyzer::on_actionReload_triggered()
-{
-    int index = ui->traceFileTabs->currentIndex();
-    reloadTab(index);
-    this->statusChanged(QString("Reloaded tab ") + QString::number(index) + " ");
+void TraceAnalyzer::on_traceFileTabs_tabCloseRequested(int index) {
+  closeTab(index);
 }
 
-void TraceAnalyzer::on_actionReload_all_triggered()
-{
-    int index = ui->traceFileTabs->currentIndex();
-
-    for (unsigned int i = ui->traceFileTabs->count(); i--;)
-        reloadTab(i);
-
-    ui->traceFileTabs->setCurrentIndex(index);
-
-    this->statusChanged(QString("All databases reloaded "));
+void TraceAnalyzer::on_actionClose_triggered() {
+  closeTab(ui->traceFileTabs->currentIndex());
 }
 
-void TraceAnalyzer::on_actionSave_triggered()
-{
-    auto* traceFileTab = dynamic_cast<TraceFileTab*>(ui->traceFileTabs->currentWidget());
+void TraceAnalyzer::on_actionClose_all_triggered() {
+  for (unsigned int i = ui->traceFileTabs->count(); i--;)
+    closeTab(i);
+
+  statusLabel->clear();
+}
+
+void TraceAnalyzer::reloadTab(int index) {
+  auto *traceFileTab =
+      dynamic_cast<TraceFileTab *>(ui->traceFileTabs->widget(index));
+
+  QString traceFile = traceFileTab->getPathToTraceFile();
+  traceTime time = traceFileTab->getCurrentTraceTime();
+  traceTime zoomLevel = traceFileTab->getZoomLevel();
+  auto rootNode = traceFileTab->saveTraceSelectorState();
+
+  if (!traceFileTab->close())
+    return;
+
+  ui->traceFileTabs->removeTab(index);
+  delete traceFileTab;
+
+  traceFileTab = createTraceFileTab(traceFile);
+  traceFileTab->setZoomLevel(zoomLevel);
+  traceFileTab->navigateToTime(time);
+  traceFileTab->restoreTraceSelectorState(std::move(rootNode));
+
+  ui->traceFileTabs->insertTab(index, traceFileTab,
+                               QFileInfo(traceFile).baseName());
+  ui->traceFileTabs->setCurrentIndex(index);
+}
+
+void TraceAnalyzer::on_actionReload_triggered() {
+  int index = ui->traceFileTabs->currentIndex();
+  reloadTab(index);
+  this->statusChanged(QString("Reloaded tab ") + QString::number(index) + " ");
+}
+
+void TraceAnalyzer::on_actionReload_all_triggered() {
+  int index = ui->traceFileTabs->currentIndex();
+
+  for (unsigned int i = ui->traceFileTabs->count(); i--;)
+    reloadTab(i);
+
+  ui->traceFileTabs->setCurrentIndex(index);
+
+  this->statusChanged(QString("All databases reloaded "));
+}
+
+void TraceAnalyzer::on_actionSave_triggered() {
+  auto *traceFileTab =
+      dynamic_cast<TraceFileTab *>(ui->traceFileTabs->currentWidget());
+  traceFileTab->commitChangesToDB();
+
+  this->statusChanged(QString("Saved database ") +
+                      QFileInfo(traceFileTab->getPathToTraceFile()).baseName() +
+                      " ");
+}
+
+void TraceAnalyzer::on_actionSave_all_triggered() {
+  for (int index = 0; index < ui->traceFileTabs->count(); index++) {
+    // Changes in the database files will trigger the file watchers from
+    // the TraceFileTab class. They generate signals connected to
+    // TraceAnalyzer::statusChanged().
+    auto *traceFileTab =
+        dynamic_cast<TraceFileTab *>(ui->traceFileTabs->widget(index));
     traceFileTab->commitChangesToDB();
-
-    this->statusChanged(QString("Saved database ") +
-                        QFileInfo(traceFileTab->getPathToTraceFile()).baseName() + " ");
+  }
 }
 
-void TraceAnalyzer::on_actionSave_all_triggered()
-{
-    for (int index = 0; index < ui->traceFileTabs->count(); index++)
-    {
-        // Changes in the database files will trigger the file watchers from
-        // the TraceFileTab class. They generate signals connected to
-        // TraceAnalyzer::statusChanged().
-        auto* traceFileTab = dynamic_cast<TraceFileTab*>(ui->traceFileTabs->widget(index));
-        traceFileTab->commitChangesToDB();
-    }
-}
-
-void TraceAnalyzer::on_actionExportAsVCD_triggered()
-{
+void TraceAnalyzer::on_actionExportAsVCD_triggered() {
 #ifndef EXTENSION_ENABLED
-        showExtensionDisclaimerMessageBox();
-        return;
+  showExtensionDisclaimerMessageBox();
+  return;
 #endif
 
-    auto* traceFileTab = dynamic_cast<TraceFileTab*>(ui->traceFileTabs->currentWidget());
-    traceFileTab->exportAsVCD();
+  auto *traceFileTab =
+      dynamic_cast<TraceFileTab *>(ui->traceFileTabs->currentWidget());
+  traceFileTab->exportAsVCD();
 }
 
-void TraceAnalyzer::statusChanged(const QString& message)
-{
-    statusLabel->setText(message + QTime::currentTime().toString());
+void TraceAnalyzer::statusChanged(const QString &message) {
+  statusLabel->setText(message + QTime::currentTime().toString());
 }
 
-void TraceAnalyzer::on_actionMetrics_triggered()
-{
+void TraceAnalyzer::on_actionMetrics_triggered() {
 #ifndef EXTENSION_ENABLED
-        showExtensionDisclaimerMessageBox();
-        return;
+  showExtensionDisclaimerMessageBox();
+  return;
 #endif
 
-    evaluationTool.raise();
-    evaluationTool.activateWindow();
-    evaluationTool.showAndEvaluateMetrics(openedTraceFiles.values());
+  evaluationTool.raise();
+  evaluationTool.activateWindow();
+  evaluationTool.showAndEvaluateMetrics(openedTraceFiles.values());
 }
 
-void TraceAnalyzer::on_actionAbout_triggered()
-{
-    QMessageBox::about(
-        this,
-        QStringLiteral("DRAMSys"),
-        QStringLiteral(
-            "<b>DRAMSys5.0</b> is a flexible DRAM subsystem design space exploration "
-            "framework based on SystemC "
-            "TLM-2.0. It was developed by the <a "
-            "href=\"https://ems.eit.uni-kl.de/en/start/\">Microelectronic Systems "
-            "Design Research Group</a>, by <a "
-            "href=\"https://www.iese.fraunhofer.de/en.html\">Fraunhofer IESE</a> and by the <a "
-            "href=\"https://www.informatik.uni-wuerzburg.de/ce\">Computer Engineering Group</a> at "
-            "<a href=\"https://www.uni-wuerzburg.de/en/home\">JMU Würzburg</a>."));
+void TraceAnalyzer::on_actionAbout_triggered() {
+  QMessageBox::about(
+      this, QStringLiteral("DRAMSys"),
+      QStringLiteral("<b>DRAMSys5.0</b> is a flexible DRAM subsystem design "
+                     "space exploration "
+                     "framework based on SystemC "
+                     "TLM-2.0. It was developed by the <a "
+                     "href=\"https://ems.eit.uni-kl.de/en/start/"
+                     "\">Microelectronic Systems "
+                     "Design Research Group</a>, by <a "
+                     "href=\"https://www.iese.fraunhofer.de/"
+                     "en.html\">Fraunhofer IESE</a> and by the <a "
+                     "href=\"https://www.informatik.uni-wuerzburg.de/"
+                     "ce\">Computer Engineering Group</a> at "
+                     "<a href=\"https://www.uni-wuerzburg.de/en/home\">JMU "
+                     "Würzburg</a>."));
 }
 
-void TraceAnalyzer::closeEvent(QCloseEvent* event)
-{
-    for (int i = 0; i < ui->traceFileTabs->count(); i++)
-    {
-        QWidget* tab = ui->traceFileTabs->widget(i);
-        if (!tab->close())
-        {
-            event->ignore();
-            return;
-        }
+void TraceAnalyzer::closeEvent(QCloseEvent *event) {
+  for (int i = 0; i < ui->traceFileTabs->count(); i++) {
+    QWidget *tab = ui->traceFileTabs->widget(i);
+    if (!tab->close()) {
+      event->ignore();
+      return;
     }
+  }
 
-    event->accept();
+  event->accept();
 }

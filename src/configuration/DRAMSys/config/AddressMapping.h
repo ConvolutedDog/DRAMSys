@@ -40,38 +40,29 @@
 
 #include <optional>
 
-namespace DRAMSys::Config
-{
+namespace DRAMSys::Config {
 
-struct AddressMapping
-{
-    static constexpr std::string_view KEY = "addressmapping";
-    static constexpr std::string_view SUB_DIR = "addressmapping";
+struct AddressMapping {
+  static constexpr std::string_view KEY = "addressmapping";
+  static constexpr std::string_view SUB_DIR = "addressmapping";
 
-    using BitEntry = std::variant<unsigned int, std::vector<unsigned int>>;
+  using BitEntry = std::variant<unsigned int, std::vector<unsigned int>>;
 
-    std::optional<std::vector<BitEntry>> BYTE_BIT;
-    std::optional<std::vector<BitEntry>> COLUMN_BIT;
-    std::optional<std::vector<BitEntry>> ROW_BIT;
-    std::optional<std::vector<BitEntry>> BANK_BIT;
-    std::optional<std::vector<BitEntry>> BANKGROUP_BIT;
-    std::optional<std::vector<BitEntry>> RANK_BIT;
-    std::optional<std::vector<BitEntry>> STACK_BIT;
-    std::optional<std::vector<BitEntry>> PSEUDOCHANNEL_BIT;
-    std::optional<std::vector<BitEntry>> CHANNEL_BIT;
+  std::optional<std::vector<BitEntry>> BYTE_BIT;
+  std::optional<std::vector<BitEntry>> COLUMN_BIT;
+  std::optional<std::vector<BitEntry>> ROW_BIT;
+  std::optional<std::vector<BitEntry>> BANK_BIT;
+  std::optional<std::vector<BitEntry>> BANKGROUP_BIT;
+  std::optional<std::vector<BitEntry>> RANK_BIT;
+  std::optional<std::vector<BitEntry>> STACK_BIT;
+  std::optional<std::vector<BitEntry>> PSEUDOCHANNEL_BIT;
+  std::optional<std::vector<BitEntry>> CHANNEL_BIT;
 };
 
-NLOHMANN_JSONIFY_ALL_THINGS(AddressMapping,
-                            BYTE_BIT,
-                            COLUMN_BIT,
-                            ROW_BIT,
-                            BANK_BIT,
-                            BANKGROUP_BIT,
-                            RANK_BIT,
-                            STACK_BIT,
-                            PSEUDOCHANNEL_BIT,
-                            CHANNEL_BIT)
+NLOHMANN_JSONIFY_ALL_THINGS(AddressMapping, BYTE_BIT, COLUMN_BIT, ROW_BIT,
+                            BANK_BIT, BANKGROUP_BIT, RANK_BIT, STACK_BIT,
+                            PSEUDOCHANNEL_BIT, CHANNEL_BIT)
 
-} // namespace DRAMSys::Config
+}  // namespace DRAMSys::Config
 
-#endif // DRAMSYSCONFIGURATION_ADDRESSMAPPING_H
+#endif  // DRAMSYSCONFIGURATION_ADDRESSMAPPING_H

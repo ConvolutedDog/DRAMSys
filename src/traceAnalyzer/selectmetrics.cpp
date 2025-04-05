@@ -38,84 +38,67 @@
 #include "ui_selectmetrics.h"
 #include <QMessageBox>
 
-SelectMetrics::SelectMetrics(QWidget* parent) : QDialog(parent), ui(new Ui::SelectMetrics)
-{
-    ui->setupUi(this);
+SelectMetrics::SelectMetrics(QWidget *parent)
+    : QDialog(parent), ui(new Ui::SelectMetrics) {
+  ui->setupUi(this);
 
-    layout = new QVBoxLayout();
+  layout = new QVBoxLayout();
 
-    ui->scrollAreaWidgetContents->setLayout(layout);
+  ui->scrollAreaWidgetContents->setLayout(layout);
 
-    ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 }
 
-void SelectMetrics::on_okButton_clicked()
-{
-    if (isThereAnyMetricSelected())
-    {
-        close();
-        Q_EMIT getSelectedMetrics();
+void SelectMetrics::on_okButton_clicked() {
+  if (isThereAnyMetricSelected()) {
+    close();
+    Q_EMIT getSelectedMetrics();
+  } else {
+    QMessageBox::warning(this, "Warning", "Please select at least one metric");
+  }
+}
+
+void SelectMetrics::on_clearAllButton_clicked() {
+  for (QCheckBox *checkBox : metrics) {
+    checkBox->setChecked(false);
+  }
+}
+
+void SelectMetrics::on_selectAllButton_clicked() {
+  for (QCheckBox *checkBox : metrics) {
+    checkBox->setChecked(true);
+  }
+}
+
+bool SelectMetrics::isThereAnyMetricSelected() {
+  for (QCheckBox *checkBox : metrics) {
+    if (checkBox->isChecked())
+      return true;
+  }
+  return false;
+}
+
+void SelectMetrics::setMetrics(std::vector<std::string> metrics) {
+  if (this->metrics.size() != metrics.size()) {
+    for (QCheckBox *checkBox : this->metrics) {
+      layout->removeWidget(checkBox);
     }
-    else
-    {
-        QMessageBox::warning(this, "Warning", "Please select at least one metric");
+
+    this->metrics.clear();
+
+    for (std::string metric : metrics) {
+      QCheckBox *checkBox = new QCheckBox();
+      checkBox->setObjectName(QString::fromStdString(metric));
+      checkBox->setCheckable(true);
+      checkBox->setChecked(true);
+
+      checkBox->setGeometry(10, 25, 100, 17);
+      checkBox->setText(QString::fromStdString(metric));
+      this->metrics.push_back(checkBox);
+      layout->addWidget(checkBox, Qt::AlignLeft);
     }
+  }
 }
 
-void SelectMetrics::on_clearAllButton_clicked()
-{
-    for (QCheckBox* checkBox : metrics)
-    {
-        checkBox->setChecked(false);
-    }
-}
-
-void SelectMetrics::on_selectAllButton_clicked()
-{
-    for (QCheckBox* checkBox : metrics)
-    {
-        checkBox->setChecked(true);
-    }
-}
-
-bool SelectMetrics::isThereAnyMetricSelected()
-{
-    for (QCheckBox* checkBox : metrics)
-    {
-        if (checkBox->isChecked())
-            return true;
-    }
-    return false;
-}
-
-void SelectMetrics::setMetrics(std::vector<std::string> metrics)
-{
-    if (this->metrics.size() != metrics.size())
-    {
-        for (QCheckBox* checkBox : this->metrics)
-        {
-            layout->removeWidget(checkBox);
-        }
-
-        this->metrics.clear();
-
-        for (std::string metric : metrics)
-        {
-            QCheckBox* checkBox = new QCheckBox();
-            checkBox->setObjectName(QString::fromStdString(metric));
-            checkBox->setCheckable(true);
-            checkBox->setChecked(true);
-
-            checkBox->setGeometry(10, 25, 100, 17);
-            checkBox->setText(QString::fromStdString(metric));
-            this->metrics.push_back(checkBox);
-            layout->addWidget(checkBox, Qt::AlignLeft);
-        }
-    }
-}
-
-SelectMetrics::~SelectMetrics()
-{
-    delete ui;
-}
+SelectMetrics::~SelectMetrics() { delete ui; }

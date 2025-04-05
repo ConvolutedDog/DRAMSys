@@ -41,40 +41,28 @@
 #include "traceplot.h"
 #include <qwt_plot_picker.h>
 
-enum class MouseLabelMode
-{
-    AbsoluteTime,
-    Timedifference
-};
+enum class MouseLabelMode { AbsoluteTime, Timedifference };
 
-class TracePlotMouseLabel : public QwtPlotPicker
-{
+class TracePlotMouseLabel : public QwtPlotPicker {
 public:
-    TracePlotMouseLabel(TracePlot* traceplot,
-                        unsigned int clkPeriod,
-                        Timespan& timeDifferenceSpan) :
-        QwtPlotPicker(QwtPlot::xBottom,
-                      QwtPlot::yLeft,
-                      QwtPlotPicker::VLineRubberBand,
-                      QwtPicker::AlwaysOn,
+  TracePlotMouseLabel(TracePlot *traceplot, unsigned int clkPeriod,
+                      Timespan &timeDifferenceSpan)
+      : QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
+                      QwtPlotPicker::VLineRubberBand, QwtPicker::AlwaysOn,
                       traceplot->canvas()),
-        mode(MouseLabelMode::AbsoluteTime),
-        traceplot(traceplot),
-        clkPeriod(clkPeriod),
-        timeDifferenceSpan(timeDifferenceSpan)
-    {
-    }
+        mode(MouseLabelMode::AbsoluteTime), traceplot(traceplot),
+        clkPeriod(clkPeriod), timeDifferenceSpan(timeDifferenceSpan) {}
 
-    void setMode(MouseLabelMode mode);
+  void setMode(MouseLabelMode mode);
 
 protected:
-    virtual QwtText trackerText(const QPoint& point) const;
+  virtual QwtText trackerText(const QPoint &point) const;
 
 private:
-    MouseLabelMode mode;
-    TracePlot* traceplot;
-    unsigned int clkPeriod;
-    Timespan& timeDifferenceSpan;
+  MouseLabelMode mode;
+  TracePlot *traceplot;
+  unsigned int clkPeriod;
+  Timespan &timeDifferenceSpan;
 };
 
-#endif // TRACEPLOTPICKER_H
+#endif  // TRACEPLOTPICKER_H

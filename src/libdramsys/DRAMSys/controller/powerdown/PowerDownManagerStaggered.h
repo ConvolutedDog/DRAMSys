@@ -41,43 +41,41 @@
 
 #include <systemc>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
 class BankMachine;
 
-class PowerDownManagerStaggered final : public PowerDownManagerIF
-{
+class PowerDownManagerStaggered final : public PowerDownManagerIF {
 public:
-    PowerDownManagerStaggered(ControllerVector<Bank, BankMachine*>& bankMachinesOnRank, Rank rank);
+  PowerDownManagerStaggered(
+      ControllerVector<Bank, BankMachine *> &bankMachinesOnRank, Rank rank);
 
-    void triggerEntry() override;
-    void triggerExit() override;
-    void triggerInterruption() override;
+  void triggerEntry() override;
+  void triggerExit() override;
+  void triggerInterruption() override;
 
-    CommandTuple::Type getNextCommand() override;
-    void update(Command command) override;
-    void evaluate() override;
+  CommandTuple::Type getNextCommand() override;
+  void update(Command command) override;
+  void evaluate() override;
 
 private:
-    enum class State
-    {
-        Idle,
-        ActivePdn,
-        PrechargePdn,
-        SelfRefresh,
-        ExtraRefresh
-    } state = State::Idle;
-    tlm::tlm_generic_payload powerDownPayload;
-    ControllerVector<Bank, BankMachine*>& bankMachinesOnRank;
-    Command nextCommand = Command::NOP;
+  enum class State {
+    Idle,
+    ActivePdn,
+    PrechargePdn,
+    SelfRefresh,
+    ExtraRefresh
+  } state = State::Idle;
+  tlm::tlm_generic_payload powerDownPayload;
+  ControllerVector<Bank, BankMachine *> &bankMachinesOnRank;
+  Command nextCommand = Command::NOP;
 
-    bool controllerIdle = true;
-    bool entryTriggered = true;
-    bool exitTriggered = false;
-    bool enterSelfRefresh = false;
+  bool controllerIdle = true;
+  bool entryTriggered = true;
+  bool exitTriggered = false;
+  bool enterSelfRefresh = false;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // POWERDOWNMANAGERSTAGGERED_H
+#endif  // POWERDOWNMANAGERSTAGGERED_H

@@ -36,88 +36,46 @@
 #ifndef COMMANDLENGTHS_H
 #define COMMANDLENGTHS_H
 
-struct CommandLengths
-{
-    double NOP = 1;
-    double RD = 1;
-    double WR = 1;
-    double MWR = 1;
-    double RDA = 1;
-    double WRA = 1;
-    double MWRA = 1;
-    double ACT = 1;
-    double PREPB = 1;
-    double REFPB = 1;
-    double RFMPB = 1;
-    double REFP2B = 1;
-    double RFMP2B = 1;
-    double PRESB = 1;
-    double REFSB = 1;
-    double RFMSB = 1;
-    double PREAB = 1;
-    double REFAB = 1;
-    double RFMAB = 1;
-    double PDEA = 1;
-    double PDXA = 1;
-    double PDEP = 1;
-    double PDXP = 1;
-    double SREFEN = 1;
-    double SREFEX = 1;
+struct CommandLengths {
+  double NOP = 1;
+  double RD = 1;
+  double WR = 1;
+  double MWR = 1;
+  double RDA = 1;
+  double WRA = 1;
+  double MWRA = 1;
+  double ACT = 1;
+  double PREPB = 1;
+  double REFPB = 1;
+  double RFMPB = 1;
+  double REFP2B = 1;
+  double RFMP2B = 1;
+  double PRESB = 1;
+  double REFSB = 1;
+  double RFMSB = 1;
+  double PREAB = 1;
+  double REFAB = 1;
+  double RFMAB = 1;
+  double PDEA = 1;
+  double PDXA = 1;
+  double PDEP = 1;
+  double PDXP = 1;
+  double SREFEN = 1;
+  double SREFEX = 1;
 
-    CommandLengths(double NOP,
-                   double RD,
-                   double WR,
-                   double MWR,
-                   double RDA,
-                   double WRA,
-                   double MWRA,
-                   double ACT,
-                   double PREPB,
-                   double REFPB,
-                   double RFMPB,
-                   double REFP2B,
-                   double RFMP2B,
-                   double PRESB,
-                   double REFSB,
-                   double RFMSB,
-                   double PREAB,
-                   double REFAB,
-                   double RFMAB,
-                   double PDEA,
-                   double PDXA,
-                   double PDEP,
-                   double PDXP,
-                   double SREFEN,
-                   double SREFEX) :
-        NOP(NOP),
-        RD(RD),
-        WR(WR),
-        MWR(MWR),
-        RDA(RDA),
-        WRA(WRA),
-        MWRA(MWRA),
-        ACT(ACT),
-        PREPB(PREPB),
-        REFPB(REFPB),
-        RFMPB(RFMPB),
-        REFP2B(REFP2B),
-        RFMP2B(RFMP2B),
-        PRESB(PRESB),
-        REFSB(REFSB),
-        RFMSB(RFMSB),
-        PREAB(PREAB),
-        REFAB(REFAB),
-        RFMAB(RFMAB),
-        PDEA(PDEA),
-        PDXA(PDXA),
-        PDEP(PDEP),
-        PDXP(PDXP),
-        SREFEN(SREFEN),
-        SREFEX(SREFEX)
-    {
-    }
+  CommandLengths(double NOP, double RD, double WR, double MWR, double RDA,
+                 double WRA, double MWRA, double ACT, double PREPB,
+                 double REFPB, double RFMPB, double REFP2B, double RFMP2B,
+                 double PRESB, double REFSB, double RFMSB, double PREAB,
+                 double REFAB, double RFMAB, double PDEA, double PDXA,
+                 double PDEP, double PDXP, double SREFEN, double SREFEX)
+      : NOP(NOP), RD(RD), WR(WR), MWR(MWR), RDA(RDA), WRA(WRA), MWRA(MWRA),
+        ACT(ACT), PREPB(PREPB), REFPB(REFPB), RFMPB(RFMPB), REFP2B(REFP2B),
+        RFMP2B(RFMP2B), PRESB(PRESB), REFSB(REFSB), RFMSB(RFMSB), PREAB(PREAB),
+        REFAB(REFAB), RFMAB(RFMAB), PDEA(PDEA), PDXA(PDXA), PDEP(PDEP),
+        PDXP(PDXP), SREFEN(SREFEN), SREFEX(SREFEX) {}
 
-    CommandLengths() = default;
+  CommandLengths() = default;
 };
 
-#endif // COMMANDLENGTHS_H
+#endif  // COMMANDLENGTHS_H

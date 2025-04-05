@@ -52,77 +52,77 @@ class CommentModel;
  *
  */
 
-class TraceNavigator : public QObject
-{
-    Q_OBJECT
+class TraceNavigator : public QObject {
+  Q_OBJECT
 
 public:
-    TraceNavigator(QString path, CommentModel* commentModel, QObject* parent = 0);
+  TraceNavigator(QString path, CommentModel *commentModel, QObject *parent = 0);
 
-    traceTime CurrentTraceTime() const { return currentTraceTime; }
-    TraceDB& TraceFile() { return traceFile; }
-    const GeneralInfo& GeneralTraceInfo() { return traceFile.getGeneralInfo(); }
+  traceTime CurrentTraceTime() const { return currentTraceTime; }
+  TraceDB &TraceFile() { return traceFile; }
+  const GeneralInfo &GeneralTraceInfo() { return traceFile.getGeneralInfo(); }
 
-    void navigateToTime(traceTime time);
-    void navigateToTransaction(ID id);
+  void navigateToTime(traceTime time);
+  void navigateToTransaction(ID id);
 
-    /* Transaction selection
-     * (selecting a single transactions also navigates to that transaction)
-     */
-    void selectTransaction(ID id);
-    void selectTransaction(const std::shared_ptr<Transaction>& transaction);
-    void selectNextTransaction();
-    void selectPreviousTransaction();
-    void selectLastTransaction();
-    void selectFirstTransaction();
-    void selectNextRefresh(traceTime time);
-    void selectNextActivate(traceTime time);
-    void selectNextPrecharge(traceTime time);
-    void selectNextCommand(traceTime time);
-    //     void selectNextActb();
-    //     void selectNextPreb();
-    //     void selectNextRefb();
+  /* Transaction selection
+   * (selecting a single transactions also navigates to that transaction)
+   */
+  void selectTransaction(ID id);
+  void selectTransaction(const std::shared_ptr<Transaction> &transaction);
+  void selectNextTransaction();
+  void selectPreviousTransaction();
+  void selectLastTransaction();
+  void selectFirstTransaction();
+  void selectNextRefresh(traceTime time);
+  void selectNextActivate(traceTime time);
+  void selectNextPrecharge(traceTime time);
+  void selectNextCommand(traceTime time);
+  //     void selectNextActb();
+  //     void selectNextPreb();
+  //     void selectNextRefb();
 
-    void addSelectedTransactions(const std::vector<std::shared_ptr<Transaction>>& transactions);
-    const std::vector<std::shared_ptr<Transaction>>& SelectedTransactions()
-    {
-        return selectedTransactions;
-    }
-    void addSelectedTransaction(const std::shared_ptr<Transaction>& Transaction);
-    void addSelectedTransaction(ID id);
-    void clearSelectedTransactions();
-    bool hasSelectedTransactions();
-    Timespan getSpanCoveredBySelectedTransaction();
+  void addSelectedTransactions(
+      const std::vector<std::shared_ptr<Transaction>> &transactions);
+  const std::vector<std::shared_ptr<Transaction>> &SelectedTransactions() {
+    return selectedTransactions;
+  }
+  void addSelectedTransaction(const std::shared_ptr<Transaction> &Transaction);
+  void addSelectedTransaction(ID id);
+  void clearSelectedTransactions();
+  bool hasSelectedTransactions();
+  Timespan getSpanCoveredBySelectedTransaction();
 
-    bool transactionIsSelected(ID id) const;
-    bool transactionIsSelected(const std::shared_ptr<Transaction>& Transaction) const;
+  bool transactionIsSelected(ID id) const;
+  bool
+  transactionIsSelected(const std::shared_ptr<Transaction> &Transaction) const;
 
-    void commitChangesToDB();
-    void refreshData();
+  void commitChangesToDB();
+  void refreshData();
 
-    const CommentModel* getCommentModel() const;
+  const CommentModel *getCommentModel() const;
 
-    bool existChangesToCommit() const;
+  bool existChangesToCommit() const;
 
 Q_SIGNALS:
-    void currentTraceTimeChanged();
-    void selectedTransactionsChanged();
+  void currentTraceTimeChanged();
+  void selectedTransactionsChanged();
 
 public Q_SLOTS:
-    void traceFileModified();
+  void traceFileModified();
 
 private:
-    TraceDB traceFile;
+  TraceDB traceFile;
 
-    // represents the current position in the tracefile
-    // components drawing the tracefile center around that time
-    traceTime currentTraceTime = 0;
-    std::vector<std::shared_ptr<Transaction>> selectedTransactions;
+  // represents the current position in the tracefile
+  // components drawing the tracefile center around that time
+  traceTime currentTraceTime = 0;
+  std::vector<std::shared_ptr<Transaction>> selectedTransactions;
 
-    CommentModel* commentModel;
+  CommentModel *commentModel;
 
-    void getCommentsFromDB();
-    bool changesToCommitExist;
+  void getCommentsFromDB();
+  bool changesToCommitExist;
 };
 
-#endif // TRACENAVIGATOR_H
+#endif  // TRACENAVIGATOR_H

@@ -40,94 +40,82 @@
 
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-SchedulerFrFcfs::SchedulerFrFcfs(const McConfig& config, const MemSpec& memSpec)
-{
-    buffer = ControllerVector<Bank, std::list<tlm_generic_payload*>>(memSpec.banksPerChannel);
+SchedulerFrFcfs::SchedulerFrFcfs(const McConfig &config,
+                                 const MemSpec &memSpec) {
+  buffer = ControllerVector<Bank, std::list<tlm_generic_payload *>>(
+      memSpec.banksPerChannel);
 
-    if (config.schedulerBuffer == Config::SchedulerBufferType::Bankwise)
-        bufferCounter = std::make_unique<BufferCounterBankwise>(config.requestBufferSize,
-                                                                memSpec.banksPerChannel);
-    else if (config.schedulerBuffer == Config::SchedulerBufferType::ReadWrite)
-        bufferCounter = std::make_unique<BufferCounterReadWrite>(config.requestBufferSizeRead,
-                                                                 config.requestBufferSizeWrite);
-    else if (config.schedulerBuffer == Config::SchedulerBufferType::Shared)
-        bufferCounter = std::make_unique<BufferCounterShared>(config.requestBufferSize);
+  if (config.schedulerBuffer == Config::SchedulerBufferType::Bankwise)
+    bufferCounter = std::make_unique<BufferCounterBankwise>(
+        config.requestBufferSize, memSpec.banksPerChannel);
+  else if (config.schedulerBuffer == Config::SchedulerBufferType::ReadWrite)
+    bufferCounter = std::make_unique<BufferCounterReadWrite>(
+        config.requestBufferSizeRead, config.requestBufferSizeWrite);
+  else if (config.schedulerBuffer == Config::SchedulerBufferType::Shared)
+    bufferCounter =
+        std::make_unique<BufferCounterShared>(config.requestBufferSize);
 }
 
-bool SchedulerFrFcfs::hasBufferSpace(unsigned entries) const
-{
-    return bufferCounter->hasBufferSpace(entries);
+bool SchedulerFrFcfs::hasBufferSpace(unsigned entries) const {
+  return bufferCounter->hasBufferSpace(entries);
 }
 
-void SchedulerFrFcfs::storeRequest(tlm_generic_payload& payload)
-{
-    buffer[ControllerExtension::getBank(payload)].push_back(&payload);
-    bufferCounter->storeRequest(payload);
+void SchedulerFrFcfs::storeRequest(tlm_generic_payload &payload) {
+  buffer[ControllerExtension::getBank(payload)].push_back(&payload);
+  bufferCounter->storeRequest(payload);
 }
 
-void SchedulerFrFcfs::removeRequest(tlm_generic_payload& payload)
-{
-    bufferCounter->removeRequest(payload);
-    Bank bank = ControllerExtension::getBank(payload);
-    for (auto it = buffer[bank].begin(); it != buffer[bank].end(); it++)
-    {
-        if (*it == &payload)
-        {
-            buffer[bank].erase(it);
-            break;
-        }
+void SchedulerFrFcfs::removeRequest(tlm_generic_payload &payload) {
+  bufferCounter->removeRequest(payload);
+  Bank bank = ControllerExtension::getBank(payload);
+  for (auto it = buffer[bank].begin(); it != buffer[bank].end(); it++) {
+    if (*it == &payload) {
+      buffer[bank].erase(it);
+      break;
     }
+  }
 }
 
-tlm_generic_payload* SchedulerFrFcfs::getNextRequest(const BankMachine& bankMachine) const
-{
-    Bank bank = bankMachine.getBank();
-    if (!buffer[bank].empty())
-    {
-        if (bankMachine.isActivated())
-        {
-            // Search for row hit
-            Row openRow = bankMachine.getOpenRow();
-            for (auto* it : buffer[bank])
-            {
-                if (ControllerExtension::getRow(*it) == openRow)
-                    return it;
-            }
-        }
-        // No row hit found or bank precharged
-        return buffer[bank].front();
+tlm_generic_payload *
+SchedulerFrFcfs::getNextRequest(const BankMachine &bankMachine) const {
+  Bank bank = bankMachine.getBank();
+  if (!buffer[bank].empty()) {
+    if (bankMachine.isActivated()) {
+      // Search for row hit
+      Row openRow = bankMachine.getOpenRow();
+      for (auto *it : buffer[bank]) {
+        if (ControllerExtension::getRow(*it) == openRow)
+          return it;
+      }
     }
-    return nullptr;
+    // No row hit found or bank precharged
+    return buffer[bank].front();
+  }
+  return nullptr;
 }
 
-bool SchedulerFrFcfs::hasFurtherRowHit(Bank bank,
-                                       Row row,
-                                       [[maybe_unused]] tlm_command command) const
-{
-    unsigned rowHitCounter = 0;
-    for (auto* it : buffer[bank])
-    {
-        if (ControllerExtension::getRow(*it) == row)
-        {
-            rowHitCounter++;
-            if (rowHitCounter == 2)
-                return true;
-        }
+bool SchedulerFrFcfs::hasFurtherRowHit(
+    Bank bank, Row row, [[maybe_unused]] tlm_command command) const {
+  unsigned rowHitCounter = 0;
+  for (auto *it : buffer[bank]) {
+    if (ControllerExtension::getRow(*it) == row) {
+      rowHitCounter++;
+      if (rowHitCounter == 2)
+        return true;
     }
-    return false;
+  }
+  return false;
 }
 
-bool SchedulerFrFcfs::hasFurtherRequest(Bank bank, [[maybe_unused]] tlm_command command) const
-{
-    return (buffer[bank].size() >= 2);
+bool SchedulerFrFcfs::hasFurtherRequest(
+    Bank bank, [[maybe_unused]] tlm_command command) const {
+  return (buffer[bank].size() >= 2);
 }
 
-const std::vector<unsigned>& SchedulerFrFcfs::getBufferDepth() const
-{
-    return bufferCounter->getBufferDepth();
+const std::vector<unsigned> &SchedulerFrFcfs::getBufferDepth() const {
+  return bufferCounter->getBufferDepth();
 }
 
-} // namespace DRAMSys
+}  // namespace DRAMSys

@@ -42,48 +42,44 @@
 #include <systemc>
 #include <tlm>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class ControllerRecordable final : public Controller
-{
+class ControllerRecordable final : public Controller {
 public:
-    ControllerRecordable(const sc_core::sc_module_name& name,
-                         const McConfig& config,
-                         const SimConfig& simConfig,
-                         const MemSpec& memSpec,
-                         const AddressDecoder& addressDecoder,
-                         TlmRecorder& tlmRecorder);
+  ControllerRecordable(const sc_core::sc_module_name &name,
+                       const McConfig &config, const SimConfig &simConfig,
+                       const MemSpec &memSpec,
+                       const AddressDecoder &addressDecoder,
+                       TlmRecorder &tlmRecorder);
 
 protected:
-    tlm::tlm_sync_enum nb_transport_fw(tlm::tlm_generic_payload& trans,
-                                       tlm::tlm_phase& phase,
-                                       sc_core::sc_time& delay) override;
-    tlm::tlm_sync_enum nb_transport_bw(tlm::tlm_generic_payload& trans,
-                                       tlm::tlm_phase& phase,
-                                       sc_core::sc_time& delay) override;
+  tlm::tlm_sync_enum nb_transport_fw(tlm::tlm_generic_payload &trans,
+                                     tlm::tlm_phase &phase,
+                                     sc_core::sc_time &delay) override;
+  tlm::tlm_sync_enum nb_transport_bw(tlm::tlm_generic_payload &trans,
+                                     tlm::tlm_phase &phase,
+                                     sc_core::sc_time &delay) override;
 
-    void sendToFrontend(tlm::tlm_generic_payload& payload,
-                        tlm::tlm_phase& phase,
-                        sc_core::sc_time& delay) override;
+  void sendToFrontend(tlm::tlm_generic_payload &payload, tlm::tlm_phase &phase,
+                      sc_core::sc_time &delay) override;
 
-    void controllerMethod() override;
+  void controllerMethod() override;
 
 private:
-    TlmRecorder& tlmRecorder;
+  TlmRecorder &tlmRecorder;
 
-    sc_core::sc_event windowEvent;
-    const sc_core::sc_time windowSizeTime;
-    sc_core::sc_time nextWindowEventTime;
-    std::vector<sc_core::sc_time> slidingAverageBufferDepth;
-    std::vector<double> windowAverageBufferDepth;
-    sc_core::sc_time lastTimeCalled = sc_core::SC_ZERO_TIME;
+  sc_core::sc_event windowEvent;
+  const sc_core::sc_time windowSizeTime;
+  sc_core::sc_time nextWindowEventTime;
+  std::vector<sc_core::sc_time> slidingAverageBufferDepth;
+  std::vector<double> windowAverageBufferDepth;
+  sc_core::sc_time lastTimeCalled = sc_core::SC_ZERO_TIME;
 
-    uint64_t lastNumberOfBeatsServed = 0;
-    const sc_core::sc_time activeTimeMultiplier;
-    const bool enableWindowing;
+  uint64_t lastNumberOfBeatsServed = 0;
+  const sc_core::sc_time activeTimeMultiplier;
+  const bool enableWindowing;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // CONTROLLERRECORDABLE_H
+#endif  // CONTROLLERRECORDABLE_H

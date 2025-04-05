@@ -41,67 +41,66 @@
 
 #include <systemc>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class MemSpecHBM2 final : public MemSpec
-{
+class MemSpecHBM2 final : public MemSpec {
 public:
-    explicit MemSpecHBM2(const Config::MemSpec& memSpec);
+  explicit MemSpecHBM2(const Config::MemSpec &memSpec);
 
-    // Memspec Variables:
-    const unsigned stacksPerChannel;
+  // Memspec Variables:
+  const unsigned stacksPerChannel;
 
-    const sc_core::sc_time tDQSCK;
-    //    sc_time tDQSQ; // TODO: check actual value of this parameter
-    const sc_core::sc_time tRC;
-    const sc_core::sc_time tRAS;
-    const sc_core::sc_time tRCDRD;
-    const sc_core::sc_time tRCDWR;
-    const sc_core::sc_time tRRDL;
-    const sc_core::sc_time tRRDS;
-    const sc_core::sc_time tFAW;
-    const sc_core::sc_time tRTP;
-    const sc_core::sc_time tRP;
-    const sc_core::sc_time tRL;
-    const sc_core::sc_time tWL;
-    const sc_core::sc_time tPL;
-    const sc_core::sc_time tWR;
-    const sc_core::sc_time tCCDL;
-    const sc_core::sc_time tCCDS;
-    const sc_core::sc_time tCCDR;
-    const sc_core::sc_time tWTRL;
-    const sc_core::sc_time tWTRS;
-    const sc_core::sc_time tRTW;
-    const sc_core::sc_time tXP;
-    const sc_core::sc_time tCKE;
-    const sc_core::sc_time tPD;    // = tCKE;
-    const sc_core::sc_time tCKESR; // = tCKE + tCK;
-    const sc_core::sc_time tXS;
-    const sc_core::sc_time tRFC;
-    const sc_core::sc_time tRFCSB;
-    const sc_core::sc_time tRREFD;
-    const sc_core::sc_time tREFI;
-    const sc_core::sc_time tREFISB;
+  const sc_core::sc_time tDQSCK;
+  //    sc_time tDQSQ; // TODO: check actual value of this parameter
+  const sc_core::sc_time tRC;
+  const sc_core::sc_time tRAS;
+  const sc_core::sc_time tRCDRD;
+  const sc_core::sc_time tRCDWR;
+  const sc_core::sc_time tRRDL;
+  const sc_core::sc_time tRRDS;
+  const sc_core::sc_time tFAW;
+  const sc_core::sc_time tRTP;
+  const sc_core::sc_time tRP;
+  const sc_core::sc_time tRL;
+  const sc_core::sc_time tWL;
+  const sc_core::sc_time tPL;
+  const sc_core::sc_time tWR;
+  const sc_core::sc_time tCCDL;
+  const sc_core::sc_time tCCDS;
+  const sc_core::sc_time tCCDR;
+  const sc_core::sc_time tWTRL;
+  const sc_core::sc_time tWTRS;
+  const sc_core::sc_time tRTW;
+  const sc_core::sc_time tXP;
+  const sc_core::sc_time tCKE;
+  const sc_core::sc_time tPD;     // = tCKE;
+  const sc_core::sc_time tCKESR;  // = tCKE + tCK;
+  const sc_core::sc_time tXS;
+  const sc_core::sc_time tRFC;
+  const sc_core::sc_time tRFCSB;
+  const sc_core::sc_time tRREFD;
+  const sc_core::sc_time tREFI;
+  const sc_core::sc_time tREFISB;
 
-    // Currents and Voltages:
-    // TODO: to be completed
+  // Currents and Voltages:
+  // TODO: to be completed
 
-    [[nodiscard]] sc_core::sc_time getRefreshIntervalAB() const override;
-    [[nodiscard]] sc_core::sc_time getRefreshIntervalPB() const override;
+  [[nodiscard]] sc_core::sc_time getRefreshIntervalAB() const override;
+  [[nodiscard]] sc_core::sc_time getRefreshIntervalPB() const override;
 
-    [[nodiscard]] bool hasRasAndCasBus() const override;
-    [[nodiscard]] bool pseudoChannelMode() const override;
+  [[nodiscard]] bool hasRasAndCasBus() const override;
+  [[nodiscard]] bool pseudoChannelMode() const override;
 
-    [[nodiscard]] sc_core::sc_time
-    getExecutionTime(Command command, const tlm::tlm_generic_payload& payload) const override;
-    [[nodiscard]] TimeInterval
-    getIntervalOnDataStrobe(Command command,
-                            const tlm::tlm_generic_payload& payload) const override;
+  [[nodiscard]] sc_core::sc_time
+  getExecutionTime(Command command,
+                   const tlm::tlm_generic_payload &payload) const override;
+  [[nodiscard]] TimeInterval getIntervalOnDataStrobe(
+      Command command, const tlm::tlm_generic_payload &payload) const override;
 
-    [[nodiscard]] bool requiresMaskedWrite(const tlm::tlm_generic_payload& payload) const override;
+  [[nodiscard]] bool
+  requiresMaskedWrite(const tlm::tlm_generic_payload &payload) const override;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // MEMSPECHBM2_H
+#endif  // MEMSPECHBM2_H

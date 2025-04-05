@@ -37,19 +37,18 @@
 
 #include "Request.h"
 
-class RequestProducer
-{
+class RequestProducer {
 protected:
-    RequestProducer(const RequestProducer&) = default;
-    RequestProducer(RequestProducer&&) = default;
-    RequestProducer& operator=(const RequestProducer&) = default;
-    RequestProducer& operator=(RequestProducer&&) = default;
+  RequestProducer(const RequestProducer &) = default;
+  RequestProducer(RequestProducer &&) = default;
+  RequestProducer &operator=(const RequestProducer &) = default;
+  RequestProducer &operator=(RequestProducer &&) = default;
 
 public:
-    RequestProducer() = default;
-    virtual ~RequestProducer() = default;
+  RequestProducer() = default;
+  virtual ~RequestProducer() = default;
 
-    virtual Request nextRequest() = 0;
-    virtual uint64_t totalRequests() = 0;
-    virtual void reset(){};
+  virtual Request nextRequest() = 0;
+  virtual uint64_t totalRequests() = 0;
+  virtual void reset() {};
 };

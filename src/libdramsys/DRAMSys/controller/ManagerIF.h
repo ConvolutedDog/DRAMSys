@@ -37,26 +37,24 @@
 
 #include "DRAMSys/controller/Command.h"
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class ManagerIF
-{
+class ManagerIF {
 protected:
-    ManagerIF(const ManagerIF&) = default;
-    ManagerIF(ManagerIF&&) = default;
-    ManagerIF& operator=(const ManagerIF&) = default;
-    ManagerIF& operator=(ManagerIF&&) = default;
+  ManagerIF(const ManagerIF &) = default;
+  ManagerIF(ManagerIF &&) = default;
+  ManagerIF &operator=(const ManagerIF &) = default;
+  ManagerIF &operator=(ManagerIF &&) = default;
 
 public:
-    ManagerIF() = default;
-    virtual ~ManagerIF() = default;
+  ManagerIF() = default;
+  virtual ~ManagerIF() = default;
 
-    virtual void evaluate() = 0;
-    virtual CommandTuple::Type getNextCommand() = 0;
-    virtual void update(Command command) = 0;
+  virtual void evaluate() = 0;
+  virtual CommandTuple::Type getNextCommand() = 0;
+  virtual void update(Command command) = 0;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // MANAGERIF_H
+#endif  // MANAGERIF_H

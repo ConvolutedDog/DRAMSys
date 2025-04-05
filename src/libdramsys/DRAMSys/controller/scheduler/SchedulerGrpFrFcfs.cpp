@@ -40,170 +40,150 @@
 
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-SchedulerGrpFrFcfs::SchedulerGrpFrFcfs(const McConfig& config, const MemSpec& memSpec)
-{
-    readBuffer = ControllerVector<Bank, std::list<tlm_generic_payload*>>(memSpec.banksPerChannel);
-    writeBuffer = ControllerVector<Bank, std::list<tlm_generic_payload*>>(memSpec.banksPerChannel);
+SchedulerGrpFrFcfs::SchedulerGrpFrFcfs(const McConfig &config,
+                                       const MemSpec &memSpec) {
+  readBuffer = ControllerVector<Bank, std::list<tlm_generic_payload *>>(
+      memSpec.banksPerChannel);
+  writeBuffer = ControllerVector<Bank, std::list<tlm_generic_payload *>>(
+      memSpec.banksPerChannel);
 
-    if (config.schedulerBuffer == Config::SchedulerBufferType::Bankwise)
-        bufferCounter = std::make_unique<BufferCounterBankwise>(config.requestBufferSize,
-                                                                memSpec.banksPerChannel);
-    else if (config.schedulerBuffer == Config::SchedulerBufferType::ReadWrite)
-        bufferCounter = std::make_unique<BufferCounterReadWrite>(config.requestBufferSizeRead,
-                                                                 config.requestBufferSizeWrite);
-    else if (config.schedulerBuffer == Config::SchedulerBufferType::Shared)
-        bufferCounter = std::make_unique<BufferCounterShared>(config.requestBufferSize);
+  if (config.schedulerBuffer == Config::SchedulerBufferType::Bankwise)
+    bufferCounter = std::make_unique<BufferCounterBankwise>(
+        config.requestBufferSize, memSpec.banksPerChannel);
+  else if (config.schedulerBuffer == Config::SchedulerBufferType::ReadWrite)
+    bufferCounter = std::make_unique<BufferCounterReadWrite>(
+        config.requestBufferSizeRead, config.requestBufferSizeWrite);
+  else if (config.schedulerBuffer == Config::SchedulerBufferType::Shared)
+    bufferCounter =
+        std::make_unique<BufferCounterShared>(config.requestBufferSize);
 
-    SC_REPORT_WARNING("SchedulerGrpFrFcfs", "Hazard detection not yet implemented!");
+  SC_REPORT_WARNING("SchedulerGrpFrFcfs",
+                    "Hazard detection not yet implemented!");
 }
 
-bool SchedulerGrpFrFcfs::hasBufferSpace(unsigned entries) const
-{
-    return bufferCounter->hasBufferSpace(entries);
+bool SchedulerGrpFrFcfs::hasBufferSpace(unsigned entries) const {
+  return bufferCounter->hasBufferSpace(entries);
 }
 
-void SchedulerGrpFrFcfs::storeRequest(tlm_generic_payload& payload)
-{
-    if (payload.is_read())
-        readBuffer[ControllerExtension::getBank(payload)].push_back(&payload);
-    else
-        writeBuffer[ControllerExtension::getBank(payload)].push_back(&payload);
-    bufferCounter->storeRequest(payload);
+void SchedulerGrpFrFcfs::storeRequest(tlm_generic_payload &payload) {
+  if (payload.is_read())
+    readBuffer[ControllerExtension::getBank(payload)].push_back(&payload);
+  else
+    writeBuffer[ControllerExtension::getBank(payload)].push_back(&payload);
+  bufferCounter->storeRequest(payload);
 }
 
-void SchedulerGrpFrFcfs::removeRequest(tlm_generic_payload& payload)
-{
-    bufferCounter->removeRequest(payload);
-    lastCommand = payload.get_command();
-    Bank bank = ControllerExtension::getBank(payload);
+void SchedulerGrpFrFcfs::removeRequest(tlm_generic_payload &payload) {
+  bufferCounter->removeRequest(payload);
+  lastCommand = payload.get_command();
+  Bank bank = ControllerExtension::getBank(payload);
 
-    if (payload.is_read())
-        readBuffer[bank].remove(&payload);
-    else
-        writeBuffer[bank].remove(&payload);
+  if (payload.is_read())
+    readBuffer[bank].remove(&payload);
+  else
+    writeBuffer[bank].remove(&payload);
 }
 
-tlm_generic_payload* SchedulerGrpFrFcfs::getNextRequest(const BankMachine& bankMachine) const
-{
-    // search row hits, search wrd/wr hits
-    // search rd/wr hits, search row hits
-    Bank bank = bankMachine.getBank();
+tlm_generic_payload *
+SchedulerGrpFrFcfs::getNextRequest(const BankMachine &bankMachine) const {
+  // search row hits, search wrd/wr hits
+  // search rd/wr hits, search row hits
+  Bank bank = bankMachine.getBank();
 
-    if (lastCommand == tlm::TLM_READ_COMMAND)
-    {
-        if (!readBuffer[bank].empty())
-        {
-            if (bankMachine.isActivated())
-            {
-                // Search for read row hit
-                Row openRow = bankMachine.getOpenRow();
-                for (auto* it : readBuffer[bank])
-                {
-                    if (ControllerExtension::getRow(*it) == openRow)
-                        return it;
-                }
-            }
-            // No read row hit found or bank precharged
-            return readBuffer[bank].front();
+  if (lastCommand == tlm::TLM_READ_COMMAND) {
+    if (!readBuffer[bank].empty()) {
+      if (bankMachine.isActivated()) {
+        // Search for read row hit
+        Row openRow = bankMachine.getOpenRow();
+        for (auto *it : readBuffer[bank]) {
+          if (ControllerExtension::getRow(*it) == openRow)
+            return it;
         }
-        if (!writeBuffer[bank].empty())
-        {
-            if (bankMachine.isActivated())
-            {
-                // Search for write row hit
-                Row openRow = bankMachine.getOpenRow();
-                for (auto* it : writeBuffer[bank])
-                {
-                    if (ControllerExtension::getRow(*it) == openRow)
-                        return it;
-                }
-            }
-            // No write row hit found or bank precharged
-            return writeBuffer[bank].front();
-        }
-        return nullptr;
+      }
+      // No read row hit found or bank precharged
+      return readBuffer[bank].front();
     }
-
-    if (!writeBuffer[bank].empty())
-    {
-        if (bankMachine.isActivated())
-        {
-            // Search for write row hit
-            Row openRow = bankMachine.getOpenRow();
-            for (auto* it : writeBuffer[bank])
-            {
-                if (ControllerExtension::getRow(*it) == openRow)
-                    return it;
-            }
+    if (!writeBuffer[bank].empty()) {
+      if (bankMachine.isActivated()) {
+        // Search for write row hit
+        Row openRow = bankMachine.getOpenRow();
+        for (auto *it : writeBuffer[bank]) {
+          if (ControllerExtension::getRow(*it) == openRow)
+            return it;
         }
-        // No write row hit found or bank precharged
-        return writeBuffer[bank].front();
-    }
-    if (!readBuffer[bank].empty())
-    {
-        if (bankMachine.isActivated())
-        {
-            // Search for read row hit
-            Row openRow = bankMachine.getOpenRow();
-            for (auto* it : readBuffer[bank])
-            {
-                if (ControllerExtension::getRow(*it) == openRow)
-                    return it;
-            }
-        }
-        // No read row hit found or bank precharged
-        return readBuffer[bank].front();
+      }
+      // No write row hit found or bank precharged
+      return writeBuffer[bank].front();
     }
     return nullptr;
+  }
+
+  if (!writeBuffer[bank].empty()) {
+    if (bankMachine.isActivated()) {
+      // Search for write row hit
+      Row openRow = bankMachine.getOpenRow();
+      for (auto *it : writeBuffer[bank]) {
+        if (ControllerExtension::getRow(*it) == openRow)
+          return it;
+      }
+    }
+    // No write row hit found or bank precharged
+    return writeBuffer[bank].front();
+  }
+  if (!readBuffer[bank].empty()) {
+    if (bankMachine.isActivated()) {
+      // Search for read row hit
+      Row openRow = bankMachine.getOpenRow();
+      for (auto *it : readBuffer[bank]) {
+        if (ControllerExtension::getRow(*it) == openRow)
+          return it;
+      }
+    }
+    // No read row hit found or bank precharged
+    return readBuffer[bank].front();
+  }
+  return nullptr;
 }
 
-bool SchedulerGrpFrFcfs::hasFurtherRowHit(Bank bank, Row row, tlm_command command) const
-{
-    // TODO: do this based on current RD/WR mode
-    unsigned rowHitCounter = 0;
-    if (command == tlm::TLM_READ_COMMAND)
-    {
-        for (auto* it : readBuffer[bank])
-        {
-            if (ControllerExtension::getRow(*it) == row)
-            {
-                rowHitCounter++;
-                if (rowHitCounter == 2)
-                    return true;
-            }
-        }
-        return false;
+bool SchedulerGrpFrFcfs::hasFurtherRowHit(Bank bank, Row row,
+                                          tlm_command command) const {
+  // TODO: do this based on current RD/WR mode
+  unsigned rowHitCounter = 0;
+  if (command == tlm::TLM_READ_COMMAND) {
+    for (auto *it : readBuffer[bank]) {
+      if (ControllerExtension::getRow(*it) == row) {
+        rowHitCounter++;
+        if (rowHitCounter == 2)
+          return true;
+      }
     }
-
-    for (auto* it : writeBuffer[bank])
-    {
-        if (ControllerExtension::getRow(*it) == row)
-        {
-            rowHitCounter++;
-            if (rowHitCounter == 2)
-                return true;
-        }
-    }
-
     return false;
-}
+  }
 
-bool SchedulerGrpFrFcfs::hasFurtherRequest(Bank bank, tlm_command command) const
-{
-    if (command == tlm::TLM_READ_COMMAND)
-    {
-        return readBuffer[bank].size() >= 2;
+  for (auto *it : writeBuffer[bank]) {
+    if (ControllerExtension::getRow(*it) == row) {
+      rowHitCounter++;
+      if (rowHitCounter == 2)
+        return true;
     }
+  }
 
-    return writeBuffer[bank].size() >= 2;
+  return false;
 }
 
-const std::vector<unsigned>& SchedulerGrpFrFcfs::getBufferDepth() const
-{
-    return bufferCounter->getBufferDepth();
+bool SchedulerGrpFrFcfs::hasFurtherRequest(Bank bank,
+                                           tlm_command command) const {
+  if (command == tlm::TLM_READ_COMMAND) {
+    return readBuffer[bank].size() >= 2;
+  }
+
+  return writeBuffer[bank].size() >= 2;
 }
 
-} // namespace DRAMSys
+const std::vector<unsigned> &SchedulerGrpFrFcfs::getBufferDepth() const {
+  return bufferCounter->getBufferDepth();
+}
+
+}  // namespace DRAMSys

@@ -40,28 +40,26 @@
 #include <tlm>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class BufferCounterBankwise final : public BufferCounterIF
-{
+class BufferCounterBankwise final : public BufferCounterIF {
 public:
-    BufferCounterBankwise(unsigned requestBufferSize, unsigned numberOfBanks);
-    [[nodiscard]] bool hasBufferSpace(unsigned entries) const override;
-    void storeRequest(const tlm::tlm_generic_payload& trans) override;
-    void removeRequest(const tlm::tlm_generic_payload& trans) override;
-    [[nodiscard]] const std::vector<unsigned>& getBufferDepth() const override;
-    [[nodiscard]] unsigned getNumReadRequests() const override;
-    [[nodiscard]] unsigned getNumWriteRequests() const override;
+  BufferCounterBankwise(unsigned requestBufferSize, unsigned numberOfBanks);
+  [[nodiscard]] bool hasBufferSpace(unsigned entries) const override;
+  void storeRequest(const tlm::tlm_generic_payload &trans) override;
+  void removeRequest(const tlm::tlm_generic_payload &trans) override;
+  [[nodiscard]] const std::vector<unsigned> &getBufferDepth() const override;
+  [[nodiscard]] unsigned getNumReadRequests() const override;
+  [[nodiscard]] unsigned getNumWriteRequests() const override;
 
 private:
-    const unsigned requestBufferSize;
-    std::vector<unsigned> numRequestsOnBank;
-    std::size_t lastBankID = 0;
-    unsigned numReadRequests = 0;
-    unsigned numWriteRequests = 0;
+  const unsigned requestBufferSize;
+  std::vector<unsigned> numRequestsOnBank;
+  std::size_t lastBankID = 0;
+  unsigned numReadRequests = 0;
+  unsigned numWriteRequests = 0;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // BUFFERCOUNTERBANKWISE_H
+#endif  // BUFFERCOUNTERBANKWISE_H

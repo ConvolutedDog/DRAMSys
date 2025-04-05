@@ -40,36 +40,35 @@
 #include <iomanip>
 #include <iostream>
 
-void loadBar(uint64_t x, uint64_t n, unsigned int w, unsigned int granularity)
-{
-    if ((n < 100) || ((x != n) && (x % (n / 100 * granularity) != 0)))
-        return;
+void loadBar(uint64_t x, uint64_t n, unsigned int w, unsigned int granularity) {
+  if ((n < 100) || ((x != n) && (x % (n / 100 * granularity) != 0)))
+    return;
 
-    float ratio = x / (float)n;
-    unsigned int c = (ratio * w);
-    float rest = (ratio * w) - c;
-    std::cout << std::setw(3) << std::round(ratio * 100) << "% |";
-    for (unsigned int x = 0; x < c; x++)
-        std::cout << "█";
+  float ratio = x / (float)n;
+  unsigned int c = (ratio * w);
+  float rest = (ratio * w) - c;
+  std::cout << std::setw(3) << std::round(ratio * 100) << "% |";
+  for (unsigned int x = 0; x < c; x++)
+    std::cout << "█";
 
-    if (rest >= 0 && rest < 0.125F && c != w)
-        std::cout << " ";
-    if (rest >= 0.125F && rest < 2 * 0.125F)
-        std::cout << "▏";
-    if (rest >= 2 * 0.125F && rest < 3 * 0.125F)
-        std::cout << "▎";
-    if (rest >= 3 * 0.125F && rest < 4 * 0.125F)
-        std::cout << "▍";
-    if (rest >= 4 * 0.125F && rest < 5 * 0.125F)
-        std::cout << "▌";
-    if (rest >= 5 * 0.125F && rest < 6 * 0.125F)
-        std::cout << "▋";
-    if (rest >= 6 * 0.125F && rest < 7 * 0.125F)
-        std::cout << "▊";
-    if (rest >= 7 * 0.125F && rest < 8 * 0.125F)
-        std::cout << "▉";
+  if (rest >= 0 && rest < 0.125F && c != w)
+    std::cout << " ";
+  if (rest >= 0.125F && rest < 2 * 0.125F)
+    std::cout << "▏";
+  if (rest >= 2 * 0.125F && rest < 3 * 0.125F)
+    std::cout << "▎";
+  if (rest >= 3 * 0.125F && rest < 4 * 0.125F)
+    std::cout << "▍";
+  if (rest >= 4 * 0.125F && rest < 5 * 0.125F)
+    std::cout << "▌";
+  if (rest >= 5 * 0.125F && rest < 6 * 0.125F)
+    std::cout << "▋";
+  if (rest >= 6 * 0.125F && rest < 7 * 0.125F)
+    std::cout << "▊";
+  if (rest >= 7 * 0.125F && rest < 8 * 0.125F)
+    std::cout << "▉";
 
-    for (unsigned int x = c; x < (w - 1); x++)
-        std::cout << " ";
-    std::cout << "|\r" << std::flush;
+  for (unsigned int x = c; x < (w - 1); x++)
+    std::cout << " ";
+  std::cout << "|\r" << std::flush;
 }

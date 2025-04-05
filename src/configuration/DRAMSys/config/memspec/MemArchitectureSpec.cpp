@@ -35,25 +35,20 @@
 
 #include "MemArchitectureSpec.h"
 
-namespace DRAMSys::Config
-{
+namespace DRAMSys::Config {
 
-void to_json(json_t& j, const MemArchitectureSpecType& c)
-{
-    j = json_t{};
+void to_json(json_t &j, const MemArchitectureSpecType &c) {
+  j = json_t{};
 
-    for (const auto& entry : c.entries)
-    {
-        j[entry.first] = entry.second;
-    }
+  for (const auto &entry : c.entries) {
+    j[entry.first] = entry.second;
+  }
 }
 
-void from_json(const json_t& j, MemArchitectureSpecType& c)
-{
-    for (const auto& entry : j.items())
-    {
-        c.entries[entry.key()] = entry.value();
-    }
+void from_json(const json_t &j, MemArchitectureSpecType &c) {
+  for (const auto &entry : j.items()) {
+    c.entries[entry.key()] = entry.value();
+  }
 }
 
-} // namespace DRAMSys::Config
+}  // namespace DRAMSys::Config

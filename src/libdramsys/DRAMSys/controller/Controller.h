@@ -58,130 +58,123 @@
 #include <utility>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class Controller : public sc_core::sc_module
-{
+class Controller : public sc_core::sc_module {
 public:
-    tlm_utils::simple_target_socket<Controller> tSocket{"tSocket"};    // Arbiter side
-    tlm_utils::simple_initiator_socket<Controller> iSocket{"iSocket"}; // DRAM side
+  tlm_utils::simple_target_socket<Controller> tSocket{
+      "tSocket"};  // Arbiter side
+  tlm_utils::simple_initiator_socket<Controller> iSocket{
+      "iSocket"};  // DRAM side
 
-    Controller(const sc_core::sc_module_name& name,
-               const McConfig& config,
-               const MemSpec& memSpec,
-               const AddressDecoder& addressDecoder);
-    SC_HAS_PROCESS(Controller);
+  Controller(const sc_core::sc_module_name &name, const McConfig &config,
+             const MemSpec &memSpec, const AddressDecoder &addressDecoder);
+  SC_HAS_PROCESS(Controller);
 
-    [[nodiscard]] bool idle() const { return totalNumberOfPayloads == 0; }
-    void registerIdleCallback(std::function<void()> idleCallback);
+  [[nodiscard]] bool idle() const { return totalNumberOfPayloads == 0; }
+  void registerIdleCallback(std::function<void()> idleCallback);
 
 protected:
-    void end_of_simulation() override;
+  void end_of_simulation() override;
 
-    virtual tlm::tlm_sync_enum nb_transport_fw(tlm::tlm_generic_payload& trans,
-                                               tlm::tlm_phase& phase,
-                                               sc_core::sc_time& delay);
-    virtual tlm::tlm_sync_enum nb_transport_bw(tlm::tlm_generic_payload& trans,
-                                               tlm::tlm_phase& phase,
-                                               sc_core::sc_time& delay);
-    void b_transport(tlm::tlm_generic_payload& trans, sc_core::sc_time& delay);
-    unsigned int transport_dbg(tlm::tlm_generic_payload& trans);
+  virtual tlm::tlm_sync_enum nb_transport_fw(tlm::tlm_generic_payload &trans,
+                                             tlm::tlm_phase &phase,
+                                             sc_core::sc_time &delay);
+  virtual tlm::tlm_sync_enum nb_transport_bw(tlm::tlm_generic_payload &trans,
+                                             tlm::tlm_phase &phase,
+                                             sc_core::sc_time &delay);
+  void b_transport(tlm::tlm_generic_payload &trans, sc_core::sc_time &delay);
+  unsigned int transport_dbg(tlm::tlm_generic_payload &trans);
 
-    virtual void
-    sendToFrontend(tlm::tlm_generic_payload& trans, tlm::tlm_phase& phase, sc_core::sc_time& delay);
+  virtual void sendToFrontend(tlm::tlm_generic_payload &trans,
+                              tlm::tlm_phase &phase, sc_core::sc_time &delay);
 
-    virtual void controllerMethod();
+  virtual void controllerMethod();
 
-    const McConfig& config;
-    const MemSpec& memSpec;
-    const AddressDecoder& addressDecoder;
+  const McConfig &config;
+  const MemSpec &memSpec;
+  const AddressDecoder &addressDecoder;
 
-    std::unique_ptr<SchedulerIF> scheduler;
+  std::unique_ptr<SchedulerIF> scheduler;
 
-    sc_core::sc_time scMaxTime = sc_core::sc_max_time();
+  sc_core::sc_time scMaxTime = sc_core::sc_max_time();
 
-    std::vector<uint64_t> numberOfBeatsServed;
-    unsigned totalNumberOfPayloads = 0;
-    std::function<void()> idleCallback;
-    ControllerVector<Rank, unsigned> ranksNumberOfPayloads;
-    ReadyCommands readyCommands;
+  std::vector<uint64_t> numberOfBeatsServed;
+  unsigned totalNumberOfPayloads = 0;
+  std::function<void()> idleCallback;
+  ControllerVector<Rank, unsigned> ranksNumberOfPayloads;
+  ReadyCommands readyCommands;
 
-    ControllerVector<Bank, std::unique_ptr<BankMachine>> bankMachines;
-    ControllerVector<Rank, ControllerVector<Bank, BankMachine*>> bankMachinesOnRank;
-    std::unique_ptr<CmdMuxIF> cmdMux;
-    std::unique_ptr<CheckerIF> checker;
-    std::unique_ptr<RespQueueIF> respQueue;
-    ControllerVector<Rank, std::unique_ptr<RefreshManagerIF>> refreshManagers;
-    ControllerVector<Rank, std::unique_ptr<PowerDownManagerIF>> powerDownManagers;
+  ControllerVector<Bank, std::unique_ptr<BankMachine>> bankMachines;
+  ControllerVector<Rank, ControllerVector<Bank, BankMachine *>>
+      bankMachinesOnRank;
+  std::unique_ptr<CmdMuxIF> cmdMux;
+  std::unique_ptr<CheckerIF> checker;
+  std::unique_ptr<RespQueueIF> respQueue;
+  ControllerVector<Rank, std::unique_ptr<RefreshManagerIF>> refreshManagers;
+  ControllerVector<Rank, std::unique_ptr<PowerDownManagerIF>> powerDownManagers;
 
-    uint64_t nextChannelPayloadIDToAppend = 1;
+  uint64_t nextChannelPayloadIDToAppend = 1;
 
-    struct PayloadAndArrival
-    {
-        tlm::tlm_generic_payload* payload = nullptr;
-        sc_core::sc_time arrival = sc_core::sc_max_time();
-    } transToAcquire, transToRelease;
+  struct PayloadAndArrival {
+    tlm::tlm_generic_payload *payload = nullptr;
+    sc_core::sc_time arrival = sc_core::sc_max_time();
+  } transToAcquire, transToRelease;
 
-    void manageResponses();
-    void manageRequests(const sc_core::sc_time& delay);
+  void manageResponses();
+  void manageRequests(const sc_core::sc_time &delay);
 
-    sc_core::sc_event beginReqEvent, endRespEvent, controllerEvent, dataResponseEvent;
+  sc_core::sc_event beginReqEvent, endRespEvent, controllerEvent,
+      dataResponseEvent;
 
-    const unsigned minBytesPerBurst;
-    const unsigned maxBytesPerBurst;
+  const unsigned minBytesPerBurst;
+  const unsigned maxBytesPerBurst;
 
-    void createChildTranses(tlm::tlm_generic_payload& parentTrans);
+  void createChildTranses(tlm::tlm_generic_payload &parentTrans);
 
-    class MemoryManager : public tlm::tlm_mm_interface
-    {
-    public:
-        MemoryManager() = default;
-        MemoryManager(const MemoryManager&) = delete;
-        MemoryManager(MemoryManager&&) = delete;
-        MemoryManager& operator=(const MemoryManager&) = delete;
-        MemoryManager& operator=(MemoryManager&&) = delete;
-        ~MemoryManager() override;
+  class MemoryManager : public tlm::tlm_mm_interface {
+  public:
+    MemoryManager() = default;
+    MemoryManager(const MemoryManager &) = delete;
+    MemoryManager(MemoryManager &&) = delete;
+    MemoryManager &operator=(const MemoryManager &) = delete;
+    MemoryManager &operator=(MemoryManager &&) = delete;
+    ~MemoryManager() override;
 
-        tlm::tlm_generic_payload& allocate();
-        void free(tlm::tlm_generic_payload* trans) override;
+    tlm::tlm_generic_payload &allocate();
+    void free(tlm::tlm_generic_payload *trans) override;
 
-    private:
-        std::stack<tlm::tlm_generic_payload*> freePayloads;
-    } memoryManager;
+  private:
+    std::stack<tlm::tlm_generic_payload *> freePayloads;
+  } memoryManager;
 
-    class IdleTimeCollector
-    {
-    public:
-        void start()
-        {
-            if (!isIdle)
-            {
-                PRINTDEBUGMESSAGE("IdleTimeCollector", "IDLE start");
-                idleStart = sc_core::sc_time_stamp();
-                isIdle = true;
-            }
-        }
+  class IdleTimeCollector {
+  public:
+    void start() {
+      if (!isIdle) {
+        PRINTDEBUGMESSAGE("IdleTimeCollector", "IDLE start");
+        idleStart = sc_core::sc_time_stamp();
+        isIdle = true;
+      }
+    }
 
-        void end()
-        {
-            if (isIdle)
-            {
-                PRINTDEBUGMESSAGE("IdleTimeCollector", "IDLE end");
-                idleTime += sc_core::sc_time_stamp() - idleStart;
-                isIdle = false;
-            }
-        }
+    void end() {
+      if (isIdle) {
+        PRINTDEBUGMESSAGE("IdleTimeCollector", "IDLE end");
+        idleTime += sc_core::sc_time_stamp() - idleStart;
+        isIdle = false;
+      }
+    }
 
-        sc_core::sc_time getIdleTime() { return idleTime; }
+    sc_core::sc_time getIdleTime() { return idleTime; }
 
-    private:
-        bool isIdle = false;
-        sc_core::sc_time idleTime = sc_core::SC_ZERO_TIME;
-        sc_core::sc_time idleStart;
-    } idleTimeCollector;
+  private:
+    bool isIdle = false;
+    sc_core::sc_time idleTime = sc_core::SC_ZERO_TIME;
+    sc_core::sc_time idleStart;
+  } idleTimeCollector;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // CONTROLLER_H
+#endif  // CONTROLLER_H

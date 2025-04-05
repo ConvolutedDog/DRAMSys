@@ -39,43 +39,37 @@
 using namespace sc_core;
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-void RespQueueReorder::insertPayload(tlm_generic_payload* payload, sc_time strobeEnd)
-{
-    buffer[ControllerExtension::getChannelPayloadID(*payload)] = {payload, strobeEnd};
+void RespQueueReorder::insertPayload(tlm_generic_payload *payload,
+                                     sc_time strobeEnd) {
+  buffer[ControllerExtension::getChannelPayloadID(*payload)] = {payload,
+                                                                strobeEnd};
 }
 
-tlm_generic_payload* RespQueueReorder::nextPayload()
-{
-    if (!buffer.empty())
-    {
-        if (buffer.begin()->first == nextPayloadID)
-        {
-            std::pair<tlm_generic_payload*, sc_time> element = buffer.begin()->second;
-            if (element.second <= sc_time_stamp())
-            {
-                buffer.erase(nextPayloadID++);
-                return element.first;
-            }
-        }
+tlm_generic_payload *RespQueueReorder::nextPayload() {
+  if (!buffer.empty()) {
+    if (buffer.begin()->first == nextPayloadID) {
+      std::pair<tlm_generic_payload *, sc_time> element =
+          buffer.begin()->second;
+      if (element.second <= sc_time_stamp()) {
+        buffer.erase(nextPayloadID++);
+        return element.first;
+      }
     }
-    return nullptr;
+  }
+  return nullptr;
 }
 
-sc_time RespQueueReorder::getTriggerTime() const
-{
-    if (!buffer.empty())
-    {
-        if (buffer.begin()->first == nextPayloadID)
-        {
-            sc_time triggerTime = buffer.begin()->second.second;
-            if (triggerTime > sc_time_stamp())
-                return triggerTime;
-        }
+sc_time RespQueueReorder::getTriggerTime() const {
+  if (!buffer.empty()) {
+    if (buffer.begin()->first == nextPayloadID) {
+      sc_time triggerTime = buffer.begin()->second.second;
+      if (triggerTime > sc_time_stamp())
+        return triggerTime;
     }
-    return scMaxTime;
+  }
+  return scMaxTime;
 }
 
-} // namespace DRAMSys
+}  // namespace DRAMSys

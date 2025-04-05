@@ -38,4 +38,5 @@
 
 #include <cstdint>
 
-void loadBar(uint64_t x, uint64_t n, unsigned int w = 50, unsigned int granularity = 1);
+void loadBar(uint64_t x, uint64_t n, unsigned int w = 50,
+             unsigned int granularity = 1);

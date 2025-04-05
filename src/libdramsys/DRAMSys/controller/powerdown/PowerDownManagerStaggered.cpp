@@ -39,128 +39,107 @@
 using namespace sc_core;
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
 PowerDownManagerStaggered::PowerDownManagerStaggered(
-    ControllerVector<Bank, BankMachine*>& bankMachinesOnRank, Rank rank) :
-    bankMachinesOnRank(bankMachinesOnRank)
-{
-    setUpDummy(powerDownPayload, UINT64_MAX - 1, rank);
+    ControllerVector<Bank, BankMachine *> &bankMachinesOnRank, Rank rank)
+    : bankMachinesOnRank(bankMachinesOnRank) {
+  setUpDummy(powerDownPayload, UINT64_MAX - 1, rank);
 }
 
-void PowerDownManagerStaggered::triggerEntry()
-{
-    controllerIdle = true;
+void PowerDownManagerStaggered::triggerEntry() {
+  controllerIdle = true;
 
-    if (state == State::Idle)
-        entryTriggered = true;
+  if (state == State::Idle)
+    entryTriggered = true;
 }
 
-void PowerDownManagerStaggered::triggerExit()
-{
-    controllerIdle = false;
-    enterSelfRefresh = false;
-    entryTriggered = false;
+void PowerDownManagerStaggered::triggerExit() {
+  controllerIdle = false;
+  enterSelfRefresh = false;
+  entryTriggered = false;
 
-    if (state != State::Idle)
-        exitTriggered = true;
+  if (state != State::Idle)
+    exitTriggered = true;
 }
 
-void PowerDownManagerStaggered::triggerInterruption()
-{
-    entryTriggered = false;
+void PowerDownManagerStaggered::triggerInterruption() {
+  entryTriggered = false;
 
-    if (state != State::Idle)
-        exitTriggered = true;
+  if (state != State::Idle)
+    exitTriggered = true;
 }
 
-CommandTuple::Type PowerDownManagerStaggered::getNextCommand()
-{
-    return {nextCommand, &powerDownPayload, SC_ZERO_TIME};
+CommandTuple::Type PowerDownManagerStaggered::getNextCommand() {
+  return {nextCommand, &powerDownPayload, SC_ZERO_TIME};
 }
 
-void PowerDownManagerStaggered::evaluate()
-{
-    nextCommand = Command::NOP;
+void PowerDownManagerStaggered::evaluate() {
+  nextCommand = Command::NOP;
 
-    if (exitTriggered)
-    {
-        if (state == State::ActivePdn)
-            nextCommand = Command::PDXA;
-        else if (state == State::PrechargePdn)
-            nextCommand = Command::PDXP;
-        else if (state == State::SelfRefresh)
-            nextCommand = Command::SREFEX;
-        else if (state == State::ExtraRefresh)
-            nextCommand = Command::REFAB;
+  if (exitTriggered) {
+    if (state == State::ActivePdn)
+      nextCommand = Command::PDXA;
+    else if (state == State::PrechargePdn)
+      nextCommand = Command::PDXP;
+    else if (state == State::SelfRefresh)
+      nextCommand = Command::SREFEX;
+    else if (state == State::ExtraRefresh)
+      nextCommand = Command::REFAB;
+  } else if (entryTriggered) {
+    nextCommand = Command::PDEP;
+    for (auto *it : bankMachinesOnRank) {
+      if (it->isActivated()) {
+        nextCommand = Command::PDEA;
+        break;
+      }
     }
-    else if (entryTriggered)
-    {
-        nextCommand = Command::PDEP;
-        for (auto* it : bankMachinesOnRank)
-        {
-            if (it->isActivated())
-            {
-                nextCommand = Command::PDEA;
-                break;
-            }
-        }
-    }
-    else if (enterSelfRefresh)
-    {
-        nextCommand = Command::SREFEN;
-    }
+  } else if (enterSelfRefresh) {
+    nextCommand = Command::SREFEN;
+  }
 }
 
-void PowerDownManagerStaggered::update(Command command)
-{
-    switch (command)
-    {
+void PowerDownManagerStaggered::update(Command command) {
+  switch (command) {
     case Command::PDEA:
-        state = State::ActivePdn;
-        entryTriggered = false;
-        break;
+      state = State::ActivePdn;
+      entryTriggered = false;
+      break;
     case Command::PDEP:
-        state = State::PrechargePdn;
-        entryTriggered = false;
-        break;
+      state = State::PrechargePdn;
+      entryTriggered = false;
+      break;
     case Command::SREFEN:
-        state = State::SelfRefresh;
-        entryTriggered = false;
-        enterSelfRefresh = false;
-        break;
+      state = State::SelfRefresh;
+      entryTriggered = false;
+      enterSelfRefresh = false;
+      break;
     case Command::PDXA:
-        state = State::Idle;
-        exitTriggered = false;
-        break;
+      state = State::Idle;
+      exitTriggered = false;
+      break;
     case Command::PDXP:
+      state = State::Idle;
+      exitTriggered = false;
+      if (controllerIdle)
+        enterSelfRefresh = true;
+      break;
+    case Command::SREFEX: state = State::ExtraRefresh; break;
+    case Command::REFAB:
+      if (state == State::ExtraRefresh) {
         state = State::Idle;
         exitTriggered = false;
-        if (controllerIdle)
-            enterSelfRefresh = true;
-        break;
-    case Command::SREFEX:
-        state = State::ExtraRefresh;
-        break;
-    case Command::REFAB:
-        if (state == State::ExtraRefresh)
-        {
-            state = State::Idle;
-            exitTriggered = false;
-        }
-        else if (controllerIdle)
-            entryTriggered = true;
-        break;
+      } else if (controllerIdle)
+        entryTriggered = true;
+      break;
     case Command::REFPB:
     case Command::REFP2B:
     case Command::REFSB:
-        if (controllerIdle)
-            entryTriggered = true;
-        break;
-    default:
-        break;
-    }
+      if (controllerIdle)
+        entryTriggered = true;
+      break;
+    default: break;
+  }
 }
 
-} // namespace DRAMSys
+}  // namespace DRAMSys

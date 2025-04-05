@@ -36,52 +36,44 @@
 
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
 BufferCounterReadWrite::BufferCounterReadWrite(unsigned requestBufferSizeRead,
-                                               unsigned requestBufferSizeWrite) :
-    requestBufferSizeRead(requestBufferSizeRead),
-    requestBufferSizeWrite(requestBufferSizeWrite)
-{
-    numReadWriteRequests = std::vector<unsigned>(2);
+                                               unsigned requestBufferSizeWrite)
+    : requestBufferSizeRead(requestBufferSizeRead),
+      requestBufferSizeWrite(requestBufferSizeWrite) {
+  numReadWriteRequests = std::vector<unsigned>(2);
 }
 
-bool BufferCounterReadWrite::hasBufferSpace(unsigned entries) const
-{
-    return (numReadWriteRequests[0] + entries <= requestBufferSizeRead &&
-            numReadWriteRequests[1] + entries <= requestBufferSizeWrite);
+bool BufferCounterReadWrite::hasBufferSpace(unsigned entries) const {
+  return (numReadWriteRequests[0] + entries <= requestBufferSizeRead &&
+          numReadWriteRequests[1] + entries <= requestBufferSizeWrite);
 }
 
-void BufferCounterReadWrite::storeRequest(const tlm_generic_payload& trans)
-{
-    if (trans.is_read())
-        numReadWriteRequests[0]++;
-    else
-        numReadWriteRequests[1]++;
+void BufferCounterReadWrite::storeRequest(const tlm_generic_payload &trans) {
+  if (trans.is_read())
+    numReadWriteRequests[0]++;
+  else
+    numReadWriteRequests[1]++;
 }
 
-void BufferCounterReadWrite::removeRequest(const tlm_generic_payload& trans)
-{
-    if (trans.is_read())
-        numReadWriteRequests[0]--;
-    else
-        numReadWriteRequests[1]--;
+void BufferCounterReadWrite::removeRequest(const tlm_generic_payload &trans) {
+  if (trans.is_read())
+    numReadWriteRequests[0]--;
+  else
+    numReadWriteRequests[1]--;
 }
 
-const std::vector<unsigned>& BufferCounterReadWrite::getBufferDepth() const
-{
-    return numReadWriteRequests;
+const std::vector<unsigned> &BufferCounterReadWrite::getBufferDepth() const {
+  return numReadWriteRequests;
 }
 
-unsigned BufferCounterReadWrite::getNumReadRequests() const
-{
-    return numReadWriteRequests[0];
+unsigned BufferCounterReadWrite::getNumReadRequests() const {
+  return numReadWriteRequests[0];
 }
 
-unsigned BufferCounterReadWrite::getNumWriteRequests() const
-{
-    return numReadWriteRequests[1];
+unsigned BufferCounterReadWrite::getNumWriteRequests() const {
+  return numReadWriteRequests[1];
 }
 
-} // namespace DRAMSys
+}  // namespace DRAMSys

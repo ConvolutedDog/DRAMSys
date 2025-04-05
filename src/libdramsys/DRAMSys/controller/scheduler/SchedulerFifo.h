@@ -37,37 +37,36 @@
 
 #include "DRAMSys/common/dramExtensions.h"
 #include "DRAMSys/controller/BankMachine.h"
+#include "DRAMSys/controller/McConfig.h"
 #include "DRAMSys/controller/scheduler/BufferCounterIF.h"
 #include "DRAMSys/controller/scheduler/SchedulerIF.h"
-#include "DRAMSys/controller/McConfig.h"
 
 #include <deque>
 #include <memory>
 #include <tlm>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class SchedulerFifo final : public SchedulerIF
-{
+class SchedulerFifo final : public SchedulerIF {
 public:
-    explicit SchedulerFifo(const McConfig& config, const MemSpec& memSpec);
-    [[nodiscard]] bool hasBufferSpace(unsigned entries) const override;
-    void storeRequest(tlm::tlm_generic_payload& payload) override;
-    void removeRequest(tlm::tlm_generic_payload& payload) override;
-    [[nodiscard]] tlm::tlm_generic_payload*
-    getNextRequest(const BankMachine& bankMachine) const override;
-    [[nodiscard]] bool
-    hasFurtherRowHit(Bank bank, Row row, tlm::tlm_command command) const override;
-    [[nodiscard]] bool hasFurtherRequest(Bank bank, tlm::tlm_command command) const override;
-    [[nodiscard]] const std::vector<unsigned>& getBufferDepth() const override;
+  explicit SchedulerFifo(const McConfig &config, const MemSpec &memSpec);
+  [[nodiscard]] bool hasBufferSpace(unsigned entries) const override;
+  void storeRequest(tlm::tlm_generic_payload &payload) override;
+  void removeRequest(tlm::tlm_generic_payload &payload) override;
+  [[nodiscard]] tlm::tlm_generic_payload *
+  getNextRequest(const BankMachine &bankMachine) const override;
+  [[nodiscard]] bool hasFurtherRowHit(Bank bank, Row row,
+                                      tlm::tlm_command command) const override;
+  [[nodiscard]] bool hasFurtherRequest(Bank bank,
+                                       tlm::tlm_command command) const override;
+  [[nodiscard]] const std::vector<unsigned> &getBufferDepth() const override;
 
 private:
-    ControllerVector<Bank, std::deque<tlm::tlm_generic_payload*>> buffer;
-    std::unique_ptr<BufferCounterIF> bufferCounter;
+  ControllerVector<Bank, std::deque<tlm::tlm_generic_payload *>> buffer;
+  std::unique_ptr<BufferCounterIF> bufferCounter;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // SCHEDULERFIFO_H
+#endif  // SCHEDULERFIFO_H

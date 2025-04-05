@@ -40,34 +40,33 @@
 #include <tlm>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
 class BankMachine;
 
-class SchedulerIF
-{
+class SchedulerIF {
 protected:
-    SchedulerIF(const SchedulerIF&) = default;
-    SchedulerIF(SchedulerIF&&) = default;
-    SchedulerIF& operator=(const SchedulerIF&) = default;
-    SchedulerIF& operator=(SchedulerIF&&) = default;
+  SchedulerIF(const SchedulerIF &) = default;
+  SchedulerIF(SchedulerIF &&) = default;
+  SchedulerIF &operator=(const SchedulerIF &) = default;
+  SchedulerIF &operator=(SchedulerIF &&) = default;
 
 public:
-    SchedulerIF() = default;
-    virtual ~SchedulerIF() = default;
+  SchedulerIF() = default;
+  virtual ~SchedulerIF() = default;
 
-    [[nodiscard]] virtual bool hasBufferSpace(unsigned entries) const = 0;
-    virtual void storeRequest(tlm::tlm_generic_payload& payload) = 0;
-    virtual void removeRequest(tlm::tlm_generic_payload& payload) = 0;
-    [[nodiscard]] virtual tlm::tlm_generic_payload*
-    getNextRequest(const BankMachine& bankMachine) const = 0;
-    [[nodiscard]] virtual bool
-    hasFurtherRowHit(Bank bank, Row row, tlm::tlm_command command) const = 0;
-    [[nodiscard]] virtual bool hasFurtherRequest(Bank bank, tlm::tlm_command command) const = 0;
-    [[nodiscard]] virtual const std::vector<unsigned>& getBufferDepth() const = 0;
+  [[nodiscard]] virtual bool hasBufferSpace(unsigned entries) const = 0;
+  virtual void storeRequest(tlm::tlm_generic_payload &payload) = 0;
+  virtual void removeRequest(tlm::tlm_generic_payload &payload) = 0;
+  [[nodiscard]] virtual tlm::tlm_generic_payload *
+  getNextRequest(const BankMachine &bankMachine) const = 0;
+  [[nodiscard]] virtual bool
+  hasFurtherRowHit(Bank bank, Row row, tlm::tlm_command command) const = 0;
+  [[nodiscard]] virtual bool
+  hasFurtherRequest(Bank bank, tlm::tlm_command command) const = 0;
+  [[nodiscard]] virtual const std::vector<unsigned> &getBufferDepth() const = 0;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // SCHEDULERIF_H
+#endif  // SCHEDULERIF_H

@@ -41,63 +41,62 @@
 
 #include <systemc>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class MemSpecLPDDR4 final : public MemSpec
-{
+class MemSpecLPDDR4 final : public MemSpec {
 public:
-    explicit MemSpecLPDDR4(const Config::MemSpec& memSpec);
+  explicit MemSpecLPDDR4(const Config::MemSpec &memSpec);
 
-    // Memspec Variables:
-    const sc_core::sc_time tREFI;
-    const sc_core::sc_time tREFIpb;
-    const sc_core::sc_time tRFCab;
-    const sc_core::sc_time tRFCpb;
-    const sc_core::sc_time tRAS;
-    const sc_core::sc_time tRPab;
-    const sc_core::sc_time tRPpb;
-    const sc_core::sc_time tRCpb;
-    const sc_core::sc_time tRCab;
-    const sc_core::sc_time tPPD;
-    const sc_core::sc_time tRCD;
-    const sc_core::sc_time tFAW;
-    const sc_core::sc_time tRRD;
-    const sc_core::sc_time tCCD;
-    const sc_core::sc_time tCCDMW;
-    const sc_core::sc_time tRL;
-    const sc_core::sc_time tRPST;
-    const sc_core::sc_time tDQSCK;
-    const sc_core::sc_time tRTP;
-    const sc_core::sc_time tWL;
-    const sc_core::sc_time tDQSS;
-    const sc_core::sc_time tDQS2DQ;
-    const sc_core::sc_time tWR;
-    const sc_core::sc_time tWPRE;
-    const sc_core::sc_time tWTR;
-    const sc_core::sc_time tXP;
-    const sc_core::sc_time tSR;
-    const sc_core::sc_time tXSR;
-    const sc_core::sc_time tESCKE;
-    const sc_core::sc_time tCKE;
-    const sc_core::sc_time tCMDCKE;
-    const sc_core::sc_time tRTRS;
+  // Memspec Variables:
+  const sc_core::sc_time tREFI;
+  const sc_core::sc_time tREFIpb;
+  const sc_core::sc_time tRFCab;
+  const sc_core::sc_time tRFCpb;
+  const sc_core::sc_time tRAS;
+  const sc_core::sc_time tRPab;
+  const sc_core::sc_time tRPpb;
+  const sc_core::sc_time tRCpb;
+  const sc_core::sc_time tRCab;
+  const sc_core::sc_time tPPD;
+  const sc_core::sc_time tRCD;
+  const sc_core::sc_time tFAW;
+  const sc_core::sc_time tRRD;
+  const sc_core::sc_time tCCD;
+  const sc_core::sc_time tCCDMW;
+  const sc_core::sc_time tRL;
+  const sc_core::sc_time tRPST;
+  const sc_core::sc_time tDQSCK;
+  const sc_core::sc_time tRTP;
+  const sc_core::sc_time tWL;
+  const sc_core::sc_time tDQSS;
+  const sc_core::sc_time tDQS2DQ;
+  const sc_core::sc_time tWR;
+  const sc_core::sc_time tWPRE;
+  const sc_core::sc_time tWTR;
+  const sc_core::sc_time tXP;
+  const sc_core::sc_time tSR;
+  const sc_core::sc_time tXSR;
+  const sc_core::sc_time tESCKE;
+  const sc_core::sc_time tCKE;
+  const sc_core::sc_time tCMDCKE;
+  const sc_core::sc_time tRTRS;
 
-    // Currents and Voltages:
-    // TODO: to be completed
+  // Currents and Voltages:
+  // TODO: to be completed
 
-    [[nodiscard]] sc_core::sc_time getRefreshIntervalAB() const override;
-    [[nodiscard]] sc_core::sc_time getRefreshIntervalPB() const override;
+  [[nodiscard]] sc_core::sc_time getRefreshIntervalAB() const override;
+  [[nodiscard]] sc_core::sc_time getRefreshIntervalPB() const override;
 
-    [[nodiscard]] sc_core::sc_time
-    getExecutionTime(Command command, const tlm::tlm_generic_payload& payload) const override;
-    [[nodiscard]] TimeInterval
-    getIntervalOnDataStrobe(Command command,
-                            const tlm::tlm_generic_payload& payload) const override;
+  [[nodiscard]] sc_core::sc_time
+  getExecutionTime(Command command,
+                   const tlm::tlm_generic_payload &payload) const override;
+  [[nodiscard]] TimeInterval getIntervalOnDataStrobe(
+      Command command, const tlm::tlm_generic_payload &payload) const override;
 
-    [[nodiscard]] bool requiresMaskedWrite(const tlm::tlm_generic_payload& payload) const override;
+  [[nodiscard]] bool
+  requiresMaskedWrite(const tlm::tlm_generic_payload &payload) const override;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // MEMSPECLPDDR4_H
+#endif  // MEMSPECLPDDR4_H

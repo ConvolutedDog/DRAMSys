@@ -44,60 +44,51 @@
 using namespace sc_core;
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-bool TimeInterval::timeIsInInterval(const sc_time& time) const
-{
-    return (start < time && time < end);
+bool TimeInterval::timeIsInInterval(const sc_time &time) const {
+  return (start < time && time < end);
 }
 
-bool TimeInterval::intersects(const TimeInterval& other) const
-{
-    return other.timeIsInInterval(this->start) || this->timeIsInInterval(other.start);
+bool TimeInterval::intersects(const TimeInterval &other) const {
+  return other.timeIsInInterval(this->start) ||
+         this->timeIsInInterval(other.start);
 }
 
-sc_time TimeInterval::getLength() const
-{
-    if (start > end)
-        return start - end;
+sc_time TimeInterval::getLength() const {
+  if (start > end)
+    return start - end;
 
-    return end - start;
+  return end - start;
 }
 
-std::string getPhaseName(const tlm_phase& phase)
-{
-    std::ostringstream oss;
-    oss << phase;
-    return oss.str();
+std::string getPhaseName(const tlm_phase &phase) {
+  std::ostringstream oss;
+  oss << phase;
+  return oss.str();
 }
 
-void setUpDummy(tlm_generic_payload& payload,
-                uint64_t channelPayloadID,
-                Rank rank,
-                BankGroup bankGroup,
-                Bank bank)
-{
-    payload.set_address(0);
-    payload.set_command(TLM_IGNORE_COMMAND);
-    payload.set_data_length(0);
-    payload.set_response_status(TLM_OK_RESPONSE);
-    payload.set_dmi_allowed(false);
-    payload.set_byte_enable_length(0);
-    payload.set_streaming_width(0);
-    ControllerExtension::setExtension(
-        payload, channelPayloadID, rank, Stack(0), bankGroup, bank, Row(0), Column(0), 0);
-    ArbiterExtension::setExtension(payload, Thread(UINT_MAX), Channel(0), 0, SC_ZERO_TIME);
+void setUpDummy(tlm_generic_payload &payload, uint64_t channelPayloadID,
+                Rank rank, BankGroup bankGroup, Bank bank) {
+  payload.set_address(0);
+  payload.set_command(TLM_IGNORE_COMMAND);
+  payload.set_data_length(0);
+  payload.set_response_status(TLM_OK_RESPONSE);
+  payload.set_dmi_allowed(false);
+  payload.set_byte_enable_length(0);
+  payload.set_streaming_width(0);
+  ControllerExtension::setExtension(payload, channelPayloadID, rank, Stack(0),
+                                    bankGroup, bank, Row(0), Column(0), 0);
+  ArbiterExtension::setExtension(payload, Thread(UINT_MAX), Channel(0), 0,
+                                 SC_ZERO_TIME);
 }
 
-bool isFullCycle(sc_core::sc_time time, sc_core::sc_time cycleTime)
-{
-    return alignAtNext(time, cycleTime) == time;
+bool isFullCycle(sc_core::sc_time time, sc_core::sc_time cycleTime) {
+  return alignAtNext(time, cycleTime) == time;
 }
 
-sc_time alignAtNext(sc_time time, sc_time alignment)
-{
-    return std::ceil(time / alignment) * alignment;
+sc_time alignAtNext(sc_time time, sc_time alignment) {
+  return std::ceil(time / alignment) * alignment;
 }
 
-} // namespace DRAMSys
+}  // namespace DRAMSys

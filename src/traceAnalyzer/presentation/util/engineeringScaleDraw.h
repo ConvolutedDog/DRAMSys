@@ -42,12 +42,10 @@
 #include <qwt_scale_draw.h>
 #include <qwt_text.h>
 
-class EngineeringScaleDraw : public QwtScaleDraw
-{
+class EngineeringScaleDraw : public QwtScaleDraw {
 public:
-    virtual QwtText label(double number) const
-    {
-        return QwtText(QString::number(number / 1000, 'g', 9));
-    }
+  virtual QwtText label(double number) const {
+    return QwtText(QString::number(number / 1000, 'g', 9));
+  }
 };
-#endif // ENGINEERINGSCALEDRAW_H
+#endif  // ENGINEERINGSCALEDRAW_H

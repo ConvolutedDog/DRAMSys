@@ -41,13 +41,12 @@
 #include "businessObjects/tracecalculatedmetrics.h"
 #include <QTreeWidget>
 
-class TraceMetricTreeWidget : public QTreeWidget
-{
-    Q_OBJECT
+class TraceMetricTreeWidget : public QTreeWidget {
+  Q_OBJECT
 public:
-    explicit TraceMetricTreeWidget(QWidget* parent = nullptr);
-    void addTraceMetricResults(const TraceCalculatedMetrics& result);
-    void addTracePlotResults(QString traceName, QString outputFiles);
+  explicit TraceMetricTreeWidget(QWidget *parent = nullptr);
+  void addTraceMetricResults(const TraceCalculatedMetrics &result);
+  void addTracePlotResults(QString traceName, QString outputFiles);
 };
 
-#endif // TRACEMETRICTREEWIDGET_H
+#endif  // TRACEMETRICTREEWIDGET_H

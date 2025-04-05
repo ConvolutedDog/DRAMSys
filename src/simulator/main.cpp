@@ -39,25 +39,22 @@
 
 #include <filesystem>
 
-int sc_main(int argc, char** argv)
-{
-    std::filesystem::path resourceDirectory = DRAMSYS_RESOURCE_DIR;
-    if (argc >= 3)
-    {
-        resourceDirectory = argv[2];
-    }
+int sc_main(int argc, char **argv) {
+  std::filesystem::path resourceDirectory = DRAMSYS_RESOURCE_DIR;
+  if (argc >= 3) {
+    resourceDirectory = argv[2];
+  }
 
-    std::filesystem::path baseConfig = resourceDirectory / "ddr4-example.json";
-    if (argc >= 2)
-    {
-        baseConfig = argv[1];
-    }
+  std::filesystem::path baseConfig = resourceDirectory / "ddr4-example.json";
+  if (argc >= 2) {
+    baseConfig = argv[1];
+  }
 
-    DRAMSys::Config::Configuration configuration =
-        DRAMSys::Config::from_path(baseConfig.c_str(), resourceDirectory.c_str());
+  DRAMSys::Config::Configuration configuration =
+      DRAMSys::Config::from_path(baseConfig.c_str(), resourceDirectory.c_str());
 
-    Simulator simulator(std::move(configuration), std::move(resourceDirectory));
-    simulator.run();
+  Simulator simulator(std::move(configuration), std::move(resourceDirectory));
+  simulator.run();
 
-    return 0;
+  return 0;
 }

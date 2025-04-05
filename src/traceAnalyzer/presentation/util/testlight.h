@@ -41,21 +41,20 @@
 #include <QPaintEvent>
 #include <QWidget>
 
-class TestLight : public QWidget
-{
-    Q_OBJECT
+class TestLight : public QWidget {
+  Q_OBJECT
 
 public:
-    TestLight(QWidget* parent = 0);
-    void setGreen();
-    void setRed();
-    void setGray();
+  TestLight(QWidget *parent = 0);
+  void setGreen();
+  void setRed();
+  void setGray();
 
 protected:
-    void paintEvent(QPaintEvent* paintEvent);
+  void paintEvent(QPaintEvent *paintEvent);
 
 private:
-    QColor lightColor;
+  QColor lightColor;
 };
 
-#endif // TESTLIGHT_H
+#endif  // TESTLIGHT_H

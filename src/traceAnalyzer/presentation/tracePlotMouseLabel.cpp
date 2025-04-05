@@ -39,29 +39,20 @@
 #include "businessObjects/tracetime.h"
 #include <qwt_text.h>
 
-void TracePlotMouseLabel::setMode(MouseLabelMode mode)
-{
-    this->mode = mode;
-}
+void TracePlotMouseLabel::setMode(MouseLabelMode mode) { this->mode = mode; }
 
-QwtText TracePlotMouseLabel::trackerText(const QPoint& point) const
-{
-    if (mode == MouseLabelMode::AbsoluteTime)
-    {
-        traceTime mouseTime =
-            static_cast<traceTime>(traceplot->invTransform(traceplot->xBottom, point.x()));
-        return QwtText(prettyFormatTime(alignToClk(mouseTime, clkPeriod)) + "(" +
-                       formatInClks(mouseTime, clkPeriod) + ")");
-    }
-    else if (mode == MouseLabelMode::Timedifference)
-    {
-        traceTime mouseTime = timeDifferenceSpan.timeCovered();
-        return QwtText(prettyFormatTime(alignToClk(mouseTime, clkPeriod)) + "(" +
-                       formatInClks(mouseTime, clkPeriod) + ")");
-    }
-    else
-    {
-        Q_ASSERT(false);
-    }
-    return QwtText(QString(""));
+QwtText TracePlotMouseLabel::trackerText(const QPoint &point) const {
+  if (mode == MouseLabelMode::AbsoluteTime) {
+    traceTime mouseTime = static_cast<traceTime>(
+        traceplot->invTransform(traceplot->xBottom, point.x()));
+    return QwtText(prettyFormatTime(alignToClk(mouseTime, clkPeriod)) + "(" +
+                   formatInClks(mouseTime, clkPeriod) + ")");
+  } else if (mode == MouseLabelMode::Timedifference) {
+    traceTime mouseTime = timeDifferenceSpan.timeCovered();
+    return QwtText(prettyFormatTime(alignToClk(mouseTime, clkPeriod)) + "(" +
+                   formatInClks(mouseTime, clkPeriod) + ")");
+  } else {
+    Q_ASSERT(false);
+  }
+  return QwtText(QString(""));
 }

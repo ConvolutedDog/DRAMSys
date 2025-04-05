@@ -37,55 +37,50 @@
 #ifndef CHECKERDDR4_H
 #define CHECKERDDR4_H
 
-#include "DRAMSys/controller/checker/CheckerIF.h"
 #include "DRAMSys/configuration/memspec/MemSpecDDR4.h"
+#include "DRAMSys/controller/checker/CheckerIF.h"
 
 #include <queue>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class CheckerDDR4 final : public CheckerIF
-{
+class CheckerDDR4 final : public CheckerIF {
 public:
-    explicit CheckerDDR4(const MemSpecDDR4& memSpec);
-    [[nodiscard]] sc_core::sc_time timeToSatisfyConstraints(Command command, const tlm::tlm_generic_payload& payload) const override;
-    void insert(Command command, const tlm::tlm_generic_payload& payload) override;
+  explicit CheckerDDR4(const MemSpecDDR4 &memSpec);
+  [[nodiscard]] sc_core::sc_time timeToSatisfyConstraints(
+      Command command, const tlm::tlm_generic_payload &payload) const override;
+  void insert(Command command,
+              const tlm::tlm_generic_payload &payload) override;
 
 private:
-    const MemSpecDDR4& memSpec;
+  const MemSpecDDR4 &memSpec;
 
-    sc_core::sc_time tBURST;
-    sc_core::sc_time tRDWR;
-    sc_core::sc_time tRDWR_R;
-    sc_core::sc_time tWRRD_S;
-    sc_core::sc_time tWRRD_L;
-    sc_core::sc_time tWRRD_R;
-    sc_core::sc_time tRDAACT;
-    sc_core::sc_time tWRPRE;
-    sc_core::sc_time tWRAACT;
-    sc_core::sc_time tRDPDEN;
-    sc_core::sc_time tWRPDEN;
-    sc_core::sc_time tWRAPDEN;
-    template<typename T>
-    using CommandArray = std::array<T, Command::END_ENUM>;
-    template<typename T>
-    using BankVector = ControllerVector<Bank, T>;
-    template<typename T>
-    using BankGroupVector = ControllerVector<BankGroup, T>;
-    template<typename T>
-    using RankVector = ControllerVector<Rank, T>;
+  sc_core::sc_time tBURST;
+  sc_core::sc_time tRDWR;
+  sc_core::sc_time tRDWR_R;
+  sc_core::sc_time tWRRD_S;
+  sc_core::sc_time tWRRD_L;
+  sc_core::sc_time tWRRD_R;
+  sc_core::sc_time tRDAACT;
+  sc_core::sc_time tWRPRE;
+  sc_core::sc_time tWRAACT;
+  sc_core::sc_time tRDPDEN;
+  sc_core::sc_time tWRPDEN;
+  sc_core::sc_time tWRAPDEN;
+  template <typename T> using CommandArray = std::array<T, Command::END_ENUM>;
+  template <typename T> using BankVector = ControllerVector<Bank, T>;
+  template <typename T> using BankGroupVector = ControllerVector<BankGroup, T>;
+  template <typename T> using RankVector = ControllerVector<Rank, T>;
 
-    
-    CommandArray<BankVector<sc_core::sc_time>> nextCommandByBank;
-    CommandArray<BankGroupVector<sc_core::sc_time>> nextCommandByBankGroup;
-    CommandArray<RankVector<sc_core::sc_time>> nextCommandByRank;
-    
-    RankVector<std::queue<sc_core::sc_time>> last4ActivatesOnRank;
-    sc_core::sc_time nextCommandOnBus = sc_core::SC_ZERO_TIME;
+  CommandArray<BankVector<sc_core::sc_time>> nextCommandByBank;
+  CommandArray<BankGroupVector<sc_core::sc_time>> nextCommandByBankGroup;
+  CommandArray<RankVector<sc_core::sc_time>> nextCommandByRank;
+
+  RankVector<std::queue<sc_core::sc_time>> last4ActivatesOnRank;
+  sc_core::sc_time nextCommandOnBus = sc_core::SC_ZERO_TIME;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // CHECKERDDR4_H
+#endif  // CHECKERDDR4_H

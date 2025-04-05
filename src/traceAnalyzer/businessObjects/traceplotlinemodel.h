@@ -46,243 +46,219 @@ class TracePlot;
 class CustomLabelScaleDraw;
 class QItemSelectionModel;
 
-class AbstractTracePlotLineModel : public QAbstractItemModel
-{
-    Q_OBJECT
+class AbstractTracePlotLineModel : public QAbstractItemModel {
+  Q_OBJECT
 
 public:
-    explicit AbstractTracePlotLineModel(const GeneralInfo& generalInfo, QObject* parent = nullptr);
+  explicit AbstractTracePlotLineModel(const GeneralInfo &generalInfo,
+                                      QObject *parent = nullptr);
 
-    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  QVariant data(const QModelIndex &index,
+                int role = Qt::DisplayRole) const override;
 
-    QModelIndex
-    index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
-    QModelIndex parent(const QModelIndex& index) const override;
+  QModelIndex index(int row, int column,
+                    const QModelIndex &parent = QModelIndex()) const override;
+  QModelIndex parent(const QModelIndex &index) const override;
 
-    QItemSelectionModel* selectionModel() const;
+  QItemSelectionModel *selectionModel() const;
 
-    enum Role
-    {
-        TypeRole = Qt::UserRole + 1,
-        CollapsedRole
+  enum Role { TypeRole = Qt::UserRole + 1, CollapsedRole };
+  Q_ENUM(Role)
+
+  enum LineType {
+    RequestLine,
+    ResponseLine,
+    CommandBusLine,
+    RowCommandBusLine,
+    ColumnCommandBusLine,
+    DataBusLine,
+    PseudoChannel0Line,
+    PseudoChannel1Line,
+    RankGroup,
+    BankLine
+  };
+  Q_ENUM(LineType)
+
+  struct Node {
+    struct NodeData {
+      NodeData() = default;
+
+      NodeData(LineType type, const QString &label)
+          : type(type), label(label) {}
+
+      NodeData(LineType type, const QString &label, unsigned int rank)
+          : type(type), label(label), rank(rank) {}
+
+      NodeData(LineType type, const QString &label, unsigned int rank,
+               unsigned int group, unsigned int bank)
+          : type(type), label(label), rank(rank), group(group), bank(bank) {}
+
+      LineType type;
+      QString label;
+      unsigned int yVal = 0;
+
+      /**
+       * Used to store the collapsed state in the traceplot.
+       * The value has only an effect when the type is Type::RankGroup.
+       */
+      bool collapsed = true;
+
+      /**
+       * Only used when the type is Type::BankLine.
+       * (Absolute numbering)
+       */
+      unsigned int rank = 0, group = 0, bank = 0;
     };
-    Q_ENUM(Role)
 
-    enum LineType
-    {
-        RequestLine,
-        ResponseLine,
-        CommandBusLine,
-        RowCommandBusLine,
-        ColumnCommandBusLine,
-        DataBusLine,
-        PseudoChannel0Line,
-        PseudoChannel1Line,
-        RankGroup,
-        BankLine
-    };
-    Q_ENUM(LineType)
+    /**
+     * Constructor only used for the root node that does not contain any data.
+     */
+    Node() = default;
 
-    struct Node
-    {
-        struct NodeData
-        {
-            NodeData() = default;
+    Node(NodeData data, const Node *parent) : data(data), parent(parent) {}
 
-            NodeData(LineType type, const QString& label) : type(type), label(label) {}
+    /**
+     * Gets the row relative to its parent.
+     */
+    int getRow() const;
+    int childCount() const { return children.size(); }
 
-            NodeData(LineType type, const QString& label, unsigned int rank) :
-                type(type),
-                label(label),
-                rank(rank)
-            {
-            }
+    static std::shared_ptr<Node> cloneNode(const Node *node,
+                                           const Node *parent);
 
-            NodeData(LineType type,
-                     const QString& label,
-                     unsigned int rank,
-                     unsigned int group,
-                     unsigned int bank) :
-                type(type),
-                label(label),
-                rank(rank),
-                group(group),
-                bank(bank)
-            {
-            }
+    NodeData data;
 
-            LineType type;
-            QString label;
-            unsigned int yVal = 0;
-
-            /**
-             * Used to store the collapsed state in the traceplot.
-             * The value has only an effect when the type is Type::RankGroup.
-             */
-            bool collapsed = true;
-
-            /**
-             * Only used when the type is Type::BankLine.
-             * (Absolute numbering)
-             */
-            unsigned int rank = 0, group = 0, bank = 0;
-        };
-
-        /**
-         * Constructor only used for the root node that does not contain any data.
-         */
-        Node() = default;
-
-        Node(NodeData data, const Node* parent) : data(data), parent(parent) {}
-
-        /**
-         * Gets the row relative to its parent.
-         */
-        int getRow() const;
-        int childCount() const { return children.size(); }
-
-        static std::shared_ptr<Node> cloneNode(const Node* node, const Node* parent);
-
-        NodeData data;
-
-        const Node* parent = nullptr;
-        std::vector<std::shared_ptr<Node>> children;
-    };
+    const Node *parent = nullptr;
+    std::vector<std::shared_ptr<Node>> children;
+  };
 
 protected:
-    enum class CommandBusType
-    {
-        SingleCommandBus,
-        RowColumnCommandBus
-    };
+  enum class CommandBusType { SingleCommandBus, RowColumnCommandBus };
 
-    enum class DataBusType
-    {
-        LegacyMode,
-        PseudoChannelMode
-    };
+  enum class DataBusType { LegacyMode, PseudoChannelMode };
 
-    QStringList mimeTypes() const override;
-    QMimeData* mimeData(const QModelIndexList& indexes) const override;
-    bool dropMimeData(const QMimeData* data,
-                      Qt::DropAction action,
-                      int row,
-                      int column,
-                      const QModelIndex& parent) override;
-    bool canDropMimeData(const QMimeData* data,
-                         Qt::DropAction action,
-                         int row,
-                         int column,
-                         const QModelIndex& parent) const override;
-    Qt::DropActions supportedDropActions() const override;
-    Qt::ItemFlags flags(const QModelIndex& index) const override;
+  QStringList mimeTypes() const override;
+  QMimeData *mimeData(const QModelIndexList &indexes) const override;
+  bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row,
+                    int column, const QModelIndex &parent) override;
+  bool canDropMimeData(const QMimeData *data, Qt::DropAction action, int row,
+                       int column, const QModelIndex &parent) const override;
+  Qt::DropActions supportedDropActions() const override;
+  Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    void addTopLevelNode(std::shared_ptr<Node>&& node);
-    void createInitialNodes();
-    std::shared_ptr<Node> createRankGroupNode(unsigned int rank) const;
+  void addTopLevelNode(std::shared_ptr<Node> &&node);
+  void createInitialNodes();
+  std::shared_ptr<Node> createRankGroupNode(unsigned int rank) const;
 
-    static QString getLabel(LineType type);
-    QString getLabel(unsigned int rank) const;
-    QString getLabel(unsigned int rank, unsigned int group, unsigned int bank) const;
+  static QString getLabel(LineType type);
+  QString getLabel(unsigned int rank) const;
+  QString getLabel(unsigned int rank, unsigned int group,
+                   unsigned int bank) const;
 
-    static CommandBusType getCommandBusType(const GeneralInfo& generalInfo);
-    static DataBusType getDataBusType(const GeneralInfo& generalInfo);
+  static CommandBusType getCommandBusType(const GeneralInfo &generalInfo);
+  static DataBusType getDataBusType(const GeneralInfo &generalInfo);
 
-    static constexpr auto TRACELINE_MIMETYPE = "application/x-tracelinedata";
+  static constexpr auto TRACELINE_MIMETYPE = "application/x-tracelinedata";
 
-    QItemSelectionModel* const internalSelectionModel;
+  QItemSelectionModel *const internalSelectionModel;
 
-    std::shared_ptr<Node> rootNode;
+  std::shared_ptr<Node> rootNode;
 
-    const unsigned int numberOfRanks;
-    const unsigned int groupsPerRank;
-    const unsigned int banksPerGroup;
-    const unsigned int banksPerRank;
+  const unsigned int numberOfRanks;
+  const unsigned int groupsPerRank;
+  const unsigned int banksPerGroup;
+  const unsigned int banksPerRank;
 
-    const CommandBusType commandBusType;
-    const DataBusType dataBusType;
+  const CommandBusType commandBusType;
+  const DataBusType dataBusType;
 };
 
-class AvailableTracePlotLineModel : public AbstractTracePlotLineModel
-{
-    Q_OBJECT
+class AvailableTracePlotLineModel : public AbstractTracePlotLineModel {
+  Q_OBJECT
 
 public:
-    explicit AvailableTracePlotLineModel(const GeneralInfo& generalInfo, QObject* parent = nullptr);
+  explicit AvailableTracePlotLineModel(const GeneralInfo &generalInfo,
+                                       QObject *parent = nullptr);
 
 public Q_SLOTS:
-    void itemsDoubleClicked(const QModelIndex& index);
+  void itemsDoubleClicked(const QModelIndex &index);
 
 Q_SIGNALS:
-    void returnPressed(const QModelIndexList& indexes);
+  void returnPressed(const QModelIndexList &indexes);
 
 protected:
-    QVariant
-    headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-    bool eventFilter(QObject* object, QEvent* event) override;
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const override;
+  bool eventFilter(QObject *object, QEvent *event) override;
 };
 
-class SelectedTracePlotLineModel : public AbstractTracePlotLineModel
-{
-    Q_OBJECT
+class SelectedTracePlotLineModel : public AbstractTracePlotLineModel {
+  Q_OBJECT
 
 public:
-    explicit SelectedTracePlotLineModel(const GeneralInfo& generalInfo, QObject* parent = nullptr);
+  explicit SelectedTracePlotLineModel(const GeneralInfo &generalInfo,
+                                      QObject *parent = nullptr);
 
-    bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+  bool setData(const QModelIndex &index, const QVariant &value,
+               int role) override;
 
-    void recreateCollapseButtons(TracePlot* tracePlot, CustomLabelScaleDraw* customLabelScaleDraw);
+  void recreateCollapseButtons(TracePlot *tracePlot,
+                               CustomLabelScaleDraw *customLabelScaleDraw);
 
-    std::shared_ptr<Node> getClonedRootNode();
-    void setRootNode(std::shared_ptr<Node> node);
+  std::shared_ptr<Node> getClonedRootNode();
+  void setRootNode(std::shared_ptr<Node> node);
 
 public Q_SLOTS:
-    void itemsDoubleClicked(const QModelIndex& index);
+  void itemsDoubleClicked(const QModelIndex &index);
 
-    void addIndexesFromAvailableModel(const QModelIndexList& indexes);
+  void addIndexesFromAvailableModel(const QModelIndexList &indexes);
 
 protected:
-    bool eventFilter(QObject* object, QEvent* event) override;
+  bool eventFilter(QObject *object, QEvent *event) override;
 
-    QVariant
-    headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-    bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const override;
+  bool removeRows(int row, int count,
+                  const QModelIndex &parent = QModelIndex()) override;
 
 private:
-    std::vector<QPushButton*> collapseButtons;
+  std::vector<QPushButton *> collapseButtons;
 
-    friend class TracePlotLineDataSource;
+  friend class TracePlotLineDataSource;
 };
 
 /*
  * Simple list that is the true source for the traceplot.
  */
-class TracePlotLineDataSource : public QObject
-{
-    Q_OBJECT
+class TracePlotLineDataSource : public QObject {
+  Q_OBJECT
 
 public:
-    using TracePlotLine = AbstractTracePlotLineModel::Node;
+  using TracePlotLine = AbstractTracePlotLineModel::Node;
 
-    explicit TracePlotLineDataSource(SelectedTracePlotLineModel* selectedModel,
-                                     QObject* parent = nullptr);
+  explicit TracePlotLineDataSource(SelectedTracePlotLineModel *selectedModel,
+                                   QObject *parent = nullptr);
 
-    SelectedTracePlotLineModel* getSelectedModel() const { return selectedModel; };
-    std::vector<std::shared_ptr<TracePlotLine>>& getTracePlotLines() { return entries; }
+  SelectedTracePlotLineModel *getSelectedModel() const {
+    return selectedModel;
+  };
+  std::vector<std::shared_ptr<TracePlotLine>> &getTracePlotLines() {
+    return entries;
+  }
 
 public Q_SLOTS:
-    void updateModel();
+  void updateModel();
 
 Q_SIGNALS:
-    void modelChanged();
+  void modelChanged();
 
 private:
-    SelectedTracePlotLineModel* selectedModel;
+  SelectedTracePlotLineModel *selectedModel;
 
-    std::vector<std::shared_ptr<TracePlotLine>> entries;
+  std::vector<std::shared_ptr<TracePlotLine>> entries;
 };
 
-#endif // TRACEPLOTLINEMODEL_H
+#endif  // TRACEPLOTLINEMODEL_H

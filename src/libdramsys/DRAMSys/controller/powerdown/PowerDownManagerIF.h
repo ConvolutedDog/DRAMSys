@@ -40,17 +40,15 @@
 
 #include <systemc>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class PowerDownManagerIF : public ManagerIF
-{
+class PowerDownManagerIF : public ManagerIF {
 public:
-    virtual void triggerEntry() = 0;
-    virtual void triggerExit() = 0;
-    virtual void triggerInterruption() = 0;
+  virtual void triggerEntry() = 0;
+  virtual void triggerExit() = 0;
+  virtual void triggerInterruption() = 0;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // POWERDOWNMANAGERIF_H
+#endif  // POWERDOWNMANAGERIF_H

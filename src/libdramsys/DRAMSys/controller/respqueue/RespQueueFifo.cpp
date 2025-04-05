@@ -37,37 +37,31 @@
 using namespace sc_core;
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-void RespQueueFifo::insertPayload(tlm_generic_payload* payload, sc_time strobeEnd)
-{
-    buffer.emplace(payload, strobeEnd);
+void RespQueueFifo::insertPayload(tlm_generic_payload *payload,
+                                  sc_time strobeEnd) {
+  buffer.emplace(payload, strobeEnd);
 }
 
-tlm_generic_payload* RespQueueFifo::nextPayload()
-{
-    if (!buffer.empty())
-    {
-        std::pair<tlm_generic_payload*, sc_time> element = buffer.front();
-        if (element.second <= sc_time_stamp())
-        {
-            buffer.pop();
-            return element.first;
-        }
+tlm_generic_payload *RespQueueFifo::nextPayload() {
+  if (!buffer.empty()) {
+    std::pair<tlm_generic_payload *, sc_time> element = buffer.front();
+    if (element.second <= sc_time_stamp()) {
+      buffer.pop();
+      return element.first;
     }
-    return nullptr;
+  }
+  return nullptr;
 }
 
-sc_time RespQueueFifo::getTriggerTime() const
-{
-    if (!buffer.empty())
-    {
-        sc_time triggerTime = buffer.front().second;
-        if (triggerTime > sc_time_stamp())
-            return triggerTime;
-    }
-    return scMaxTime;
+sc_time RespQueueFifo::getTriggerTime() const {
+  if (!buffer.empty()) {
+    sc_time triggerTime = buffer.front().second;
+    if (triggerTime > sc_time_stamp())
+      return triggerTime;
+  }
+  return scMaxTime;
 }
 
-} // namespace DRAMSys
+}  // namespace DRAMSys

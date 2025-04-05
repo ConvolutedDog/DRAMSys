@@ -40,38 +40,29 @@
 #include <QMessageBox>
 #include <vector>
 
-QueryEditor::QueryEditor(QWidget* parent) : QWidget(parent), ui(new Ui::QueryEditor)
-{
-    ui->setupUi(this);
-    ui->queryHead->setText(queryTexts.queryHead);
+QueryEditor::QueryEditor(QWidget *parent)
+    : QWidget(parent), ui(new Ui::QueryEditor) {
+  ui->setupUi(this);
+  ui->queryHead->setText(queryTexts.queryHead);
 }
 
-QueryEditor::~QueryEditor()
-{
-    delete ui;
+QueryEditor::~QueryEditor() { delete ui; }
+
+void QueryEditor::init(TraceNavigator *_navigator) {
+  this->navigator = _navigator;
+  ui->transactiontreeWidget->init(_navigator);
 }
 
-void QueryEditor::init(TraceNavigator* _navigator)
-{
-    this->navigator = _navigator;
-    ui->transactiontreeWidget->init(_navigator);
-}
-
-void QueryEditor::on_executeQuery_clicked()
-{
-    try
-    {
-        std::vector<std::shared_ptr<Transaction>> result =
-            navigator->TraceFile().getTransactionsWithCustomQuery(queryTexts.queryHead + " " +
-                                                                  ui->queryEdit->toPlainText());
-        ui->transactiontreeWidget->clear();
-        for (const auto& trans : result)
-        {
-            ui->transactiontreeWidget->AppendTransaction(trans);
-        }
+void QueryEditor::on_executeQuery_clicked() {
+  try {
+    std::vector<std::shared_ptr<Transaction>> result =
+        navigator->TraceFile().getTransactionsWithCustomQuery(
+            queryTexts.queryHead + " " + ui->queryEdit->toPlainText());
+    ui->transactiontreeWidget->clear();
+    for (const auto &trans : result) {
+      ui->transactiontreeWidget->AppendTransaction(trans);
     }
-    catch (const sqlException& ex)
-    {
-        QMessageBox::warning(this, "Query failed", ex.what());
-    }
+  } catch (const sqlException &ex) {
+    QMessageBox::warning(this, "Query failed", ex.what());
+  }
 }

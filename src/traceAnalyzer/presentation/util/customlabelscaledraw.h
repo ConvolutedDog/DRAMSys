@@ -44,24 +44,23 @@
 #include <qwt_scale_draw.h>
 #include <qwt_text.h>
 
-class CustomLabelScaleDraw : public QObject, public QwtScaleDraw
-{
-    Q_OBJECT
+class CustomLabelScaleDraw : public QObject, public QwtScaleDraw {
+  Q_OBJECT
 
 private:
-    const std::shared_ptr<QHash<int, QString>> labels;
+  const std::shared_ptr<QHash<int, QString>> labels;
 
 public:
-    CustomLabelScaleDraw(std::shared_ptr<QHash<int, QString>> labels);
-    ~CustomLabelScaleDraw() = default;
+  CustomLabelScaleDraw(std::shared_ptr<QHash<int, QString>> labels);
+  ~CustomLabelScaleDraw() = default;
 
-    virtual QwtText label(double v) const override;
+  virtual QwtText label(double v) const override;
 
-    void draw(QPainter* painter, const QPalette& palette) const override;
-    void clearCache();
+  void draw(QPainter *painter, const QPalette &palette) const override;
+  void clearCache();
 
 Q_SIGNALS:
-    void scaleRedraw() const;
+  void scaleRedraw() const;
 };
 
-#endif // CUSTOMLABELSCALEDRAW_H
+#endif  // CUSTOMLABELSCALEDRAW_H

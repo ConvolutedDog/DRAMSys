@@ -41,75 +41,78 @@
 
 #include <systemc>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-struct McConfig
-{
-    McConfig(const Config::McConfig& config, const MemSpec& memSpec);
+struct McConfig {
+  McConfig(const Config::McConfig &config, const MemSpec &memSpec);
 
-    Config::PagePolicyType pagePolicy;
-    Config::SchedulerType scheduler;
-    Config::SchedulerBufferType schedulerBuffer;
+  Config::PagePolicyType pagePolicy;
+  Config::SchedulerType scheduler;
+  Config::SchedulerBufferType schedulerBuffer;
 
-    unsigned int lowWatermark;
-    unsigned int highWatermark;
+  unsigned int lowWatermark;
+  unsigned int highWatermark;
 
-    Config::CmdMuxType cmdMux;
-    Config::RespQueueType respQueue;
-    Config::ArbiterType arbiter;
+  Config::CmdMuxType cmdMux;
+  Config::RespQueueType respQueue;
+  Config::ArbiterType arbiter;
 
-    unsigned int requestBufferSize;
-    unsigned int requestBufferSizeRead;
-    unsigned int requestBufferSizeWrite;
+  unsigned int requestBufferSize;
+  unsigned int requestBufferSizeRead;
+  unsigned int requestBufferSizeWrite;
 
-    Config::RefreshPolicyType refreshPolicy;
-    unsigned int refreshMaxPostponed;
-    unsigned int refreshMaxPulledin;
+  Config::RefreshPolicyType refreshPolicy;
+  unsigned int refreshMaxPostponed;
+  unsigned int refreshMaxPulledin;
 
-    Config::PowerDownPolicyType powerDownPolicy;
-    unsigned int maxActiveTransactions;
-    bool refreshManagement;
+  Config::PowerDownPolicyType powerDownPolicy;
+  unsigned int maxActiveTransactions;
+  bool refreshManagement;
 
-    sc_core::sc_time arbitrationDelayFw;
-    sc_core::sc_time arbitrationDelayBw;
-    sc_core::sc_time thinkDelayFw;
-    sc_core::sc_time thinkDelayBw;
-    sc_core::sc_time phyDelayFw;
-    sc_core::sc_time phyDelayBw;
-    sc_core::sc_time blockingReadDelay;
-    sc_core::sc_time blockingWriteDelay;
+  sc_core::sc_time arbitrationDelayFw;
+  sc_core::sc_time arbitrationDelayBw;
+  sc_core::sc_time thinkDelayFw;
+  sc_core::sc_time thinkDelayBw;
+  sc_core::sc_time phyDelayFw;
+  sc_core::sc_time phyDelayBw;
+  sc_core::sc_time blockingReadDelay;
+  sc_core::sc_time blockingWriteDelay;
 
-    static constexpr Config::PagePolicyType DEFAULT_PAGE_POLICY = Config::PagePolicyType::Open;
-    static constexpr Config::SchedulerType DEFAULT_SCHEDULER = Config::SchedulerType::FrFcfs;
-    static constexpr Config::SchedulerBufferType DEFAULT_SCHEDULER_BUFFER =
-        Config::SchedulerBufferType::Bankwise;
-    static constexpr unsigned int DEFAULT_LOW_WATERMARK = 0;
-    static constexpr unsigned int DEFAULT_HIGH_WATERMARK = 0;
-    static constexpr Config::CmdMuxType DEFAULT_CMD_MUX = Config::CmdMuxType::Oldest;
-    static constexpr Config::RespQueueType DEFAULT_RESP_QUEUE = Config::RespQueueType::Fifo;
-    static constexpr Config::ArbiterType DEFAULT_ARBITER = Config::ArbiterType::Simple;
-    static constexpr unsigned int DEFAULT_REQUEST_BUFFER_SIZE = 8;
-    static constexpr unsigned int DEFAULT_REQUEST_BUFFER_SIZE_READ = 8;
-    static constexpr unsigned int DEFAULT_REQUEST_BUFFER_SIZE_WRITE = 8;
-    static constexpr Config::RefreshPolicyType DEFAULT_REFRESH_POLICY =
-        Config::RefreshPolicyType::AllBank;
-    static constexpr unsigned int DEFAULT_REFRESH_MAX_POSTPONED = 0;
-    static constexpr unsigned int DEFAULT_REFRESH_MAX_PULLEDIN = 0;
-    static constexpr Config::PowerDownPolicyType DEFAULT_POWER_DOWN_POLICY =
-        Config::PowerDownPolicyType::NoPowerDown;
-    static constexpr unsigned int DEFAULT_MAX_ACTIVE_TRANSACTIONS = 64;
-    static constexpr bool DEFAULT_REFRESH_MANAGEMENT = false;
-    static constexpr unsigned DEFAULT_ARBITRATION_DELAY_FW = 0;
-    static constexpr unsigned DEFAULT_ARBITRATION_DELAY_BW = 0;
-    static constexpr unsigned DEFAULT_THINK_DELAY_FW = 1;
-    static constexpr unsigned DEFAULT_THINK_DELAY_BW = 0;
-    static constexpr unsigned DEFAULT_PHY_DELAY_FW = 0;
-    static constexpr unsigned DEFAULT_PHY_DELAY_BW = 0;
-    static constexpr unsigned DEFAULT_BLOCKING_READ_DELAY = 60;
-    static constexpr unsigned DEFAULT_BLOCKING_WRITE_DELAY = 60;
+  static constexpr Config::PagePolicyType DEFAULT_PAGE_POLICY =
+      Config::PagePolicyType::Open;
+  static constexpr Config::SchedulerType DEFAULT_SCHEDULER =
+      Config::SchedulerType::FrFcfs;
+  static constexpr Config::SchedulerBufferType DEFAULT_SCHEDULER_BUFFER =
+      Config::SchedulerBufferType::Bankwise;
+  static constexpr unsigned int DEFAULT_LOW_WATERMARK = 0;
+  static constexpr unsigned int DEFAULT_HIGH_WATERMARK = 0;
+  static constexpr Config::CmdMuxType DEFAULT_CMD_MUX =
+      Config::CmdMuxType::Oldest;
+  static constexpr Config::RespQueueType DEFAULT_RESP_QUEUE =
+      Config::RespQueueType::Fifo;
+  static constexpr Config::ArbiterType DEFAULT_ARBITER =
+      Config::ArbiterType::Simple;
+  static constexpr unsigned int DEFAULT_REQUEST_BUFFER_SIZE = 8;
+  static constexpr unsigned int DEFAULT_REQUEST_BUFFER_SIZE_READ = 8;
+  static constexpr unsigned int DEFAULT_REQUEST_BUFFER_SIZE_WRITE = 8;
+  static constexpr Config::RefreshPolicyType DEFAULT_REFRESH_POLICY =
+      Config::RefreshPolicyType::AllBank;
+  static constexpr unsigned int DEFAULT_REFRESH_MAX_POSTPONED = 0;
+  static constexpr unsigned int DEFAULT_REFRESH_MAX_PULLEDIN = 0;
+  static constexpr Config::PowerDownPolicyType DEFAULT_POWER_DOWN_POLICY =
+      Config::PowerDownPolicyType::NoPowerDown;
+  static constexpr unsigned int DEFAULT_MAX_ACTIVE_TRANSACTIONS = 64;
+  static constexpr bool DEFAULT_REFRESH_MANAGEMENT = false;
+  static constexpr unsigned DEFAULT_ARBITRATION_DELAY_FW = 0;
+  static constexpr unsigned DEFAULT_ARBITRATION_DELAY_BW = 0;
+  static constexpr unsigned DEFAULT_THINK_DELAY_FW = 1;
+  static constexpr unsigned DEFAULT_THINK_DELAY_BW = 0;
+  static constexpr unsigned DEFAULT_PHY_DELAY_FW = 0;
+  static constexpr unsigned DEFAULT_PHY_DELAY_BW = 0;
+  static constexpr unsigned DEFAULT_BLOCKING_READ_DELAY = 60;
+  static constexpr unsigned DEFAULT_BLOCKING_WRITE_DELAY = 60;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
 #endif

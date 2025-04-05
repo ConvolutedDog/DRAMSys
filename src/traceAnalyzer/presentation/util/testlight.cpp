@@ -38,32 +38,25 @@
 #include "testlight.h"
 #include <QPainter>
 
-TestLight::TestLight(QWidget* parent) : QWidget(parent)
-{
-    setGray();
+TestLight::TestLight(QWidget *parent) : QWidget(parent) { setGray(); }
+
+void TestLight::setGray() {
+  lightColor = QColor(Qt::gray);
+  update();
 }
 
-void TestLight::setGray()
-{
-    lightColor = QColor(Qt::gray);
-    update();
+void TestLight::setGreen() {
+  lightColor = QColor(Qt::green);
+  update();
 }
 
-void TestLight::setGreen()
-{
-    lightColor = QColor(Qt::green);
-    update();
+void TestLight::setRed() {
+  lightColor = QColor(Qt::red);
+  update();
 }
 
-void TestLight::setRed()
-{
-    lightColor = QColor(Qt::red);
-    update();
-}
-
-void TestLight::paintEvent(QPaintEvent* /*paintEvent*/)
-{
-    QPainter painter(this);
-    painter.fillRect(this->rect(), lightColor);
-    painter.drawRect(this->rect());
+void TestLight::paintEvent(QPaintEvent * /*paintEvent*/) {
+  QPainter painter(this);
+  painter.fillRect(this->rect(), lightColor);
+  painter.drawRect(this->rect());
 }

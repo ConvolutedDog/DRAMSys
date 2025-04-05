@@ -43,69 +43,52 @@
 #include <QString>
 #include <climits>
 
-struct GeneralInfo
-{
-    uint64_t numberOfTransactions = 0;
-    uint64_t numberOfPhases = 0;
-    Timespan span = Timespan();
-    unsigned int numberOfRanks = 1;
-    unsigned int numberOfBankGroups = 1;
-    unsigned int numberOfBanks = 1;
-    unsigned int banksPerRank = 1;
-    unsigned int groupsPerRank = 1;
-    unsigned int banksPerGroup = 1;
-    QString description = "empty";
-    QString unitOfTime = "PS";
-    uint64_t clkPeriod = 1000;
-    uint64_t windowSize = 0;
-    unsigned int refreshMaxPostponed = 0;
-    unsigned int refreshMaxPulledin = 0;
-    unsigned int controllerThread = UINT_MAX;
-    unsigned int maxBufferDepth = 8;
-    unsigned int per2BankOffset = 1;
-    bool rowColumnCommandBus = false;
-    bool pseudoChannelMode = false;
+struct GeneralInfo {
+  uint64_t numberOfTransactions = 0;
+  uint64_t numberOfPhases = 0;
+  Timespan span = Timespan();
+  unsigned int numberOfRanks = 1;
+  unsigned int numberOfBankGroups = 1;
+  unsigned int numberOfBanks = 1;
+  unsigned int banksPerRank = 1;
+  unsigned int groupsPerRank = 1;
+  unsigned int banksPerGroup = 1;
+  QString description = "empty";
+  QString unitOfTime = "PS";
+  uint64_t clkPeriod = 1000;
+  uint64_t windowSize = 0;
+  unsigned int refreshMaxPostponed = 0;
+  unsigned int refreshMaxPulledin = 0;
+  unsigned int controllerThread = UINT_MAX;
+  unsigned int maxBufferDepth = 8;
+  unsigned int per2BankOffset = 1;
+  bool rowColumnCommandBus = false;
+  bool pseudoChannelMode = false;
 
-    GeneralInfo() = default;
-    GeneralInfo(uint64_t numberOfTransactions,
-                uint64_t numberOfPhases,
-                Timespan span,
-                unsigned int numberOfRanks,
-                unsigned int numberOfBankgroups,
-                unsigned int numberOfBanks,
-                QString description,
-                QString unitOfTime,
-                uint64_t clkPeriod,
-                uint64_t windowSize,
-                unsigned int refreshMaxPostponed,
-                unsigned int refreshMaxPulledin,
-                unsigned int controllerThread,
-                unsigned int maxBufferDepth,
-                unsigned int per2BankOffset,
-                bool rowColumnCommandBus,
-                bool pseudoChannelMode) :
-        numberOfTransactions(numberOfTransactions),
-        numberOfPhases(numberOfPhases),
-        span(span),
-        numberOfRanks(numberOfRanks),
-        numberOfBankGroups(numberOfBankgroups),
+  GeneralInfo() = default;
+  GeneralInfo(uint64_t numberOfTransactions, uint64_t numberOfPhases,
+              Timespan span, unsigned int numberOfRanks,
+              unsigned int numberOfBankgroups, unsigned int numberOfBanks,
+              QString description, QString unitOfTime, uint64_t clkPeriod,
+              uint64_t windowSize, unsigned int refreshMaxPostponed,
+              unsigned int refreshMaxPulledin, unsigned int controllerThread,
+              unsigned int maxBufferDepth, unsigned int per2BankOffset,
+              bool rowColumnCommandBus, bool pseudoChannelMode)
+      : numberOfTransactions(numberOfTransactions),
+        numberOfPhases(numberOfPhases), span(span),
+        numberOfRanks(numberOfRanks), numberOfBankGroups(numberOfBankgroups),
         numberOfBanks(numberOfBanks),
         banksPerRank(numberOfBanks / numberOfRanks),
         groupsPerRank(numberOfBankgroups / numberOfRanks),
         banksPerGroup(numberOfBanks / numberOfBankgroups),
-        description(std::move(description)),
-        unitOfTime(std::move(unitOfTime)),
-        clkPeriod(clkPeriod),
-        windowSize(windowSize),
+        description(std::move(description)), unitOfTime(std::move(unitOfTime)),
+        clkPeriod(clkPeriod), windowSize(windowSize),
         refreshMaxPostponed(refreshMaxPostponed),
         refreshMaxPulledin(refreshMaxPulledin),
-        controllerThread(controllerThread),
-        maxBufferDepth(maxBufferDepth),
+        controllerThread(controllerThread), maxBufferDepth(maxBufferDepth),
         per2BankOffset(per2BankOffset),
         rowColumnCommandBus(rowColumnCommandBus),
-        pseudoChannelMode(pseudoChannelMode)
-    {
-    }
+        pseudoChannelMode(pseudoChannelMode) {}
 };
 
-#endif // GENERALINFO_H
+#endif  // GENERALINFO_H

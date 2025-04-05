@@ -38,29 +38,27 @@
 #include <tlm>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class BufferCounterIF
-{
+class BufferCounterIF {
 protected:
-    BufferCounterIF(const BufferCounterIF&) = default;
-    BufferCounterIF(BufferCounterIF&&) = default;
-    BufferCounterIF& operator=(const BufferCounterIF&) = default;
-    BufferCounterIF& operator=(BufferCounterIF&&) = default;
+  BufferCounterIF(const BufferCounterIF &) = default;
+  BufferCounterIF(BufferCounterIF &&) = default;
+  BufferCounterIF &operator=(const BufferCounterIF &) = default;
+  BufferCounterIF &operator=(BufferCounterIF &&) = default;
 
 public:
-    BufferCounterIF() = default;
-    virtual ~BufferCounterIF() = default;
+  BufferCounterIF() = default;
+  virtual ~BufferCounterIF() = default;
 
-    [[nodiscard]] virtual bool hasBufferSpace(unsigned entries) const = 0;
-    virtual void storeRequest(const tlm::tlm_generic_payload& trans) = 0;
-    virtual void removeRequest(const tlm::tlm_generic_payload& trans) = 0;
-    [[nodiscard]] virtual const std::vector<unsigned>& getBufferDepth() const = 0;
-    [[nodiscard]] virtual unsigned getNumReadRequests() const = 0;
-    [[nodiscard]] virtual unsigned getNumWriteRequests() const = 0;
+  [[nodiscard]] virtual bool hasBufferSpace(unsigned entries) const = 0;
+  virtual void storeRequest(const tlm::tlm_generic_payload &trans) = 0;
+  virtual void removeRequest(const tlm::tlm_generic_payload &trans) = 0;
+  [[nodiscard]] virtual const std::vector<unsigned> &getBufferDepth() const = 0;
+  [[nodiscard]] virtual unsigned getNumReadRequests() const = 0;
+  [[nodiscard]] virtual unsigned getNumWriteRequests() const = 0;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // BUFFERCOUNTERIF_H
+#endif  // BUFFERCOUNTERIF_H

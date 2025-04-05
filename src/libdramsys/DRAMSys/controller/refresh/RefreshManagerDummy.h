@@ -39,21 +39,19 @@
 
 #include <systemc>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class RefreshManagerDummy final : public RefreshManagerIF
-{
+class RefreshManagerDummy final : public RefreshManagerIF {
 public:
-    CommandTuple::Type getNextCommand() override;
-    void evaluate() override {}
-    void update([[maybe_unused]] Command command) override {}
-    sc_core::sc_time getTimeForNextTrigger() override;
+  CommandTuple::Type getNextCommand() override;
+  void evaluate() override {}
+  void update([[maybe_unused]] Command command) override {}
+  sc_core::sc_time getTimeForNextTrigger() override;
 
 private:
-    const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
+  const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // REFRESHMANAGERDUMMY_H
+#endif  // REFRESHMANAGERDUMMY_H

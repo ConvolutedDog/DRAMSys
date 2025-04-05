@@ -40,25 +40,26 @@
 #include <QMessageBox>
 
 inline constexpr std::string_view EXTENSION_DISCLAIMER =
-    "This feature is part of the full version of Trace Analyzer. For more information, please "
-    "contact <a href=\"mailto:DRAMSys@iese.fraunhofer.de\">DRAMSys@iese.fraunhofer.de</a>.";
+    "This feature is part of the full version of Trace Analyzer. For more "
+    "information, please "
+    "contact <a "
+    "href=\"mailto:DRAMSys@iese.fraunhofer.de\">DRAMSys@iese.fraunhofer.de</"
+    "a>.";
 
-inline void showExtensionDisclaimerMessageBox()
-{
-    QMessageBox box;
-    box.setText("Feature unavailable");
-    box.setInformativeText(EXTENSION_DISCLAIMER.data());
-    box.setIcon(QMessageBox::Information);
-    box.exec();
+inline void showExtensionDisclaimerMessageBox() {
+  QMessageBox box;
+  box.setText("Feature unavailable");
+  box.setInformativeText(EXTENSION_DISCLAIMER.data());
+  box.setIcon(QMessageBox::Information);
+  box.exec();
 }
 
-inline QLabel* disclaimerLabel()
-{
-    auto* label = new QLabel;
-    label->setText(EXTENSION_DISCLAIMER.data());
-    label->setAlignment(Qt::AlignHCenter);
-    label->setWordWrap(true);
-    return label;
+inline QLabel *disclaimerLabel() {
+  auto *label = new QLabel;
+  label->setText(EXTENSION_DISCLAIMER.data());
+  label->setAlignment(Qt::AlignHCenter);
+  label->setWordWrap(true);
+  return label;
 }
 
-#endif // EXTENSION_H
+#endif  // EXTENSION_H

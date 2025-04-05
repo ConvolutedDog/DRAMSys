@@ -38,52 +38,46 @@
 
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-BufferCounterBankwise::BufferCounterBankwise(unsigned requestBufferSize, unsigned numberOfBanks) :
-    requestBufferSize(requestBufferSize)
-{
-    numRequestsOnBank = std::vector<unsigned>(numberOfBanks, 0);
+BufferCounterBankwise::BufferCounterBankwise(unsigned requestBufferSize,
+                                             unsigned numberOfBanks)
+    : requestBufferSize(requestBufferSize) {
+  numRequestsOnBank = std::vector<unsigned>(numberOfBanks, 0);
 }
 
-bool BufferCounterBankwise::hasBufferSpace(unsigned entries) const
-{
-    return (numRequestsOnBank[lastBankID] + entries <= requestBufferSize);
+bool BufferCounterBankwise::hasBufferSpace(unsigned entries) const {
+  return (numRequestsOnBank[lastBankID] + entries <= requestBufferSize);
 }
 
-void BufferCounterBankwise::storeRequest(const tlm_generic_payload& trans)
-{
-    lastBankID = static_cast<std::size_t>(ControllerExtension::getBank(trans));
-    numRequestsOnBank[lastBankID]++;
-    if (trans.is_read())
-        numReadRequests++;
-    else
-        numWriteRequests++;
+void BufferCounterBankwise::storeRequest(const tlm_generic_payload &trans) {
+  lastBankID = static_cast<std::size_t>(ControllerExtension::getBank(trans));
+  numRequestsOnBank[lastBankID]++;
+  if (trans.is_read())
+    numReadRequests++;
+  else
+    numWriteRequests++;
 }
 
-void BufferCounterBankwise::removeRequest(const tlm_generic_payload& trans)
-{
-    numRequestsOnBank[static_cast<std::size_t>(ControllerExtension::getBank(trans))]--;
-    if (trans.is_read())
-        numReadRequests--;
-    else
-        numWriteRequests--;
+void BufferCounterBankwise::removeRequest(const tlm_generic_payload &trans) {
+  numRequestsOnBank[static_cast<std::size_t>(
+      ControllerExtension::getBank(trans))]--;
+  if (trans.is_read())
+    numReadRequests--;
+  else
+    numWriteRequests--;
 }
 
-const std::vector<unsigned>& BufferCounterBankwise::getBufferDepth() const
-{
-    return numRequestsOnBank;
+const std::vector<unsigned> &BufferCounterBankwise::getBufferDepth() const {
+  return numRequestsOnBank;
 }
 
-unsigned BufferCounterBankwise::getNumReadRequests() const
-{
-    return numReadRequests;
+unsigned BufferCounterBankwise::getNumReadRequests() const {
+  return numReadRequests;
 }
 
-unsigned BufferCounterBankwise::getNumWriteRequests() const
-{
-    return numWriteRequests;
+unsigned BufferCounterBankwise::getNumWriteRequests() const {
+  return numWriteRequests;
 }
 
-} // namespace DRAMSys
+}  // namespace DRAMSys

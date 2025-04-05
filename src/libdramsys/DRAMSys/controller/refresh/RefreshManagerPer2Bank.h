@@ -46,53 +46,46 @@
 #include <unordered_map>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
 class BankMachine;
 class PowerDownManagerIF;
 
-class RefreshManagerPer2Bank final : public RefreshManagerIF
-{
+class RefreshManagerPer2Bank final : public RefreshManagerIF {
 public:
-    RefreshManagerPer2Bank(const McConfig& config,
-                           const MemSpec& memSpec,
-                           ControllerVector<Bank, BankMachine*>& bankMachinesOnRank,
-                           PowerDownManagerIF& powerDownManager,
-                           Rank rank);
+  RefreshManagerPer2Bank(
+      const McConfig &config, const MemSpec &memSpec,
+      ControllerVector<Bank, BankMachine *> &bankMachinesOnRank,
+      PowerDownManagerIF &powerDownManager, Rank rank);
 
-    CommandTuple::Type getNextCommand() override;
-    void evaluate() override;
-    void update(Command command) override;
-    sc_core::sc_time getTimeForNextTrigger() override;
+  CommandTuple::Type getNextCommand() override;
+  void evaluate() override;
+  void update(Command command) override;
+  sc_core::sc_time getTimeForNextTrigger() override;
 
 private:
-    enum class State
-    {
-        Regular,
-        Pulledin
-    } state = State::Regular;
-    const MemSpec& memSpec;
-    PowerDownManagerIF& powerDownManager;
-    std::unordered_map<BankMachine*, tlm::tlm_generic_payload> refreshPayloads;
-    tlm::tlm_generic_payload* currentRefreshPayload;
-    sc_core::sc_time timeForNextTrigger = sc_core::sc_max_time();
-    Command nextCommand = Command::NOP;
+  enum class State { Regular, Pulledin } state = State::Regular;
+  const MemSpec &memSpec;
+  PowerDownManagerIF &powerDownManager;
+  std::unordered_map<BankMachine *, tlm::tlm_generic_payload> refreshPayloads;
+  tlm::tlm_generic_payload *currentRefreshPayload;
+  sc_core::sc_time timeForNextTrigger = sc_core::sc_max_time();
+  Command nextCommand = Command::NOP;
 
-    std::list<std::vector<BankMachine*>> remainingBankMachines;
-    std::list<std::vector<BankMachine*>> allBankMachines;
-    std::list<std::vector<BankMachine*>>::iterator currentIterator;
+  std::list<std::vector<BankMachine *>> remainingBankMachines;
+  std::list<std::vector<BankMachine *>> allBankMachines;
+  std::list<std::vector<BankMachine *>>::iterator currentIterator;
 
-    int flexibilityCounter = 0;
-    const int maxPostponed = 0;
-    const int maxPulledin = 0;
+  int flexibilityCounter = 0;
+  const int maxPostponed = 0;
+  const int maxPulledin = 0;
 
-    bool sleeping = false;
-    bool skipSelection = false;
+  bool sleeping = false;
+  bool skipSelection = false;
 
-    const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
+  const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // REFRESHMANAGERPER2BANK_H
+#endif  // REFRESHMANAGERPER2BANK_H

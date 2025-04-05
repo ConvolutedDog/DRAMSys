@@ -45,53 +45,51 @@
 
 #include <optional>
 
-class RequestIssuer : sc_core::sc_module
-{
+class RequestIssuer : sc_core::sc_module {
 public:
-    tlm_utils::simple_initiator_socket<RequestIssuer> iSocket;
+  tlm_utils::simple_initiator_socket<RequestIssuer> iSocket;
 
-    RequestIssuer(sc_core::sc_module_name const& name,
-                  MemoryManager& memoryManager,
-                  sc_core::sc_time interfaceClk,
-                  std::optional<unsigned int> maxPendingReadRequests,
-                  std::optional<unsigned int> maxPendingWriteRequests,
-                  std::function<Request()> nextRequest,
-                  std::function<void()> transactionFinished,
-                  std::function<void()> terminate);
-    SC_HAS_PROCESS(RequestIssuer);
+  RequestIssuer(sc_core::sc_module_name const &name,
+                MemoryManager &memoryManager, sc_core::sc_time interfaceClk,
+                std::optional<unsigned int> maxPendingReadRequests,
+                std::optional<unsigned int> maxPendingWriteRequests,
+                std::function<Request()> nextRequest,
+                std::function<void()> transactionFinished,
+                std::function<void()> terminate);
+  SC_HAS_PROCESS(RequestIssuer);
 
 private:
-    tlm_utils::peq_with_cb_and_phase<RequestIssuer> payloadEventQueue;
-    MemoryManager& memoryManager;
+  tlm_utils::peq_with_cb_and_phase<RequestIssuer> payloadEventQueue;
+  MemoryManager &memoryManager;
 
-    sc_core::sc_time interfaceClk;
+  sc_core::sc_time interfaceClk;
 
-    bool transactionPostponed = false;
-    bool finished = false;
+  bool transactionPostponed = false;
+  bool finished = false;
 
-    uint64_t transactionsSent = 0;
-    uint64_t transactionsReceived = 0;
-    sc_core::sc_time lastEndRequest = sc_core::sc_max_time();
+  uint64_t transactionsSent = 0;
+  uint64_t transactionsReceived = 0;
+  sc_core::sc_time lastEndRequest = sc_core::sc_max_time();
 
-    unsigned int pendingReadRequests = 0;
-    unsigned int pendingWriteRequests = 0;
-    std::optional<unsigned int> maxPendingReadRequests;
-    std::optional<unsigned int> maxPendingWriteRequests;
+  unsigned int pendingReadRequests = 0;
+  unsigned int pendingWriteRequests = 0;
+  std::optional<unsigned int> maxPendingReadRequests;
+  std::optional<unsigned int> maxPendingWriteRequests;
 
-    std::function<void()> transactionFinished;
-    std::function<void()> terminate;
-    std::function<Request()> nextRequest;
+  std::function<void()> transactionFinished;
+  std::function<void()> terminate;
+  std::function<Request()> nextRequest;
 
-    void sendNextRequest();
-    bool nextRequestSendable() const;
+  void sendNextRequest();
+  bool nextRequestSendable() const;
 
-    tlm::tlm_sync_enum nb_transport_bw(tlm::tlm_generic_payload& payload,
-                                       tlm::tlm_phase& phase,
-                                       sc_core::sc_time& bwDelay)
-    {
-        payloadEventQueue.notify(payload, phase, bwDelay);
-        return tlm::TLM_ACCEPTED;
-    }
+  tlm::tlm_sync_enum nb_transport_bw(tlm::tlm_generic_payload &payload,
+                                     tlm::tlm_phase &phase,
+                                     sc_core::sc_time &bwDelay) {
+    payloadEventQueue.notify(payload, phase, bwDelay);
+    return tlm::TLM_ACCEPTED;
+  }
 
-    void peqCallback(tlm::tlm_generic_payload& payload, const tlm::tlm_phase& phase);
+  void peqCallback(tlm::tlm_generic_payload &payload,
+                   const tlm::tlm_phase &phase);
 };

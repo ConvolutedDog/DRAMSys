@@ -40,38 +40,37 @@
 
 #include <string>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-struct SimConfig
-{
-    SimConfig(const Config::SimConfig& simConfig);
+struct SimConfig {
+  SimConfig(const Config::SimConfig &simConfig);
 
-    std::string simulationName;
-    bool databaseRecording;
-    bool powerAnalysis;
-    bool enableWindowing;
-    unsigned int windowSize;
-    bool debug;
-    bool simulationProgressBar;
-    bool checkTLM2Protocol;
-    bool useMalloc;
-    unsigned long long int addressOffset;
-    Config::StoreModeType storeMode;
+  std::string simulationName;
+  bool databaseRecording;
+  bool powerAnalysis;
+  bool enableWindowing;
+  unsigned int windowSize;
+  bool debug;
+  bool simulationProgressBar;
+  bool checkTLM2Protocol;
+  bool useMalloc;
+  unsigned long long int addressOffset;
+  Config::StoreModeType storeMode;
 
-    static constexpr std::string_view DEFAULT_SIMULATION_NAME = "default";
-    static constexpr bool DEFAULT_DATABASE_RECORDING = false;
-    static constexpr bool DEFAULT_POWER_ANALYSIS = false;
-    static constexpr bool DEFAULT_ENABLE_WINDOWING = false;
-    static constexpr unsigned int DEFAULT_WINDOW_SIZE = 1000;
-    static constexpr bool DEFAULT_DEBUG = false;
-    static constexpr bool DEFAULT_SIMULATION_PROGRESS_BAR = false;
-    static constexpr bool DEFAULT_CHECK_TLM2_PROTOCOL = false;
-    static constexpr bool DEFAULT_USE_MALLOC = false;
-    static constexpr unsigned long long int DEFAULT_ADDRESS_OFFSET = 0;
-    static constexpr Config::StoreModeType DEFAULT_STORE_MODE = Config::StoreModeType::NoStorage;
+  static constexpr std::string_view DEFAULT_SIMULATION_NAME = "default";
+  static constexpr bool DEFAULT_DATABASE_RECORDING = false;
+  static constexpr bool DEFAULT_POWER_ANALYSIS = false;
+  static constexpr bool DEFAULT_ENABLE_WINDOWING = false;
+  static constexpr unsigned int DEFAULT_WINDOW_SIZE = 1000;
+  static constexpr bool DEFAULT_DEBUG = false;
+  static constexpr bool DEFAULT_SIMULATION_PROGRESS_BAR = false;
+  static constexpr bool DEFAULT_CHECK_TLM2_PROTOCOL = false;
+  static constexpr bool DEFAULT_USE_MALLOC = false;
+  static constexpr unsigned long long int DEFAULT_ADDRESS_OFFSET = 0;
+  static constexpr Config::StoreModeType DEFAULT_STORE_MODE =
+      Config::StoreModeType::NoStorage;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
 #endif

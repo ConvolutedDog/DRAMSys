@@ -38,98 +38,97 @@
 #include <fstream>
 #include <iostream>
 
-namespace DRAMSys::Config
-{
+namespace DRAMSys::Config {
 
-Configuration from_path(std::string_view path, std::string_view resourceDirectory)
-{
-    std::ifstream file(path.data());
+Configuration from_path(std::string_view path,
+                        std::string_view resourceDirectory) {
+  std::ifstream file(path.data());
 
-    enum class SubConfig
-    {
-        MemSpec,
-        AddressMapping,
-        McConfig,
-        SimConfig,
-        TraceSetup,
-        Unkown
-    } current_sub_config;
+  enum class SubConfig {
+    MemSpec,
+    AddressMapping,
+    McConfig,
+    SimConfig,
+    TraceSetup,
+    Unkown
+  } current_sub_config;
 
-    // This custom parser callback is responsible to swap out the paths to the sub-config json files
-    // with the actual json data.
-    std::function<bool(int depth, nlohmann::detail::parse_event_t event, json_t& parsed)>
-        parser_callback;
-    parser_callback = [&parser_callback, &current_sub_config, resourceDirectory](
-                          int depth, nlohmann::detail::parse_event_t event, json_t& parsed) -> bool
-    {
-        using nlohmann::detail::parse_event_t;
+  // This custom parser callback is responsible to swap out the paths to the
+  // sub-config json files with the actual json data.
+  std::function<bool(int depth, nlohmann::detail::parse_event_t event,
+                     json_t &parsed)>
+      parser_callback;
+  parser_callback = [&parser_callback, &current_sub_config, resourceDirectory](
+                        int depth, nlohmann::detail::parse_event_t event,
+                        json_t &parsed) -> bool {
+    using nlohmann::detail::parse_event_t;
 
-        if (depth != 2)
-            return true;
+    if (depth != 2)
+      return true;
 
-        if (event == parse_event_t::key)
-        {
-            assert(parsed.is_string());
+    if (event == parse_event_t::key) {
+      assert(parsed.is_string());
 
-            if (parsed == MemSpec::KEY)
-                current_sub_config = SubConfig::MemSpec;
-            else if (parsed == AddressMapping::KEY)
-                current_sub_config = SubConfig::AddressMapping;
-            else if (parsed == McConfig::KEY)
-                current_sub_config = SubConfig::McConfig;
-            else if (parsed == SimConfig::KEY)
-                current_sub_config = SubConfig::SimConfig;
-            else if (parsed == TraceSetupConstants::KEY)
-                current_sub_config = SubConfig::TraceSetup;
-            else
-                current_sub_config = SubConfig::Unkown;
-        }
-
-        // In case we have an value (string) instead of an object, replace the value with the loaded
-        // json object.
-        if (event == parse_event_t::value && current_sub_config != SubConfig::Unkown)
-        {
-            // Replace name of json file with actual json data
-            auto parse_json = [&parser_callback,
-                               resourceDirectory](std::string_view base_dir,
-                                                  std::string_view sub_config_key,
-                                                  const std::string& filename) -> json_t
-            {
-                std::filesystem::path path(resourceDirectory);
-                path /= base_dir;
-                path /= filename;
-
-                std::ifstream json_file(path);
-
-                if (!json_file.is_open())
-                    throw std::runtime_error("Failed to open file " + std::string(path));
-
-                json_t json =
-                    json_t::parse(json_file, parser_callback, true, true).at(sub_config_key);
-                return json;
-            };
-
-            if (current_sub_config == SubConfig::MemSpec)
-                parsed = parse_json(MemSpec::SUB_DIR, MemSpec::KEY, parsed);
-            else if (current_sub_config == SubConfig::AddressMapping)
-                parsed = parse_json(AddressMapping::SUB_DIR, AddressMapping::KEY, parsed);
-            else if (current_sub_config == SubConfig::McConfig)
-                parsed = parse_json(McConfig::SUB_DIR, McConfig::KEY, parsed);
-            else if (current_sub_config == SubConfig::SimConfig)
-                parsed = parse_json(SimConfig::SUB_DIR, SimConfig::KEY, parsed);
-            else if (current_sub_config == SubConfig::TraceSetup)
-                parsed = parse_json(TraceSetupConstants::SUB_DIR, TraceSetupConstants::KEY, parsed);
-        }
-
-        return true;
-    };
-
-    if (file.is_open())
-    {
-        json_t simulation = json_t::parse(file, parser_callback, true, true).at(Configuration::KEY);
-        return simulation.get<Config::Configuration>();
+      if (parsed == MemSpec::KEY)
+        current_sub_config = SubConfig::MemSpec;
+      else if (parsed == AddressMapping::KEY)
+        current_sub_config = SubConfig::AddressMapping;
+      else if (parsed == McConfig::KEY)
+        current_sub_config = SubConfig::McConfig;
+      else if (parsed == SimConfig::KEY)
+        current_sub_config = SubConfig::SimConfig;
+      else if (parsed == TraceSetupConstants::KEY)
+        current_sub_config = SubConfig::TraceSetup;
+      else
+        current_sub_config = SubConfig::Unkown;
     }
-    throw std::runtime_error("Failed to open file " + std::string(path));
+
+    // In case we have an value (string) instead of an object, replace the value
+    // with the loaded json object.
+    if (event == parse_event_t::value &&
+        current_sub_config != SubConfig::Unkown) {
+      // Replace name of json file with actual json data
+      auto parse_json = [&parser_callback, resourceDirectory](
+                            std::string_view base_dir,
+                            std::string_view sub_config_key,
+                            const std::string &filename) -> json_t {
+        std::filesystem::path path(resourceDirectory);
+        path /= base_dir;
+        path /= filename;
+
+        std::ifstream json_file(path);
+
+        if (!json_file.is_open())
+          throw std::runtime_error("Failed to open file " + std::string(path));
+
+        json_t json = json_t::parse(json_file, parser_callback, true, true)
+                          .at(sub_config_key);
+        return json;
+      };
+
+      if (current_sub_config == SubConfig::MemSpec)
+        parsed = parse_json(MemSpec::SUB_DIR, MemSpec::KEY, parsed);
+      else if (current_sub_config == SubConfig::AddressMapping)
+        parsed =
+            parse_json(AddressMapping::SUB_DIR, AddressMapping::KEY, parsed);
+      else if (current_sub_config == SubConfig::McConfig)
+        parsed = parse_json(McConfig::SUB_DIR, McConfig::KEY, parsed);
+      else if (current_sub_config == SubConfig::SimConfig)
+        parsed = parse_json(SimConfig::SUB_DIR, SimConfig::KEY, parsed);
+      else if (current_sub_config == SubConfig::TraceSetup)
+        parsed = parse_json(TraceSetupConstants::SUB_DIR,
+                            TraceSetupConstants::KEY, parsed);
+    }
+
+    return true;
+  };
+
+  if (file.is_open()) {
+    json_t simulation =
+        json_t::parse(file, parser_callback, true, true).at(Configuration::KEY);
+    return simulation.get<Config::Configuration>();
+  }
+  throw std::runtime_error("Failed to open file " + std::string(path));
 }
 
-} // namespace DRAMSys::Config
+}  // namespace DRAMSys::Config

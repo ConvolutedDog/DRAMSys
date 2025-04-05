@@ -40,18 +40,16 @@
 
 #include <unordered_map>
 
-namespace DRAMSys::Config
-{
+namespace DRAMSys::Config {
 using json = nlohmann::json;
 
-struct MemTimingSpecType
-{
-    std::unordered_map<std::string, unsigned int> entries;
+struct MemTimingSpecType {
+  std::unordered_map<std::string, unsigned int> entries;
 };
 
-void to_json(json& j, const MemTimingSpecType& c);
-void from_json(const json& j, MemTimingSpecType& c);
+void to_json(json &j, const MemTimingSpecType &c);
+void from_json(const json &j, MemTimingSpecType &c);
 
-} // namespace DRAMSys::Config
+}  // namespace DRAMSys::Config
 
-#endif // DRAMSYSCONFIGURATION_MEMTIMINGSPEC_H
+#endif  // DRAMSYSCONFIGURATION_MEMTIMINGSPEC_H

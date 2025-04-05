@@ -48,30 +48,24 @@
 #include <qwt_plot_item.h>
 #include <vector>
 
-class TracePlotItem : public QwtPlotItem
-{
+class TracePlotItem : public QwtPlotItem {
 private:
-    const std::vector<std::shared_ptr<Transaction>>& transactions;
-    const TraceNavigator& navigator;
-    const TraceDrawingProperties& drawingProperties;
+  const std::vector<std::shared_ptr<Transaction>> &transactions;
+  const TraceNavigator &navigator;
+  const TraceDrawingProperties &drawingProperties;
 
 public:
-    TracePlotItem(const std::vector<std::shared_ptr<Transaction>>& transactions,
-                  const TraceNavigator& navigator,
-                  const TraceDrawingProperties& drawingProperties) :
-        transactions(transactions),
-        navigator(navigator),
-        drawingProperties(drawingProperties)
-    {
-    }
+  TracePlotItem(const std::vector<std::shared_ptr<Transaction>> &transactions,
+                const TraceNavigator &navigator,
+                const TraceDrawingProperties &drawingProperties)
+      : transactions(transactions), navigator(navigator),
+        drawingProperties(drawingProperties) {}
 
-    virtual int rtti() const;
-    virtual void draw(QPainter* painter,
-                      const QwtScaleMap& xMap,
-                      const QwtScaleMap& yMap,
-                      const QRectF& canvasRect) const;
-    std::vector<std::shared_ptr<Transaction>> getSelectedTransactions(Timespan timespan,
-                                                                      double yVal);
+  virtual int rtti() const;
+  virtual void draw(QPainter *painter, const QwtScaleMap &xMap,
+                    const QwtScaleMap &yMap, const QRectF &canvasRect) const;
+  std::vector<std::shared_ptr<Transaction>>
+  getSelectedTransactions(Timespan timespan, double yVal);
 };
 
-#endif // TRACEPLOTITEM_H
+#endif  // TRACEPLOTITEM_H

@@ -44,43 +44,41 @@
 
 class RequestProducer;
 
-class TrafficGenerator : public Initiator
-{
+class TrafficGenerator : public Initiator {
 public:
-    TrafficGenerator(DRAMSys::Config::TrafficGenerator const& config,
-                     sc_core::sc_time interfaceClk,
-                     uint64_t memorySize,
-                     unsigned int defaultDataLength,
-                     MemoryManager& memoryManager,
-                     std::function<void()> transactionFinished,
-                     std::function<void()> terminateInitiator);
+  TrafficGenerator(DRAMSys::Config::TrafficGenerator const &config,
+                   sc_core::sc_time interfaceClk, uint64_t memorySize,
+                   unsigned int defaultDataLength, MemoryManager &memoryManager,
+                   std::function<void()> transactionFinished,
+                   std::function<void()> terminateInitiator);
 
-    TrafficGenerator(DRAMSys::Config::TrafficGeneratorStateMachine const& config,
-                     sc_core::sc_time interfaceClk,
-                     uint64_t memorySize,
-                     unsigned int defaultDataLength,
-                     MemoryManager& memoryManager,
-                     std::function<void()> transactionFinished,
-                     std::function<void()> terminateInitiator);
+  TrafficGenerator(DRAMSys::Config::TrafficGeneratorStateMachine const &config,
+                   sc_core::sc_time interfaceClk, uint64_t memorySize,
+                   unsigned int defaultDataLength, MemoryManager &memoryManager,
+                   std::function<void()> transactionFinished,
+                   std::function<void()> terminateInitiator);
 
-    void bind(tlm_utils::multi_target_base<>& target) override { issuer.iSocket.bind(target); }
+  void bind(tlm_utils::multi_target_base<> &target) override {
+    issuer.iSocket.bind(target);
+  }
 
-    uint64_t totalRequests() override;
-    Request nextRequest();
+  uint64_t totalRequests() override;
+  Request nextRequest();
 
-    std::optional<unsigned int> stateTransition(unsigned int from);
+  std::optional<unsigned int> stateTransition(unsigned int from);
 
 private:
-    uint64_t requestsInState = 0;
-    unsigned int currentState = 0;
-    const std::vector<DRAMSys::Config::TrafficGeneratorStateTransition> stateTransistions;
+  uint64_t requestsInState = 0;
+  unsigned int currentState = 0;
+  const std::vector<DRAMSys::Config::TrafficGeneratorStateTransition>
+      stateTransistions;
 
-    using IdleClks = uint64_t;
-    std::unordered_map<unsigned int, IdleClks> idleStateClks;
-    const sc_core::sc_time generatorPeriod;
+  using IdleClks = uint64_t;
+  std::unordered_map<unsigned int, IdleClks> idleStateClks;
+  const sc_core::sc_time generatorPeriod;
 
-    std::default_random_engine randomGenerator;
+  std::default_random_engine randomGenerator;
 
-    std::unordered_map<unsigned int, std::unique_ptr<RequestProducer>> producers;
-    RequestIssuer issuer;
+  std::unordered_map<unsigned int, std::unique_ptr<RequestProducer>> producers;
+  RequestIssuer issuer;
 };

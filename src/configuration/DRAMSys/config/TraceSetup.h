@@ -41,176 +41,138 @@
 #include <optional>
 #include <variant>
 
-namespace DRAMSys::Config
-{
+namespace DRAMSys::Config {
 
-enum class TrafficInitiatorType
-{
-    Player,
-    Generator,
-    Hammer,
-    Invalid = -1
-};
+enum class TrafficInitiatorType { Player, Generator, Hammer, Invalid = -1 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(TrafficInitiatorType,
-                             {{TrafficInitiatorType::Invalid, nullptr},
-                              {TrafficInitiatorType::Player, "player"},
-                              {TrafficInitiatorType::Hammer, "hammer"},
-                              {TrafficInitiatorType::Generator, "generator"}})
+                             {
+                                 {TrafficInitiatorType::Invalid,   nullptr },
+                                 {TrafficInitiatorType::Player,    "player"},
+                                 {TrafficInitiatorType::Hammer,    "hammer"},
+                                 {TrafficInitiatorType::Generator,
+                                  "generator"                              }
+})
 
-enum class AddressDistribution
-{
-    Random,
-    Sequential,
-    Invalid = -1
-};
+enum class AddressDistribution { Random, Sequential, Invalid = -1 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(AddressDistribution,
-                             {{AddressDistribution::Invalid, nullptr},
-                              {AddressDistribution::Random, "random"},
-                              {AddressDistribution::Sequential, "sequential"}})
+                             {
+                                 {AddressDistribution::Invalid,    nullptr },
+                                 {AddressDistribution::Random,     "random"},
+                                 {AddressDistribution::Sequential,
+                                  "sequential"                             }
+})
 
-struct TracePlayer
-{
-    uint64_t clkMhz{};
-    std::string name;
-    std::optional<unsigned int> maxPendingReadRequests;
-    std::optional<unsigned int> maxPendingWriteRequests;
+struct TracePlayer {
+  uint64_t clkMhz{};
+  std::string name;
+  std::optional<unsigned int> maxPendingReadRequests;
+  std::optional<unsigned int> maxPendingWriteRequests;
 };
 
-NLOHMANN_JSONIFY_ALL_THINGS(
-    TracePlayer, clkMhz, name, maxPendingReadRequests, maxPendingWriteRequests)
+NLOHMANN_JSONIFY_ALL_THINGS(TracePlayer, clkMhz, name, maxPendingReadRequests,
+                            maxPendingWriteRequests)
 
-struct TrafficGeneratorActiveState
-{
-    unsigned int id{};
+struct TrafficGeneratorActiveState {
+  unsigned int id{};
 
-    uint64_t numRequests{};
-    double rwRatio{};
-    AddressDistribution addressDistribution;
-    std::optional<uint64_t> addressIncrement;
-    std::optional<uint64_t> minAddress;
-    std::optional<uint64_t> maxAddress;
+  uint64_t numRequests{};
+  double rwRatio{};
+  AddressDistribution addressDistribution;
+  std::optional<uint64_t> addressIncrement;
+  std::optional<uint64_t> minAddress;
+  std::optional<uint64_t> maxAddress;
 };
 
-NLOHMANN_JSONIFY_ALL_THINGS(TrafficGeneratorActiveState,
-                            id,
-                            numRequests,
-                            rwRatio,
-                            addressDistribution,
-                            addressIncrement,
-                            minAddress,
-                            maxAddress)
+NLOHMANN_JSONIFY_ALL_THINGS(TrafficGeneratorActiveState, id, numRequests,
+                            rwRatio, addressDistribution, addressIncrement,
+                            minAddress, maxAddress)
 
-struct TrafficGeneratorIdleState
-{
-    unsigned int id;
+struct TrafficGeneratorIdleState {
+  unsigned int id;
 
-    uint64_t idleClks;
+  uint64_t idleClks;
 };
 
 NLOHMANN_JSONIFY_ALL_THINGS(TrafficGeneratorIdleState, id, idleClks)
 
-struct TrafficGeneratorStateTransition
-{
-    unsigned int from;
-    unsigned int to;
-    float probability;
+struct TrafficGeneratorStateTransition {
+  unsigned int from;
+  unsigned int to;
+  float probability;
 };
 
-NLOHMANN_JSONIFY_ALL_THINGS(TrafficGeneratorStateTransition, from, to, probability)
+NLOHMANN_JSONIFY_ALL_THINGS(TrafficGeneratorStateTransition, from, to,
+                            probability)
 
-struct TrafficGenerator
-{
-    uint64_t clkMhz{};
-    std::string name;
-    std::optional<unsigned int> maxPendingReadRequests;
-    std::optional<unsigned int> maxPendingWriteRequests;
+struct TrafficGenerator {
+  uint64_t clkMhz{};
+  std::string name;
+  std::optional<unsigned int> maxPendingReadRequests;
+  std::optional<unsigned int> maxPendingWriteRequests;
 
-    std::optional<uint64_t> seed;
-    std::optional<uint64_t> maxTransactions;
-    std::optional<unsigned> dataLength;
-    std::optional<unsigned> dataAlignment;
+  std::optional<uint64_t> seed;
+  std::optional<uint64_t> maxTransactions;
+  std::optional<unsigned> dataLength;
+  std::optional<unsigned> dataAlignment;
 
-    uint64_t numRequests{};
-    double rwRatio{};
-    AddressDistribution addressDistribution;
-    std::optional<uint64_t> addressIncrement;
-    std::optional<uint64_t> minAddress;
-    std::optional<uint64_t> maxAddress;
+  uint64_t numRequests{};
+  double rwRatio{};
+  AddressDistribution addressDistribution;
+  std::optional<uint64_t> addressIncrement;
+  std::optional<uint64_t> minAddress;
+  std::optional<uint64_t> maxAddress;
 };
 
-NLOHMANN_JSONIFY_ALL_THINGS(TrafficGenerator,
-                            clkMhz,
-                            name,
-                            maxPendingReadRequests,
-                            maxPendingWriteRequests,
-                            seed,
-                            maxTransactions,
-                            dataLength,
-                            dataAlignment,
-                            numRequests,
-                            rwRatio,
-                            addressDistribution,
-                            addressIncrement,
-                            minAddress,
-                            maxAddress)
+NLOHMANN_JSONIFY_ALL_THINGS(TrafficGenerator, clkMhz, name,
+                            maxPendingReadRequests, maxPendingWriteRequests,
+                            seed, maxTransactions, dataLength, dataAlignment,
+                            numRequests, rwRatio, addressDistribution,
+                            addressIncrement, minAddress, maxAddress)
 
-struct TrafficGeneratorStateMachine
-{
-    uint64_t clkMhz{};
-    std::string name;
-    std::optional<unsigned int> maxPendingReadRequests;
-    std::optional<unsigned int> maxPendingWriteRequests;
+struct TrafficGeneratorStateMachine {
+  uint64_t clkMhz{};
+  std::string name;
+  std::optional<unsigned int> maxPendingReadRequests;
+  std::optional<unsigned int> maxPendingWriteRequests;
 
-    std::optional<uint64_t> seed;
-    std::optional<uint64_t> maxTransactions;
-    std::optional<unsigned> dataLength;
-    std::optional<unsigned> dataAlignment;
-    std::vector<std::variant<TrafficGeneratorActiveState, TrafficGeneratorIdleState>> states;
-    std::vector<TrafficGeneratorStateTransition> transitions;
+  std::optional<uint64_t> seed;
+  std::optional<uint64_t> maxTransactions;
+  std::optional<unsigned> dataLength;
+  std::optional<unsigned> dataAlignment;
+  std::vector<
+      std::variant<TrafficGeneratorActiveState, TrafficGeneratorIdleState>>
+      states;
+  std::vector<TrafficGeneratorStateTransition> transitions;
 };
 
-NLOHMANN_JSONIFY_ALL_THINGS(TrafficGeneratorStateMachine,
-                            clkMhz,
-                            name,
-                            maxPendingReadRequests,
-                            maxPendingWriteRequests,
-                            seed,
-                            maxTransactions,
-                            dataLength,
-                            dataAlignment,
-                            states,
-                            transitions)
+NLOHMANN_JSONIFY_ALL_THINGS(TrafficGeneratorStateMachine, clkMhz, name,
+                            maxPendingReadRequests, maxPendingWriteRequests,
+                            seed, maxTransactions, dataLength, dataAlignment,
+                            states, transitions)
 
-struct RowHammer
-{
-    uint64_t clkMhz{};
-    std::string name;
-    std::optional<unsigned int> maxPendingReadRequests;
-    std::optional<unsigned int> maxPendingWriteRequests;
+struct RowHammer {
+  uint64_t clkMhz{};
+  std::string name;
+  std::optional<unsigned int> maxPendingReadRequests;
+  std::optional<unsigned int> maxPendingWriteRequests;
 
-    uint64_t numRequests{};
-    uint64_t rowIncrement{};
+  uint64_t numRequests{};
+  uint64_t rowIncrement{};
 };
 
-NLOHMANN_JSONIFY_ALL_THINGS(RowHammer,
-                            clkMhz,
-                            name,
-                            maxPendingReadRequests,
-                            maxPendingWriteRequests,
-                            numRequests,
-                            rowIncrement)
+NLOHMANN_JSONIFY_ALL_THINGS(RowHammer, clkMhz, name, maxPendingReadRequests,
+                            maxPendingWriteRequests, numRequests, rowIncrement)
 
-struct TraceSetupConstants
-{
-    static constexpr std::string_view KEY = "tracesetup";
-    static constexpr std::string_view SUB_DIR = "tracesetup";
+struct TraceSetupConstants {
+  static constexpr std::string_view KEY = "tracesetup";
+  static constexpr std::string_view SUB_DIR = "tracesetup";
 };
 
-using Initiator =
-    std::variant<TracePlayer, TrafficGenerator, TrafficGeneratorStateMachine, RowHammer>;
+using Initiator = std::variant<TracePlayer, TrafficGenerator,
+                               TrafficGeneratorStateMachine, RowHammer>;
 
-} // namespace DRAMSys::Config
+}  // namespace DRAMSys::Config
 
-#endif // DRAMSYSCONFIGURATION_TRACESETUP_H
+#endif  // DRAMSYSCONFIGURATION_TRACESETUP_H

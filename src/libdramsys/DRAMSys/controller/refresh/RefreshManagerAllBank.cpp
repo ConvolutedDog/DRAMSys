@@ -41,203 +41,161 @@
 using namespace sc_core;
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
 RefreshManagerAllBank::RefreshManagerAllBank(
-    const McConfig& config,
-    const MemSpec& memSpec,
-    ControllerVector<Bank, BankMachine*>& bankMachinesOnRank,
-    PowerDownManagerIF& powerDownManager,
-    Rank rank) :
-    memSpec(memSpec),
-    bankMachinesOnRank(bankMachinesOnRank),
-    powerDownManager(powerDownManager),
-    maxPostponed(static_cast<int>(config.refreshMaxPostponed)),
-    maxPulledin(-static_cast<int>(config.refreshMaxPulledin)),
-    refreshManagement(config.refreshManagement)
-{
-    timeForNextTrigger = getTimeForFirstTrigger(
-        memSpec.tCK, memSpec.getRefreshIntervalAB(), rank, memSpec.ranksPerChannel);
-    setUpDummy(refreshPayload, 0, rank);
+    const McConfig &config, const MemSpec &memSpec,
+    ControllerVector<Bank, BankMachine *> &bankMachinesOnRank,
+    PowerDownManagerIF &powerDownManager, Rank rank)
+    : memSpec(memSpec), bankMachinesOnRank(bankMachinesOnRank),
+      powerDownManager(powerDownManager),
+      maxPostponed(static_cast<int>(config.refreshMaxPostponed)),
+      maxPulledin(-static_cast<int>(config.refreshMaxPulledin)),
+      refreshManagement(config.refreshManagement) {
+  timeForNextTrigger =
+      getTimeForFirstTrigger(memSpec.tCK, memSpec.getRefreshIntervalAB(), rank,
+                             memSpec.ranksPerChannel);
+  setUpDummy(refreshPayload, 0, rank);
 }
 
-CommandTuple::Type RefreshManagerAllBank::getNextCommand()
-{
-    return {nextCommand, &refreshPayload, SC_ZERO_TIME};
+CommandTuple::Type RefreshManagerAllBank::getNextCommand() {
+  return {nextCommand, &refreshPayload, SC_ZERO_TIME};
 }
 
-void RefreshManagerAllBank::evaluate()
-{
-    nextCommand = Command::NOP;
+void RefreshManagerAllBank::evaluate() {
+  nextCommand = Command::NOP;
 
-    if (sc_time_stamp() >= timeForNextTrigger) // Normal refresh
-    {
-        powerDownManager.triggerInterruption();
+  if (sc_time_stamp() >= timeForNextTrigger)  // Normal refresh
+  {
+    powerDownManager.triggerInterruption();
 
-        if (sleeping)
-            return;
+    if (sleeping)
+      return;
 
-        if (sc_time_stamp() >= timeForNextTrigger + memSpec.getRefreshIntervalAB())
-        {
+    if (sc_time_stamp() >=
+        timeForNextTrigger + memSpec.getRefreshIntervalAB()) {
+      timeForNextTrigger += memSpec.getRefreshIntervalAB();
+      state = State::Regular;
+    }
+
+    if (state == State::Regular) {
+      bool doRefresh = true;
+      if (flexibilityCounter == maxPostponed)  // forced refresh
+      {
+        for (auto *it : bankMachinesOnRank)
+          it->block();
+      } else {
+        for (const auto *it : bankMachinesOnRank) {
+          if (!it->isIdle()) {
+            doRefresh = false;
+            flexibilityCounter++;
             timeForNextTrigger += memSpec.getRefreshIntervalAB();
-            state = State::Regular;
+            break;
+          }
         }
+      }
 
-        if (state == State::Regular)
-        {
-            bool doRefresh = true;
-            if (flexibilityCounter == maxPostponed) // forced refresh
-            {
-                for (auto* it : bankMachinesOnRank)
-                    it->block();
-            }
-            else
-            {
-                for (const auto* it : bankMachinesOnRank)
-                {
-                    if (!it->isIdle())
-                    {
-                        doRefresh = false;
-                        flexibilityCounter++;
-                        timeForNextTrigger += memSpec.getRefreshIntervalAB();
-                        break;
-                    }
-                }
-            }
-
-            if (doRefresh)
-            {
-                if (activatedBanks > 0)
-                    nextCommand = Command::PREAB;
-                else
-                    nextCommand = Command::REFAB;
-
-                return;
-            }
-        }
-        else // if (state == RmState::Pulledin)
-        {
-            bool doRefresh = true;
-            for (const auto* it : bankMachinesOnRank)
-            {
-                if (!it->isIdle())
-                {
-                    doRefresh = false;
-                    state = State::Regular;
-                    timeForNextTrigger += memSpec.getRefreshIntervalAB();
-                    break;
-                }
-            }
-
-            if (doRefresh)
-            {
-                assert(activatedBanks == 0);
-                nextCommand = Command::REFAB;
-                return;
-            }
-        }
-    }
-
-    if (refreshManagement)
-    {
-        uint64_t maxThreshold = 0;
-        for (const auto* bankMachine : bankMachinesOnRank)
-            maxThreshold = std::max(maxThreshold, bankMachine->getRefreshManagementCounter());
-
-        bool refreshManagementRequired = true;
-
-        if (maxThreshold >= memSpec.getRAAMMT())
-        {
-            for (auto* bankMachine : bankMachinesOnRank)
-                bankMachine->block();
-        }
-        else if (maxThreshold >= memSpec.getRAAIMT())
-        {
-            for (const auto* bankMachine : bankMachinesOnRank)
-            {
-                if (!bankMachine->isIdle())
-                {
-                    refreshManagementRequired = false;
-                    break;
-                }
-            }
-        }
+      if (doRefresh) {
+        if (activatedBanks > 0)
+          nextCommand = Command::PREAB;
         else
-        {
-            refreshManagementRequired = false;
-        }
+          nextCommand = Command::REFAB;
 
-        if (refreshManagementRequired)
-        {
-            if (activatedBanks > 0)
-                nextCommand = Command::PREAB;
-            else
-                nextCommand = Command::RFMAB;
-
-            return;
+        return;
+      }
+    } else  // if (state == RmState::Pulledin)
+    {
+      bool doRefresh = true;
+      for (const auto *it : bankMachinesOnRank) {
+        if (!it->isIdle()) {
+          doRefresh = false;
+          state = State::Regular;
+          timeForNextTrigger += memSpec.getRefreshIntervalAB();
+          break;
         }
+      }
+
+      if (doRefresh) {
+        assert(activatedBanks == 0);
+        nextCommand = Command::REFAB;
+        return;
+      }
     }
+  }
+
+  if (refreshManagement) {
+    uint64_t maxThreshold = 0;
+    for (const auto *bankMachine : bankMachinesOnRank)
+      maxThreshold =
+          std::max(maxThreshold, bankMachine->getRefreshManagementCounter());
+
+    bool refreshManagementRequired = true;
+
+    if (maxThreshold >= memSpec.getRAAMMT()) {
+      for (auto *bankMachine : bankMachinesOnRank)
+        bankMachine->block();
+    } else if (maxThreshold >= memSpec.getRAAIMT()) {
+      for (const auto *bankMachine : bankMachinesOnRank) {
+        if (!bankMachine->isIdle()) {
+          refreshManagementRequired = false;
+          break;
+        }
+      }
+    } else {
+      refreshManagementRequired = false;
+    }
+
+    if (refreshManagementRequired) {
+      if (activatedBanks > 0)
+        nextCommand = Command::PREAB;
+      else
+        nextCommand = Command::RFMAB;
+
+      return;
+    }
+  }
 }
 
-void RefreshManagerAllBank::update(Command command)
-{
-    switch (command)
-    {
-    case Command::ACT:
-        activatedBanks++;
-        break;
+void RefreshManagerAllBank::update(Command command) {
+  switch (command) {
+    case Command::ACT: activatedBanks++; break;
     case Command::PREPB:
     case Command::RDA:
     case Command::WRA:
-    case Command::MWRA:
-        activatedBanks--;
-        break;
-    case Command::PREAB:
-        activatedBanks = 0;
-        break;
+    case Command::MWRA: activatedBanks--; break;
+    case Command::PREAB: activatedBanks = 0; break;
     case Command::REFAB:
-        if (sleeping)
-        {
-            // Refresh command after SREFEX
-            state = State::Regular; // TODO: check if this assignment is necessary
-            timeForNextTrigger = sc_time_stamp() + memSpec.getRefreshIntervalAB();
-            sleeping = false;
-        }
-        else
-        {
-            if (state == State::Pulledin)
-                flexibilityCounter--;
-            else
-                state = State::Pulledin;
-
-            if (flexibilityCounter == maxPulledin)
-            {
-                state = State::Regular;
-                timeForNextTrigger += memSpec.getRefreshIntervalAB();
-            }
-        }
-        break;
-    case Command::PDEA:
-    case Command::PDEP:
-        sleeping = true;
-        break;
-    case Command::SREFEN:
-        sleeping = true;
-        timeForNextTrigger = scMaxTime;
-        break;
-    case Command::PDXA:
-    case Command::PDXP:
+      if (sleeping) {
+        // Refresh command after SREFEX
+        state = State::Regular;  // TODO: check if this assignment is necessary
+        timeForNextTrigger = sc_time_stamp() + memSpec.getRefreshIntervalAB();
         sleeping = false;
-        break;
-    default:
-        break;
-    }
+      } else {
+        if (state == State::Pulledin)
+          flexibilityCounter--;
+        else
+          state = State::Pulledin;
+
+        if (flexibilityCounter == maxPulledin) {
+          state = State::Regular;
+          timeForNextTrigger += memSpec.getRefreshIntervalAB();
+        }
+      }
+      break;
+    case Command::PDEA:
+    case Command::PDEP: sleeping = true; break;
+    case Command::SREFEN:
+      sleeping = true;
+      timeForNextTrigger = scMaxTime;
+      break;
+    case Command::PDXA:
+    case Command::PDXP: sleeping = false; break;
+    default: break;
+  }
 }
 
-sc_time RefreshManagerAllBank::getTimeForNextTrigger()
-{
-    return timeForNextTrigger;
+sc_time RefreshManagerAllBank::getTimeForNextTrigger() {
+  return timeForNextTrigger;
 }
 
-} // namespace DRAMSys
+}  // namespace DRAMSys

@@ -43,30 +43,25 @@
 #include <QRectF>
 #include <QString>
 
-enum class TextPositioning
-{
-    topRight,
-    topLeft,
-    bottomRight,
-    bottomLeft,
-    topCenter,
-    bottomCenter,
-    centerCenter
+enum class TextPositioning {
+  topRight,
+  topLeft,
+  bottomRight,
+  bottomLeft,
+  topCenter,
+  bottomCenter,
+  centerCenter
 };
 
-void drawVerticalLine(QPainter* painter, int xPos, const QRectF& canvasRect);
-void drawDoubleArrow(QPainter* painter, int xFrom, int xTo, int y);
-void drawDoubleArrow(QPainter* painter,
-                     int xFrom,
-                     int xTo,
-                     int y,
-                     const QString& text,
-                     const QColor& textColor = QColor(Qt::black));
-void drawHexagon(QPainter* painter, const QPoint& from, const QPoint& to, double height);
-void drawText(QPainter* painter,
-              const QString& text,
-              const QPoint& position,
-              const TextPositioning& positioning,
-              const QColor& textColor = QColor(Qt::black));
+void drawVerticalLine(QPainter *painter, int xPos, const QRectF &canvasRect);
+void drawDoubleArrow(QPainter *painter, int xFrom, int xTo, int y);
+void drawDoubleArrow(QPainter *painter, int xFrom, int xTo, int y,
+                     const QString &text,
+                     const QColor &textColor = QColor(Qt::black));
+void drawHexagon(QPainter *painter, const QPoint &from, const QPoint &to,
+                 double height);
+void drawText(QPainter *painter, const QString &text, const QPoint &position,
+              const TextPositioning &positioning,
+              const QColor &textColor = QColor(Qt::black));
 
-#endif // TRACEDRAWING_H
+#endif  // TRACEDRAWING_H

@@ -40,17 +40,15 @@
 
 #include <unordered_map>
 
-namespace DRAMSys::Config
-{
+namespace DRAMSys::Config {
 
-struct MemPowerSpec
-{
-    std::unordered_map<std::string, double> entries;
+struct MemPowerSpec {
+  std::unordered_map<std::string, double> entries;
 };
 
-void to_json(json_t& j, const MemPowerSpec& c);
-void from_json(const json_t& j, MemPowerSpec& c);
+void to_json(json_t &j, const MemPowerSpec &c);
+void from_json(const json_t &j, MemPowerSpec &c);
 
-} // namespace DRAMSys::Config
+}  // namespace DRAMSys::Config
 
-#endif // DRAMSYSCONFIGURATION_MEMPOWERSPEC_H
+#endif  // DRAMSYSCONFIGURATION_MEMPOWERSPEC_H

@@ -37,23 +37,19 @@
 
 #include "timespan.h"
 
-bool Timespan::contains(traceTime time) const
-{
-    return (begin <= time && time <= end);
+bool Timespan::contains(traceTime time) const {
+  return (begin <= time && time <= end);
 }
 
-bool Timespan::contains(const Timespan& other) const
-{
-    return (other.begin >= begin && other.end <= end);
+bool Timespan::contains(const Timespan &other) const {
+  return (other.begin >= begin && other.end <= end);
 }
 
-bool Timespan::overlaps(const Timespan& other) const
-{
-    return other.Begin() < this->end && this->begin < other.End();
+bool Timespan::overlaps(const Timespan &other) const {
+  return other.Begin() < this->end && this->begin < other.End();
 }
 
-void Timespan::shift(traceTime offset)
-{
-    begin += offset;
-    end += offset;
+void Timespan::shift(traceTime offset) {
+  begin += offset;
+  end += offset;
 }

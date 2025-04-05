@@ -41,65 +41,64 @@
 
 #include <systemc>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class MemSpecGDDR5X final : public MemSpec
-{
+class MemSpecGDDR5X final : public MemSpec {
 public:
-    explicit MemSpecGDDR5X(const Config::MemSpec& memSpec);
+  explicit MemSpecGDDR5X(const Config::MemSpec &memSpec);
 
-    // Memspec Variables:
-    const sc_core::sc_time tRP;
-    const sc_core::sc_time tRAS;
-    const sc_core::sc_time tRC;
-    const sc_core::sc_time tRCDRD;
-    const sc_core::sc_time tRCDWR;
-    const sc_core::sc_time tRTP;
-    const sc_core::sc_time tRRDS;
-    const sc_core::sc_time tRRDL;
-    const sc_core::sc_time tCCDS;
-    const sc_core::sc_time tCCDL;
-    const sc_core::sc_time tRL;
-    const sc_core::sc_time tWCK2CKPIN;
-    const sc_core::sc_time tWCK2CK;
-    const sc_core::sc_time tWCK2DQO;
-    const sc_core::sc_time tRTW;
-    const sc_core::sc_time tWL;
-    const sc_core::sc_time tWCK2DQI;
-    const sc_core::sc_time tWR;
-    const sc_core::sc_time tWTRS;
-    const sc_core::sc_time tWTRL;
-    const sc_core::sc_time tCKE;
-    const sc_core::sc_time tPD;
-    const sc_core::sc_time tXP;
-    const sc_core::sc_time tREFI;
-    const sc_core::sc_time tREFIPB;
-    const sc_core::sc_time tRFC;
-    const sc_core::sc_time tRFCPB;
-    const sc_core::sc_time tRREFD;
-    const sc_core::sc_time tXS;
-    const sc_core::sc_time tFAW;
-    const sc_core::sc_time t32AW;
-    //    sc_time tRDSRE; // = tCL + tWCK2CKPIN + tWCK2CK + tWCK2DQO + BurstLength / DataRate * tCK;
-    //    sc_time tWRSRE; // = tWL + tWCK2CKPIN + tWCK2CK + tWCK2DQI + BurstLength / DataRate * tCK;
-    const sc_core::sc_time tPPD;
-    const sc_core::sc_time tLK;
-    const sc_core::sc_time tRTRS;
+  // Memspec Variables:
+  const sc_core::sc_time tRP;
+  const sc_core::sc_time tRAS;
+  const sc_core::sc_time tRC;
+  const sc_core::sc_time tRCDRD;
+  const sc_core::sc_time tRCDWR;
+  const sc_core::sc_time tRTP;
+  const sc_core::sc_time tRRDS;
+  const sc_core::sc_time tRRDL;
+  const sc_core::sc_time tCCDS;
+  const sc_core::sc_time tCCDL;
+  const sc_core::sc_time tRL;
+  const sc_core::sc_time tWCK2CKPIN;
+  const sc_core::sc_time tWCK2CK;
+  const sc_core::sc_time tWCK2DQO;
+  const sc_core::sc_time tRTW;
+  const sc_core::sc_time tWL;
+  const sc_core::sc_time tWCK2DQI;
+  const sc_core::sc_time tWR;
+  const sc_core::sc_time tWTRS;
+  const sc_core::sc_time tWTRL;
+  const sc_core::sc_time tCKE;
+  const sc_core::sc_time tPD;
+  const sc_core::sc_time tXP;
+  const sc_core::sc_time tREFI;
+  const sc_core::sc_time tREFIPB;
+  const sc_core::sc_time tRFC;
+  const sc_core::sc_time tRFCPB;
+  const sc_core::sc_time tRREFD;
+  const sc_core::sc_time tXS;
+  const sc_core::sc_time tFAW;
+  const sc_core::sc_time t32AW;
+  //    sc_time tRDSRE; // = tCL + tWCK2CKPIN + tWCK2CK + tWCK2DQO + BurstLength
+  //    / DataRate * tCK; sc_time tWRSRE; // = tWL + tWCK2CKPIN + tWCK2CK +
+  //    tWCK2DQI + BurstLength / DataRate * tCK;
+  const sc_core::sc_time tPPD;
+  const sc_core::sc_time tLK;
+  const sc_core::sc_time tRTRS;
 
-    // Currents and Voltages:
-    // TODO: to be completed
+  // Currents and Voltages:
+  // TODO: to be completed
 
-    [[nodiscard]] sc_core::sc_time getRefreshIntervalAB() const override;
-    [[nodiscard]] sc_core::sc_time getRefreshIntervalPB() const override;
+  [[nodiscard]] sc_core::sc_time getRefreshIntervalAB() const override;
+  [[nodiscard]] sc_core::sc_time getRefreshIntervalPB() const override;
 
-    [[nodiscard]] sc_core::sc_time
-    getExecutionTime(Command command, const tlm::tlm_generic_payload& payload) const override;
-    [[nodiscard]] TimeInterval
-    getIntervalOnDataStrobe(Command command,
-                            const tlm::tlm_generic_payload& payload) const override;
+  [[nodiscard]] sc_core::sc_time
+  getExecutionTime(Command command,
+                   const tlm::tlm_generic_payload &payload) const override;
+  [[nodiscard]] TimeInterval getIntervalOnDataStrobe(
+      Command command, const tlm::tlm_generic_payload &payload) const override;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // MEMSPECGDDR5X_H
+#endif  // MEMSPECGDDR5X_H

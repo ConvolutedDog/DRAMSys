@@ -41,45 +41,41 @@
 #include <QString>
 #include <vector>
 
-class TraceCalculatedMetrics
-{
+class TraceCalculatedMetrics {
 public:
-    TraceCalculatedMetrics(const QString& traceName) : traceName(traceName) {}
+  TraceCalculatedMetrics(const QString &traceName) : traceName(traceName) {}
 
-    void addCalculatedMetric(const CalculatedMetric& result)
-    {
-        calculatedMetrics.push_back(result);
-    }
-    QString getTraceName() const { return traceName; }
-    const std::vector<CalculatedMetric>& getCalculatedMetrics() const { return calculatedMetrics; }
+  void addCalculatedMetric(const CalculatedMetric &result) {
+    calculatedMetrics.push_back(result);
+  }
+  QString getTraceName() const { return traceName; }
+  const std::vector<CalculatedMetric> &getCalculatedMetrics() const {
+    return calculatedMetrics;
+  }
 
-    QString toCSVHeader()
-    {
-        QString result = "";
-        result.append("Trace");
-        for (CalculatedMetric calculatedMetric : calculatedMetrics)
-        {
-            result.append(",");
-            result.append(calculatedMetric.name.c_str());
-        }
-        return result;
+  QString toCSVHeader() {
+    QString result = "";
+    result.append("Trace");
+    for (CalculatedMetric calculatedMetric : calculatedMetrics) {
+      result.append(",");
+      result.append(calculatedMetric.name.c_str());
     }
+    return result;
+  }
 
-    QString toCSVLine()
-    {
-        QString result = "";
-        result.append(traceName);
-        for (CalculatedMetric calculatedMetric : calculatedMetrics)
-        {
-            result.append(",");
-            result.append(QString::number(calculatedMetric.value));
-        }
-        return result;
+  QString toCSVLine() {
+    QString result = "";
+    result.append(traceName);
+    for (CalculatedMetric calculatedMetric : calculatedMetrics) {
+      result.append(",");
+      result.append(QString::number(calculatedMetric.value));
     }
+    return result;
+  }
 
 private:
-    QString traceName;
-    std::vector<CalculatedMetric> calculatedMetrics;
+  QString traceName;
+  std::vector<CalculatedMetric> calculatedMetrics;
 };
 
-#endif // TRACEMETRICRESULTS_H
+#endif  // TRACEMETRICRESULTS_H

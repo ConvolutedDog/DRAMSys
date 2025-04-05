@@ -41,80 +41,80 @@
 
 #include <systemc>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class MemSpecDDR4 final : public MemSpec
-{
+class MemSpecDDR4 final : public MemSpec {
 public:
-    explicit MemSpecDDR4(const Config::MemSpec& memSpec);
+  explicit MemSpecDDR4(const Config::MemSpec &memSpec);
 
-    // Memspec Variables:
-    const sc_core::sc_time tCKE;
-    const sc_core::sc_time tPD;
-    const sc_core::sc_time tCKESR;
-    const sc_core::sc_time tRAS;
-    const sc_core::sc_time tRC;
-    const sc_core::sc_time tRCD;
-    const sc_core::sc_time tRL;
-    const sc_core::sc_time tRPRE;
-    const sc_core::sc_time tRTP;
-    const sc_core::sc_time tWL;
-    const sc_core::sc_time tWPRE;
-    const sc_core::sc_time tWR;
-    const sc_core::sc_time tXP;
-    const sc_core::sc_time tXS;
-    const sc_core::sc_time tREFI;
-    const sc_core::sc_time tRFC;
-    const sc_core::sc_time tRP;
-    const sc_core::sc_time tDQSCK;
-    const sc_core::sc_time tCCD_S;
-    const sc_core::sc_time tCCD_L;
-    const sc_core::sc_time tFAW;
-    const sc_core::sc_time tRRD_S;
-    const sc_core::sc_time tRRD_L;
-    const sc_core::sc_time tWTR_S;
-    const sc_core::sc_time tWTR_L;
-    const sc_core::sc_time tAL;
-    const sc_core::sc_time tXPDLL;
-    const sc_core::sc_time tXSDLL;
-    const sc_core::sc_time tACTPDEN;
-    const sc_core::sc_time tPRPDEN;
-    const sc_core::sc_time tREFPDEN;
-    const sc_core::sc_time tRTRS;
+  // Memspec Variables:
+  const sc_core::sc_time tCKE;
+  const sc_core::sc_time tPD;
+  const sc_core::sc_time tCKESR;
+  const sc_core::sc_time tRAS;
+  const sc_core::sc_time tRC;
+  const sc_core::sc_time tRCD;
+  const sc_core::sc_time tRL;
+  const sc_core::sc_time tRPRE;
+  const sc_core::sc_time tRTP;
+  const sc_core::sc_time tWL;
+  const sc_core::sc_time tWPRE;
+  const sc_core::sc_time tWR;
+  const sc_core::sc_time tXP;
+  const sc_core::sc_time tXS;
+  const sc_core::sc_time tREFI;
+  const sc_core::sc_time tRFC;
+  const sc_core::sc_time tRP;
+  const sc_core::sc_time tDQSCK;
+  const sc_core::sc_time tCCD_S;
+  const sc_core::sc_time tCCD_L;
+  const sc_core::sc_time tFAW;
+  const sc_core::sc_time tRRD_S;
+  const sc_core::sc_time tRRD_L;
+  const sc_core::sc_time tWTR_S;
+  const sc_core::sc_time tWTR_L;
+  const sc_core::sc_time tAL;
+  const sc_core::sc_time tXPDLL;
+  const sc_core::sc_time tXSDLL;
+  const sc_core::sc_time tACTPDEN;
+  const sc_core::sc_time tPRPDEN;
+  const sc_core::sc_time tREFPDEN;
+  const sc_core::sc_time tRTRS;
 
-    // Currents and Voltages:
-    const double iDD0;
-    const double iDD2N;
-    const double iDD3N;
-    const double iDD4R;
-    const double iDD4W;
-    const double iDD5;
-    const double iDD6;
-    const double vDD;
-    const double iDD02;
-    const double iDD2P0;
-    const double iDD2P1;
-    const double iDD3P0;
-    const double iDD3P1;
-    const double iDD62;
-    const double vDD2;
+  // Currents and Voltages:
+  const double iDD0;
+  const double iDD2N;
+  const double iDD3N;
+  const double iDD4R;
+  const double iDD4W;
+  const double iDD5;
+  const double iDD6;
+  const double vDD;
+  const double iDD02;
+  const double iDD2P0;
+  const double iDD2P1;
+  const double iDD3P0;
+  const double iDD3P1;
+  const double iDD62;
+  const double vDD2;
 
-    [[nodiscard]] sc_core::sc_time getRefreshIntervalAB() const override;
+  [[nodiscard]] sc_core::sc_time getRefreshIntervalAB() const override;
 
-    [[nodiscard]] sc_core::sc_time
-    getExecutionTime(Command command, const tlm::tlm_generic_payload& payload) const override;
-    [[nodiscard]] TimeInterval
-    getIntervalOnDataStrobe(Command command,
-                            const tlm::tlm_generic_payload& payload) const override;
+  [[nodiscard]] sc_core::sc_time
+  getExecutionTime(Command command,
+                   const tlm::tlm_generic_payload &payload) const override;
+  [[nodiscard]] TimeInterval getIntervalOnDataStrobe(
+      Command command, const tlm::tlm_generic_payload &payload) const override;
 
-    [[nodiscard]] bool requiresMaskedWrite(const tlm::tlm_generic_payload& payload) const override;
+  [[nodiscard]] bool
+  requiresMaskedWrite(const tlm::tlm_generic_payload &payload) const override;
 
 #ifdef DRAMPOWER
-    [[nodiscard]] DRAMPower::MemorySpecification toDramPowerMemSpec() const override;
+  [[nodiscard]] DRAMPower::MemorySpecification
+  toDramPowerMemSpec() const override;
 #endif
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // MEMSPECDDR4_H
+#endif  // MEMSPECDDR4_H

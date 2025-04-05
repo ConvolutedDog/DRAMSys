@@ -41,45 +41,46 @@
 #include <queue>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class CheckerGDDR5X final : public CheckerIF
-{
+class CheckerGDDR5X final : public CheckerIF {
 public:
-    explicit CheckerGDDR5X(const MemSpecGDDR5X& memSpec);
-    [[nodiscard]] sc_core::sc_time
-    timeToSatisfyConstraints(Command command,
-                             const tlm::tlm_generic_payload& payload) const override;
-    void insert(Command command, const tlm::tlm_generic_payload& payload) override;
+  explicit CheckerGDDR5X(const MemSpecGDDR5X &memSpec);
+  [[nodiscard]] sc_core::sc_time timeToSatisfyConstraints(
+      Command command, const tlm::tlm_generic_payload &payload) const override;
+  void insert(Command command,
+              const tlm::tlm_generic_payload &payload) override;
 
 private:
-    const MemSpecGDDR5X& memSpec;
+  const MemSpecGDDR5X &memSpec;
 
-    std::vector<ControllerVector<Bank, sc_core::sc_time>> lastScheduledByCommandAndBank;
-    std::vector<ControllerVector<BankGroup, sc_core::sc_time>> lastScheduledByCommandAndBankGroup;
-    std::vector<ControllerVector<Rank, sc_core::sc_time>> lastScheduledByCommandAndRank;
-    std::vector<sc_core::sc_time> lastScheduledByCommand;
+  std::vector<ControllerVector<Bank, sc_core::sc_time>>
+      lastScheduledByCommandAndBank;
+  std::vector<ControllerVector<BankGroup, sc_core::sc_time>>
+      lastScheduledByCommandAndBankGroup;
+  std::vector<ControllerVector<Rank, sc_core::sc_time>>
+      lastScheduledByCommandAndRank;
+  std::vector<sc_core::sc_time> lastScheduledByCommand;
 
-    sc_core::sc_time lastCommandOnBus;
+  sc_core::sc_time lastCommandOnBus;
 
-    // 4 and 32 activate window
-    ControllerVector<Rank, std::queue<sc_core::sc_time>> last4Activates;
-    ControllerVector<Rank, std::queue<sc_core::sc_time>> last32Activates;
+  // 4 and 32 activate window
+  ControllerVector<Rank, std::queue<sc_core::sc_time>> last4Activates;
+  ControllerVector<Rank, std::queue<sc_core::sc_time>> last32Activates;
 
-    ControllerVector<Rank, unsigned> bankwiseRefreshCounter;
+  ControllerVector<Rank, unsigned> bankwiseRefreshCounter;
 
-    const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
-    sc_core::sc_time tBURST;
-    sc_core::sc_time tRDSRE;
-    sc_core::sc_time tWRSRE;
-    sc_core::sc_time tRDWR_R;
-    sc_core::sc_time tWRRD_S;
-    sc_core::sc_time tWRRD_L;
-    sc_core::sc_time tWRRD_R;
-    sc_core::sc_time tWRPRE;
+  const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
+  sc_core::sc_time tBURST;
+  sc_core::sc_time tRDSRE;
+  sc_core::sc_time tWRSRE;
+  sc_core::sc_time tRDWR_R;
+  sc_core::sc_time tWRRD_S;
+  sc_core::sc_time tWRRD_L;
+  sc_core::sc_time tWRRD_R;
+  sc_core::sc_time tWRPRE;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // CHECKERGDDR5X_H
+#endif  // CHECKERGDDR5X_H

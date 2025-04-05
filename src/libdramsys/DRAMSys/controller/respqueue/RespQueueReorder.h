@@ -41,22 +41,22 @@
 #include <systemc>
 #include <tlm>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class RespQueueReorder final : public RespQueueIF
-{
+class RespQueueReorder final : public RespQueueIF {
 public:
-    void insertPayload(tlm::tlm_generic_payload* payload, sc_core::sc_time strobeEnd) override;
-    tlm::tlm_generic_payload* nextPayload() override;
-    [[nodiscard]] sc_core::sc_time getTriggerTime() const override;
+  void insertPayload(tlm::tlm_generic_payload *payload,
+                     sc_core::sc_time strobeEnd) override;
+  tlm::tlm_generic_payload *nextPayload() override;
+  [[nodiscard]] sc_core::sc_time getTriggerTime() const override;
 
 private:
-    uint64_t nextPayloadID = 1;
-    std::map<uint64_t, std::pair<tlm::tlm_generic_payload*, sc_core::sc_time>> buffer;
-    const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
+  uint64_t nextPayloadID = 1;
+  std::map<uint64_t, std::pair<tlm::tlm_generic_payload *, sc_core::sc_time>>
+      buffer;
+  const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // RESPQUEUEREORDER_H
+#endif  // RESPQUEUEREORDER_H

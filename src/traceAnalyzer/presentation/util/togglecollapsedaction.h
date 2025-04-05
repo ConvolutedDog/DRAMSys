@@ -38,33 +38,23 @@
 
 #include <QAction>
 
-class ToggleCollapsedAction : public QAction
-{
+class ToggleCollapsedAction : public QAction {
 public:
-    explicit ToggleCollapsedAction(QObject* parent = nullptr);
+  explicit ToggleCollapsedAction(QObject *parent = nullptr);
 
-    enum class CollapsedState
-    {
-        Mixed,
-        Collapsed,
-        Expanded
-    };
+  enum class CollapsedState { Mixed, Collapsed, Expanded };
 
-    enum class CollapseAction
-    {
-        ExpandAllRanks,
-        CollapseAllRanks
-    };
+  enum class CollapseAction { ExpandAllRanks, CollapseAllRanks };
 
-    void updateCollapsedState(CollapsedState collapsedState);
-    CollapseAction getCollapseAction() const;
+  void updateCollapsedState(CollapsedState collapsedState);
+  CollapseAction getCollapseAction() const;
 
 public Q_SLOTS:
 
 private:
-    CollapsedState currentCollapsedState = CollapsedState::Collapsed;
-    CollapseAction collapseAction;
-    QString actionText;
+  CollapsedState currentCollapsedState = CollapsedState::Collapsed;
+  CollapseAction collapseAction;
+  QString actionText;
 };
 
-#endif // TOGGLECOLLAPSEDACTION_H
+#endif  // TOGGLECOLLAPSEDACTION_H

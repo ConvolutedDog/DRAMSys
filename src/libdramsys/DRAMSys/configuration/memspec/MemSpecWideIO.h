@@ -41,78 +41,78 @@
 
 #include <systemc>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class MemSpecWideIO final : public MemSpec
-{
+class MemSpecWideIO final : public MemSpec {
 public:
-    explicit MemSpecWideIO(const Config::MemSpec& memSpec);
+  explicit MemSpecWideIO(const Config::MemSpec &memSpec);
 
-    // Memspec Variables:
-    const sc_core::sc_time tCKE;
-    const sc_core::sc_time tCKESR;
-    const sc_core::sc_time tRAS;
-    const sc_core::sc_time tRC;
-    const sc_core::sc_time tRCD;
-    const sc_core::sc_time tRL;
-    const sc_core::sc_time tWL;
-    const sc_core::sc_time tWR;
-    const sc_core::sc_time tXP;
-    const sc_core::sc_time tXSR;
-    const sc_core::sc_time tREFI;
-    const sc_core::sc_time tRFC;
-    const sc_core::sc_time tRP;
-    const sc_core::sc_time tDQSCK;
-    const sc_core::sc_time tAC;
-    const sc_core::sc_time tCCD_R;
-    const sc_core::sc_time tCCD_W;
-    const sc_core::sc_time tRRD;
-    const sc_core::sc_time tTAW;
-    const sc_core::sc_time tWTR;
-    const sc_core::sc_time tRTRS;
+  // Memspec Variables:
+  const sc_core::sc_time tCKE;
+  const sc_core::sc_time tCKESR;
+  const sc_core::sc_time tRAS;
+  const sc_core::sc_time tRC;
+  const sc_core::sc_time tRCD;
+  const sc_core::sc_time tRL;
+  const sc_core::sc_time tWL;
+  const sc_core::sc_time tWR;
+  const sc_core::sc_time tXP;
+  const sc_core::sc_time tXSR;
+  const sc_core::sc_time tREFI;
+  const sc_core::sc_time tRFC;
+  const sc_core::sc_time tRP;
+  const sc_core::sc_time tDQSCK;
+  const sc_core::sc_time tAC;
+  const sc_core::sc_time tCCD_R;
+  const sc_core::sc_time tCCD_W;
+  const sc_core::sc_time tRRD;
+  const sc_core::sc_time tTAW;
+  const sc_core::sc_time tWTR;
+  const sc_core::sc_time tRTRS;
 
-    // Currents and Voltages:
-    const double iDD0;
-    const double iDD2N;
-    const double iDD3N;
-    const double iDD4R;
-    const double iDD4W;
-    const double iDD5;
-    const double iDD6;
-    const double vDD;
-    const double iDD02;
-    const double iDD2P0;
-    const double iDD2P02;
-    const double iDD2P1;
-    const double iDD2P12;
-    const double iDD2N2;
-    const double iDD3P0;
-    const double iDD3P02;
-    const double iDD3P1;
-    const double iDD3P12;
-    const double iDD3N2;
-    const double iDD4R2;
-    const double iDD4W2;
-    const double iDD52;
-    const double iDD62;
-    const double vDD2;
+  // Currents and Voltages:
+  const double iDD0;
+  const double iDD2N;
+  const double iDD3N;
+  const double iDD4R;
+  const double iDD4W;
+  const double iDD5;
+  const double iDD6;
+  const double vDD;
+  const double iDD02;
+  const double iDD2P0;
+  const double iDD2P02;
+  const double iDD2P1;
+  const double iDD2P12;
+  const double iDD2N2;
+  const double iDD3P0;
+  const double iDD3P02;
+  const double iDD3P1;
+  const double iDD3P12;
+  const double iDD3N2;
+  const double iDD4R2;
+  const double iDD4W2;
+  const double iDD52;
+  const double iDD62;
+  const double vDD2;
 
-    [[nodiscard]] sc_core::sc_time getRefreshIntervalAB() const override;
+  [[nodiscard]] sc_core::sc_time getRefreshIntervalAB() const override;
 
-    [[nodiscard]] sc_core::sc_time
-    getExecutionTime(Command command, const tlm::tlm_generic_payload& payload) const override;
-    [[nodiscard]] TimeInterval
-    getIntervalOnDataStrobe(Command command,
-                            const tlm::tlm_generic_payload& payload) const override;
+  [[nodiscard]] sc_core::sc_time
+  getExecutionTime(Command command,
+                   const tlm::tlm_generic_payload &payload) const override;
+  [[nodiscard]] TimeInterval getIntervalOnDataStrobe(
+      Command command, const tlm::tlm_generic_payload &payload) const override;
 
-    [[nodiscard]] bool requiresMaskedWrite(const tlm::tlm_generic_payload& payload) const override;
+  [[nodiscard]] bool
+  requiresMaskedWrite(const tlm::tlm_generic_payload &payload) const override;
 
 #ifdef DRAMPOWER
-    [[nodiscard]] DRAMPower::MemorySpecification toDramPowerMemSpec() const override;
+  [[nodiscard]] DRAMPower::MemorySpecification
+  toDramPowerMemSpec() const override;
 #endif
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // MEMSPECWIDEIO_H
+#endif  // MEMSPECWIDEIO_H

@@ -38,35 +38,30 @@
 
 #include "tracemetrictreewidget.h"
 
-TraceMetricTreeWidget::TraceMetricTreeWidget(QWidget* parent) : QTreeWidget(parent)
-{
-    setHeaderHidden(true);
+TraceMetricTreeWidget::TraceMetricTreeWidget(QWidget *parent)
+    : QTreeWidget(parent) {
+  setHeaderHidden(true);
 }
 
-void TraceMetricTreeWidget::addTraceMetricResults(const TraceCalculatedMetrics& result)
-{
-    QTreeWidgetItem* top = new QTreeWidgetItem({result.getTraceName()});
-    addTopLevelItem(top);
+void TraceMetricTreeWidget::addTraceMetricResults(
+    const TraceCalculatedMetrics &result) {
+  QTreeWidgetItem *top = new QTreeWidgetItem({result.getTraceName()});
+  addTopLevelItem(top);
 
-    if (result.getCalculatedMetrics().empty())
-    {
-        new QTreeWidgetItem(top, {QString("Number of threads: 1")});
+  if (result.getCalculatedMetrics().empty()) {
+    new QTreeWidgetItem(top, {QString("Number of threads: 1")});
+  } else {
+    for (CalculatedMetric calculatedMetric : result.getCalculatedMetrics()) {
+      new QTreeWidgetItem(top, {calculatedMetric.name.c_str() + QString(": ") +
+                                QString::number(calculatedMetric.value, 'f')});
     }
-    else
-    {
-        for (CalculatedMetric calculatedMetric : result.getCalculatedMetrics())
-        {
-            new QTreeWidgetItem(top,
-                                {calculatedMetric.name.c_str() + QString(": ") +
-                                 QString::number(calculatedMetric.value, 'f')});
-        }
-    }
+  }
 }
 
-void TraceMetricTreeWidget::addTracePlotResults(QString traceName, QString outputFiles)
-{
-    QTreeWidgetItem* top = new QTreeWidgetItem({traceName});
-    addTopLevelItem(top);
+void TraceMetricTreeWidget::addTracePlotResults(QString traceName,
+                                                QString outputFiles) {
+  QTreeWidgetItem *top = new QTreeWidgetItem({traceName});
+  addTopLevelItem(top);
 
-    new QTreeWidgetItem(top, {outputFiles});
+  new QTreeWidgetItem(top, {outputFiles});
 }

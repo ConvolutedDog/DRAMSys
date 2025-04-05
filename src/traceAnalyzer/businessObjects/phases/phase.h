@@ -58,614 +58,568 @@ typedef unsigned int ID;
 // enum TextPositioning;
 class Transaction;
 
-enum class RelevantAttributes
-{
-    Rank = 0x01,
-    BankGroup = 0x02,
-    Bank = 0x04,
-    Row = 0x08,
-    Column = 0x10,
-    BurstLength = 0x20
+enum class RelevantAttributes {
+  Rank = 0x01,
+  BankGroup = 0x02,
+  Bank = 0x04,
+  Row = 0x08,
+  Column = 0x10,
+  BurstLength = 0x20
 };
 
-inline RelevantAttributes operator|(RelevantAttributes a, RelevantAttributes b)
-{
-    return static_cast<RelevantAttributes>(static_cast<int>(a) | static_cast<int>(b));
+inline RelevantAttributes operator|(RelevantAttributes a,
+                                    RelevantAttributes b) {
+  return static_cast<RelevantAttributes>(static_cast<int>(a) |
+                                         static_cast<int>(b));
 }
 
-inline RelevantAttributes operator&(RelevantAttributes a, RelevantAttributes b)
-{
-    return static_cast<RelevantAttributes>(static_cast<int>(a) & static_cast<int>(b));
+inline RelevantAttributes operator&(RelevantAttributes a,
+                                    RelevantAttributes b) {
+  return static_cast<RelevantAttributes>(static_cast<int>(a) &
+                                         static_cast<int>(b));
 }
 
-class Phase
-{
+class Phase {
 public:
-    Phase(ID id,
-          Timespan span,
-          Timespan spanOnDataStrobe,
-          unsigned int rank,
-          unsigned int bankGroup,
-          unsigned int bank,
-          unsigned int row,
-          unsigned int column,
-          unsigned int burstLength,
-          traceTime clk,
-          const std::shared_ptr<Transaction>& transaction,
-          std::vector<Timespan> spansOnCommandBus,
-          unsigned int groupsPerRank,
-          unsigned int banksPerGroup) :
-        id(id),
-        span(span),
-        spanOnDataStrobe(spanOnDataStrobe),
-        rank(rank),
-        bankGroup(bankGroup),
-        bank(bank),
-        row(row),
-        column(column),
-        burstLength(burstLength),
-        groupsPerRank(groupsPerRank),
-        banksPerGroup(banksPerGroup),
-        clk(clk),
-        transaction(transaction),
-        spansOnCommandBus(std::move(spansOnCommandBus)),
-        hexagonHeight(0.6),
-        captionPosition(TextPositioning::bottomRight)
-    {
-    }
+  Phase(ID id, Timespan span, Timespan spanOnDataStrobe, unsigned int rank,
+        unsigned int bankGroup, unsigned int bank, unsigned int row,
+        unsigned int column, unsigned int burstLength, traceTime clk,
+        const std::shared_ptr<Transaction> &transaction,
+        std::vector<Timespan> spansOnCommandBus, unsigned int groupsPerRank,
+        unsigned int banksPerGroup)
+      : id(id), span(span), spanOnDataStrobe(spanOnDataStrobe), rank(rank),
+        bankGroup(bankGroup), bank(bank), row(row), column(column),
+        burstLength(burstLength), groupsPerRank(groupsPerRank),
+        banksPerGroup(banksPerGroup), clk(clk), transaction(transaction),
+        spansOnCommandBus(std::move(spansOnCommandBus)), hexagonHeight(0.6),
+        captionPosition(TextPositioning::bottomRight) {}
 
-    void draw(QPainter* painter,
-              const QwtScaleMap& xMap,
-              const QwtScaleMap& yMap,
-              const QRectF& canvasRect,
-              bool highlight,
-              const TraceDrawingProperties& drawingProperties) const;
-    bool isSelected(Timespan timespan,
-                    double yVal,
-                    const TraceDrawingProperties& drawingproperties) const;
-    bool isColumnCommand() const;
+  void draw(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+            const QRectF &canvasRect, bool highlight,
+            const TraceDrawingProperties &drawingProperties) const;
+  bool isSelected(Timespan timespan, double yVal,
+                  const TraceDrawingProperties &drawingproperties) const;
+  bool isColumnCommand() const;
 
-    const Timespan& Span() const { return span; }
+  const Timespan &Span() const { return span; }
 
-    ID Id() const { return id; }
+  ID Id() const { return id; }
 
-    unsigned int getRank() const { return rank; }
+  unsigned int getRank() const { return rank; }
 
-    unsigned int getBankGroup() const { return bankGroup % groupsPerRank; }
+  unsigned int getBankGroup() const { return bankGroup % groupsPerRank; }
 
-    unsigned int getBank() const { return bank % banksPerGroup; }
+  unsigned int getBank() const { return bank % banksPerGroup; }
 
-    unsigned int getRow() const { return row; }
+  unsigned int getRow() const { return row; }
 
-    unsigned int getColumn() const { return column; }
+  unsigned int getColumn() const { return column; }
 
-    unsigned int getBurstLength() const { return burstLength; }
+  unsigned int getBurstLength() const { return burstLength; }
 
-    virtual RelevantAttributes getRelevantAttributes() const = 0;
+  virtual RelevantAttributes getRelevantAttributes() const = 0;
 
-    virtual QString Name() const = 0;
+  virtual QString Name() const = 0;
 
 #ifdef EXTENSION_ENABLED
-    void addDependency(const std::shared_ptr<PhaseDependency>& dependency);
+  void addDependency(const std::shared_ptr<PhaseDependency> &dependency);
 #endif
 
 protected:
-    ID id;
-    Timespan span;
-    Timespan spanOnDataStrobe;
-    unsigned int rank, bankGroup, bank, row, column, burstLength;
-    unsigned int groupsPerRank, banksPerGroup;
-    traceTime clk;
-    std::weak_ptr<Transaction> transaction;
-    std::vector<Timespan> spansOnCommandBus;
+  ID id;
+  Timespan span;
+  Timespan spanOnDataStrobe;
+  unsigned int rank, bankGroup, bank, row, column, burstLength;
+  unsigned int groupsPerRank, banksPerGroup;
+  traceTime clk;
+  std::weak_ptr<Transaction> transaction;
+  std::vector<Timespan> spansOnCommandBus;
 #ifdef EXTENSION_ENABLED
-    std::vector<std::shared_ptr<PhaseDependency>> mDependencies;
+  std::vector<std::shared_ptr<PhaseDependency>> mDependencies;
 #endif
 
-    double hexagonHeight;
-    TextPositioning captionPosition;
+  double hexagonHeight;
+  TextPositioning captionPosition;
 
-    enum PhaseSymbol
-    {
-        Hexagon,
-        Rect
-    };
-    virtual PhaseSymbol getPhaseSymbol() const;
-    virtual Qt::BrushStyle getBrushStyle() const;
-    virtual QColor getColor(const TraceDrawingProperties& drawingProperties) const;
+  enum PhaseSymbol { Hexagon, Rect };
+  virtual PhaseSymbol getPhaseSymbol() const;
+  virtual Qt::BrushStyle getBrushStyle() const;
+  virtual QColor
+  getColor(const TraceDrawingProperties &drawingProperties) const;
 
-    virtual QColor getPhaseColor() const = 0;
-    virtual std::vector<int> getYVals(const TraceDrawingProperties& drawingProperties) const;
-    virtual void drawPhaseSymbol(traceTime begin,
-                                 traceTime end,
-                                 double y,
-                                 bool drawtext,
-                                 PhaseSymbol symbol,
-                                 QPainter* painter,
-                                 const QwtScaleMap& xMap,
-                                 const QwtScaleMap& yMap,
-                                 const QColor& textColor) const;
-    virtual void drawPhaseDependencies(traceTime begin,
-                                       traceTime end,
-                                       double y,
-                                       const TraceDrawingProperties& drawingProperties,
-                                       QPainter* painter,
-                                       const QwtScaleMap& xMap,
-                                       const QwtScaleMap& yMap) const;
+  virtual QColor getPhaseColor() const = 0;
+  virtual std::vector<int>
+  getYVals(const TraceDrawingProperties &drawingProperties) const;
+  virtual void drawPhaseSymbol(traceTime begin, traceTime end, double y,
+                               bool drawtext, PhaseSymbol symbol,
+                               QPainter *painter, const QwtScaleMap &xMap,
+                               const QwtScaleMap &yMap,
+                               const QColor &textColor) const;
+  virtual void
+  drawPhaseDependencies(traceTime begin, traceTime end, double y,
+                        const TraceDrawingProperties &drawingProperties,
+                        QPainter *painter, const QwtScaleMap &xMap,
+                        const QwtScaleMap &yMap) const;
 
-    enum class Granularity
-    {
-        Bankwise,
-        TwoBankwise,
-        Groupwise,
-        Rankwise
-    };
+  enum class Granularity { Bankwise, TwoBankwise, Groupwise, Rankwise };
 
-    virtual Granularity getGranularity() const { return Granularity::Bankwise; }
+  virtual Granularity getGranularity() const { return Granularity::Bankwise; }
 
-    friend class PhaseDependency;
+  friend class PhaseDependency;
 };
 
-class REQ final : public Phase
-{
+class REQ final : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QColor getPhaseColor() const override { return ColorGenerator::getColor(1); }
-    QString Name() const final { return "REQ"; }
+  QColor getPhaseColor() const override { return ColorGenerator::getColor(1); }
+  QString Name() const final { return "REQ"; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return static_cast<RelevantAttributes>(0);
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return static_cast<RelevantAttributes>(0);
+  }
 
-    std::vector<int> getYVals(const TraceDrawingProperties& drawingProperties) const override;
+  std::vector<int>
+  getYVals(const TraceDrawingProperties &drawingProperties) const override;
 };
 
-class RESP final : public Phase
-{
+class RESP final : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QColor getPhaseColor() const override { return ColorGenerator::getColor(1); }
-    QString Name() const override { return "RESP"; }
+  QColor getPhaseColor() const override { return ColorGenerator::getColor(1); }
+  QString Name() const override { return "RESP"; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return static_cast<RelevantAttributes>(0);
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return static_cast<RelevantAttributes>(0);
+  }
 
-    std::vector<int> getYVals(const TraceDrawingProperties& drawingProperties) const override;
+  std::vector<int>
+  getYVals(const TraceDrawingProperties &drawingProperties) const override;
 };
 
-class PREPB final : public Phase
-{
+class PREPB final : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QColor getPhaseColor() const override { return ColorGenerator::getColor(1); }
-    QString Name() const override { return "PREPB"; }
+  QColor getPhaseColor() const override { return ColorGenerator::getColor(1); }
+  QString Name() const override { return "PREPB"; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank;
+  }
 };
 
-class PRESB final : public Phase
-{
+class PRESB final : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QString Name() const override { return "PRESB"; }
-    virtual std::vector<traceTime> getTimesOnCommandBus() const { return {span.Begin()}; }
-    QColor getColor(const TraceDrawingProperties& drawingProperties) const override
-    {
-        Q_UNUSED(drawingProperties)
-        return getPhaseColor();
-    }
-    QColor getPhaseColor() const override { return ColorGenerator::getColor(1); }
-    Granularity getGranularity() const override { return Granularity::Groupwise; }
+  QString Name() const override { return "PRESB"; }
+  virtual std::vector<traceTime> getTimesOnCommandBus() const {
+    return {span.Begin()};
+  }
+  QColor
+  getColor(const TraceDrawingProperties &drawingProperties) const override {
+    Q_UNUSED(drawingProperties)
+    return getPhaseColor();
+  }
+  QColor getPhaseColor() const override { return ColorGenerator::getColor(1); }
+  Granularity getGranularity() const override { return Granularity::Groupwise; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::Bank;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::Bank;
+  }
 };
 
-class PREAB final : public Phase
-{
+class PREAB final : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QString Name() const override { return "PREAB"; }
-    virtual std::vector<traceTime> getTimesOnCommandBus() const { return {span.Begin()}; }
-    QColor getColor(const TraceDrawingProperties& drawingProperties) const override
-    {
-        Q_UNUSED(drawingProperties)
-        return getPhaseColor();
-    }
-    QColor getPhaseColor() const override { return ColorGenerator::getColor(10); }
-    Granularity getGranularity() const override { return Granularity::Rankwise; }
+  QString Name() const override { return "PREAB"; }
+  virtual std::vector<traceTime> getTimesOnCommandBus() const {
+    return {span.Begin()};
+  }
+  QColor
+  getColor(const TraceDrawingProperties &drawingProperties) const override {
+    Q_UNUSED(drawingProperties)
+    return getPhaseColor();
+  }
+  QColor getPhaseColor() const override { return ColorGenerator::getColor(10); }
+  Granularity getGranularity() const override { return Granularity::Rankwise; }
 
-    RelevantAttributes getRelevantAttributes() const override { return RelevantAttributes::Rank; }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank;
+  }
 };
 
-class ACT final : public Phase
-{
+class ACT final : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QColor getPhaseColor() const override { return ColorGenerator::getColor(3); }
-    QString Name() const override { return "ACT"; }
+  QColor getPhaseColor() const override { return ColorGenerator::getColor(3); }
+  QString Name() const override { return "ACT"; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank |
-               RelevantAttributes::Row;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank | RelevantAttributes::Row;
+  }
 };
 
-class RD final : public Phase
-{
+class RD final : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QColor getPhaseColor() const override { return ColorGenerator::getColor(4); }
-    QString Name() const override { return "RD"; }
+  QColor getPhaseColor() const override { return ColorGenerator::getColor(4); }
+  QString Name() const override { return "RD"; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank |
-               RelevantAttributes::Column | RelevantAttributes::BurstLength;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank | RelevantAttributes::Column |
+           RelevantAttributes::BurstLength;
+  }
 };
 
-class RDA final : public Phase
-{
+class RDA final : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QColor getPhaseColor() const override { return ColorGenerator::getColor(5); }
-    QString Name() const override { return "RDA"; }
+  QColor getPhaseColor() const override { return ColorGenerator::getColor(5); }
+  QString Name() const override { return "RDA"; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank |
-               RelevantAttributes::Column | RelevantAttributes::BurstLength;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank | RelevantAttributes::Column |
+           RelevantAttributes::BurstLength;
+  }
 };
 
-class WR final : public Phase
-{
+class WR final : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QColor getPhaseColor() const override { return ColorGenerator::getColor(6); }
-    QString Name() const override { return "WR"; }
+  QColor getPhaseColor() const override { return ColorGenerator::getColor(6); }
+  QString Name() const override { return "WR"; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank |
-               RelevantAttributes::Column | RelevantAttributes::BurstLength;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank | RelevantAttributes::Column |
+           RelevantAttributes::BurstLength;
+  }
 };
 
-class MWR final : public Phase
-{
+class MWR final : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QColor getPhaseColor() const override { return ColorGenerator::getColor(6); }
-    QString Name() const override { return "MWR"; }
+  QColor getPhaseColor() const override { return ColorGenerator::getColor(6); }
+  QString Name() const override { return "MWR"; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank |
-               RelevantAttributes::Column | RelevantAttributes::BurstLength;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank | RelevantAttributes::Column |
+           RelevantAttributes::BurstLength;
+  }
 };
 
-class WRA final : public Phase
-{
+class WRA final : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QColor getPhaseColor() const override { return ColorGenerator::getColor(7); }
-    QString Name() const override { return "WRA"; }
+  QColor getPhaseColor() const override { return ColorGenerator::getColor(7); }
+  QString Name() const override { return "WRA"; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank |
-               RelevantAttributes::Column | RelevantAttributes::BurstLength;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank | RelevantAttributes::Column |
+           RelevantAttributes::BurstLength;
+  }
 };
 
-class MWRA final : public Phase
-{
+class MWRA final : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QColor getPhaseColor() const override { return ColorGenerator::getColor(7); }
-    QString Name() const override { return "MWRA"; }
+  QColor getPhaseColor() const override { return ColorGenerator::getColor(7); }
+  QString Name() const override { return "MWRA"; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank |
-               RelevantAttributes::Column | RelevantAttributes::BurstLength;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank | RelevantAttributes::Column |
+           RelevantAttributes::BurstLength;
+  }
 };
 
-class AUTO_REFRESH : public Phase
-{
+class AUTO_REFRESH : public Phase {
 public:
-    using Phase::Phase;
+  using Phase::Phase;
 
 protected:
-    QString Name() const override { return "REF"; }
-    virtual std::vector<traceTime> getTimesOnCommandBus() const { return {span.Begin()}; }
-    QColor getColor(const TraceDrawingProperties& drawingProperties) const override
-    {
-        Q_UNUSED(drawingProperties)
-        return getPhaseColor();
-    }
-    QColor getPhaseColor() const override
-    {
-        auto phaseColor = QColor(Qt::darkCyan);
-        phaseColor.setAlpha(130);
-        return phaseColor;
-    }
+  QString Name() const override { return "REF"; }
+  virtual std::vector<traceTime> getTimesOnCommandBus() const {
+    return {span.Begin()};
+  }
+  QColor
+  getColor(const TraceDrawingProperties &drawingProperties) const override {
+    Q_UNUSED(drawingProperties)
+    return getPhaseColor();
+  }
+  QColor getPhaseColor() const override {
+    auto phaseColor = QColor(Qt::darkCyan);
+    phaseColor.setAlpha(130);
+    return phaseColor;
+  }
 };
 
-class REFAB final : public AUTO_REFRESH
-{
+class REFAB final : public AUTO_REFRESH {
 public:
-    using AUTO_REFRESH::AUTO_REFRESH;
+  using AUTO_REFRESH::AUTO_REFRESH;
 
 protected:
-    QString Name() const override { return "REFAB"; }
-    Granularity getGranularity() const override { return Granularity::Rankwise; }
+  QString Name() const override { return "REFAB"; }
+  Granularity getGranularity() const override { return Granularity::Rankwise; }
 
-    RelevantAttributes getRelevantAttributes() const override { return RelevantAttributes::Rank; }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank;
+  }
 };
 
-class RFMAB final : public AUTO_REFRESH
-{
+class RFMAB final : public AUTO_REFRESH {
 public:
-    using AUTO_REFRESH::AUTO_REFRESH;
+  using AUTO_REFRESH::AUTO_REFRESH;
 
 protected:
-    QString Name() const override { return "RFMAB"; }
-    Granularity getGranularity() const override { return Granularity::Rankwise; }
-    QColor getPhaseColor() const override
-    {
-        auto phaseColor = QColor(Qt::darkRed);
-        phaseColor.setAlpha(130);
-        return phaseColor;
-    }
+  QString Name() const override { return "RFMAB"; }
+  Granularity getGranularity() const override { return Granularity::Rankwise; }
+  QColor getPhaseColor() const override {
+    auto phaseColor = QColor(Qt::darkRed);
+    phaseColor.setAlpha(130);
+    return phaseColor;
+  }
 
-    RelevantAttributes getRelevantAttributes() const override { return RelevantAttributes::Rank; }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank;
+  }
 };
 
-class REFPB final : public AUTO_REFRESH
-{
+class REFPB final : public AUTO_REFRESH {
 public:
-    using AUTO_REFRESH::AUTO_REFRESH;
+  using AUTO_REFRESH::AUTO_REFRESH;
 
 protected:
-    QString Name() const override { return "REFPB"; }
+  QString Name() const override { return "REFPB"; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank;
+  }
 };
 
-class RFMPB final : public AUTO_REFRESH
-{
+class RFMPB final : public AUTO_REFRESH {
 public:
-    using AUTO_REFRESH::AUTO_REFRESH;
+  using AUTO_REFRESH::AUTO_REFRESH;
 
 protected:
-    QString Name() const override { return "RFMPB"; }
-    QColor getPhaseColor() const override
-    {
-        auto phaseColor = QColor(Qt::darkRed);
-        phaseColor.setAlpha(130);
-        return phaseColor;
-    }
+  QString Name() const override { return "RFMPB"; }
+  QColor getPhaseColor() const override {
+    auto phaseColor = QColor(Qt::darkRed);
+    phaseColor.setAlpha(130);
+    return phaseColor;
+  }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank;
+  }
 };
 
-class REFP2B final : public AUTO_REFRESH
-{
+class REFP2B final : public AUTO_REFRESH {
 public:
-    using AUTO_REFRESH::AUTO_REFRESH;
+  using AUTO_REFRESH::AUTO_REFRESH;
 
 protected:
-    QString Name() const override { return "REFP2B"; }
-    Granularity getGranularity() const override { return Granularity::TwoBankwise; }
+  QString Name() const override { return "REFP2B"; }
+  Granularity getGranularity() const override {
+    return Granularity::TwoBankwise;
+  }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank;
+  }
 };
 
-class RFMP2B final : public AUTO_REFRESH
-{
+class RFMP2B final : public AUTO_REFRESH {
 public:
-    using AUTO_REFRESH::AUTO_REFRESH;
+  using AUTO_REFRESH::AUTO_REFRESH;
 
 protected:
-    QString Name() const override { return "RFMP2B"; }
-    Granularity getGranularity() const override { return Granularity::TwoBankwise; }
-    QColor getPhaseColor() const override
-    {
-        auto phaseColor = QColor(Qt::darkRed);
-        phaseColor.setAlpha(130);
-        return phaseColor;
-    }
+  QString Name() const override { return "RFMP2B"; }
+  Granularity getGranularity() const override {
+    return Granularity::TwoBankwise;
+  }
+  QColor getPhaseColor() const override {
+    auto phaseColor = QColor(Qt::darkRed);
+    phaseColor.setAlpha(130);
+    return phaseColor;
+  }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank;
+  }
 };
 
-class REFSB final : public AUTO_REFRESH
-{
+class REFSB final : public AUTO_REFRESH {
 public:
-    using AUTO_REFRESH::AUTO_REFRESH;
+  using AUTO_REFRESH::AUTO_REFRESH;
 
 protected:
-    QString Name() const override { return "REFSB"; }
-    Granularity getGranularity() const override { return Granularity::Groupwise; }
+  QString Name() const override { return "REFSB"; }
+  Granularity getGranularity() const override { return Granularity::Groupwise; }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::Bank;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::Bank;
+  }
 };
 
-class RFMSB final : public AUTO_REFRESH
-{
+class RFMSB final : public AUTO_REFRESH {
 public:
-    using AUTO_REFRESH::AUTO_REFRESH;
+  using AUTO_REFRESH::AUTO_REFRESH;
 
 protected:
-    QString Name() const override { return "RFMSB"; }
-    Granularity getGranularity() const override { return Granularity::Groupwise; }
-    QColor getPhaseColor() const override
-    {
-        auto phaseColor = QColor(Qt::darkRed);
-        phaseColor.setAlpha(130);
-        return phaseColor;
-    }
+  QString Name() const override { return "RFMSB"; }
+  Granularity getGranularity() const override { return Granularity::Groupwise; }
+  QColor getPhaseColor() const override {
+    auto phaseColor = QColor(Qt::darkRed);
+    phaseColor.setAlpha(130);
+    return phaseColor;
+  }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::Bank;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::Bank;
+  }
 };
 
-class PDNAB : public Phase
-{
+class PDNAB : public Phase {
 public:
-    using Phase::Phase;
-    virtual ~PDNAB() = default;
+  using Phase::Phase;
+  virtual ~PDNAB() = default;
 
 protected:
-    QString Name() const override { return "PDNAB"; }
-    Qt::BrushStyle getBrushStyle() const override { return Qt::Dense6Pattern; }
-    QColor getColor(const TraceDrawingProperties& drawingProperties) const override
-    {
-        Q_UNUSED(drawingProperties)
-        return getPhaseColor();
-    }
-    QColor getPhaseColor() const override { return {Qt::black}; }
-    Phase::PhaseSymbol getPhaseSymbol() const override { return PhaseSymbol::Rect; }
+  QString Name() const override { return "PDNAB"; }
+  Qt::BrushStyle getBrushStyle() const override { return Qt::Dense6Pattern; }
+  QColor
+  getColor(const TraceDrawingProperties &drawingProperties) const override {
+    Q_UNUSED(drawingProperties)
+    return getPhaseColor();
+  }
+  QColor getPhaseColor() const override { return {Qt::black}; }
+  Phase::PhaseSymbol getPhaseSymbol() const override {
+    return PhaseSymbol::Rect;
+  }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank;
+  }
 };
 
-class PDNA final : public PDNAB
-{
+class PDNA final : public PDNAB {
 public:
-    using PDNAB::PDNAB;
+  using PDNAB::PDNAB;
 
 protected:
-    QString Name() const override { return "PDNA"; }
-    Granularity getGranularity() const override { return Granularity::Rankwise; }
+  QString Name() const override { return "PDNA"; }
+  Granularity getGranularity() const override { return Granularity::Rankwise; }
 
-    RelevantAttributes getRelevantAttributes() const override { return RelevantAttributes::Rank; }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank;
+  }
 };
 
-class PDNPB : public Phase
-{
+class PDNPB : public Phase {
 public:
-    using Phase::Phase;
-    virtual ~PDNPB() = default;
+  using Phase::Phase;
+  virtual ~PDNPB() = default;
 
 protected:
-    QString Name() const override { return "PDNPB"; }
-    Qt::BrushStyle getBrushStyle() const override { return Qt::Dense4Pattern; }
-    QColor getColor(const TraceDrawingProperties& drawingProperties) const override
-    {
-        Q_UNUSED(drawingProperties)
-        return getPhaseColor();
-    }
-    QColor getPhaseColor() const override { return {Qt::black}; }
-    Phase::PhaseSymbol getPhaseSymbol() const override { return PhaseSymbol::Rect; }
+  QString Name() const override { return "PDNPB"; }
+  Qt::BrushStyle getBrushStyle() const override { return Qt::Dense4Pattern; }
+  QColor
+  getColor(const TraceDrawingProperties &drawingProperties) const override {
+    Q_UNUSED(drawingProperties)
+    return getPhaseColor();
+  }
+  QColor getPhaseColor() const override { return {Qt::black}; }
+  Phase::PhaseSymbol getPhaseSymbol() const override {
+    return PhaseSymbol::Rect;
+  }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank;
+  }
 };
 
-class PDNP final : public PDNPB
-{
+class PDNP final : public PDNPB {
 public:
-    using PDNPB::PDNPB;
+  using PDNPB::PDNPB;
 
 protected:
-    QString Name() const override { return "PDNP"; }
-    Granularity getGranularity() const override { return Granularity::Rankwise; }
-    RelevantAttributes getRelevantAttributes() const override { return RelevantAttributes::Rank; }
+  QString Name() const override { return "PDNP"; }
+  Granularity getGranularity() const override { return Granularity::Rankwise; }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank;
+  }
 };
 
-class SREFB : public Phase
-{
+class SREFB : public Phase {
 public:
-    using Phase::Phase;
-    virtual ~SREFB() = default;
+  using Phase::Phase;
+  virtual ~SREFB() = default;
 
 protected:
-    QString Name() const override { return "SREFB"; }
-    Qt::BrushStyle getBrushStyle() const override { return Qt::Dense1Pattern; }
-    QColor getColor(const TraceDrawingProperties& drawingProperties) const override
-    {
-        Q_UNUSED(drawingProperties)
-        return getPhaseColor();
-    }
-    QColor getPhaseColor() const override { return {Qt::black}; }
-    Phase::PhaseSymbol getPhaseSymbol() const override { return PhaseSymbol::Rect; }
+  QString Name() const override { return "SREFB"; }
+  Qt::BrushStyle getBrushStyle() const override { return Qt::Dense1Pattern; }
+  QColor
+  getColor(const TraceDrawingProperties &drawingProperties) const override {
+    Q_UNUSED(drawingProperties)
+    return getPhaseColor();
+  }
+  QColor getPhaseColor() const override { return {Qt::black}; }
+  Phase::PhaseSymbol getPhaseSymbol() const override {
+    return PhaseSymbol::Rect;
+  }
 
-    RelevantAttributes getRelevantAttributes() const override
-    {
-        return RelevantAttributes::Rank | RelevantAttributes::BankGroup | RelevantAttributes::Bank;
-    }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank | RelevantAttributes::BankGroup |
+           RelevantAttributes::Bank;
+  }
 };
 
-class SREF : public SREFB
-{
+class SREF : public SREFB {
 public:
-    using SREFB::SREFB;
+  using SREFB::SREFB;
 
 protected:
-    QString Name() const override { return "SREF"; }
-    Granularity getGranularity() const override { return Granularity::Rankwise; }
-    RelevantAttributes getRelevantAttributes() const override { return RelevantAttributes::Rank; }
+  QString Name() const override { return "SREF"; }
+  Granularity getGranularity() const override { return Granularity::Rankwise; }
+  RelevantAttributes getRelevantAttributes() const override {
+    return RelevantAttributes::Rank;
+  }
 };
 
-#endif // BANKPHASE_H
+#endif  // BANKPHASE_H

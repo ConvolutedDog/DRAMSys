@@ -63,112 +63,115 @@
  *  A TraceDB object always holds an open connection to a valid database.
  */
 
-class TraceDB : public QObject
-{
-    Q_OBJECT
+class TraceDB : public QObject {
+  Q_OBJECT
 
 public:
-    TraceDB(const QString& path, bool openExisting);
-    const QString& getPathToDB() const { return pathToDB; }
+  TraceDB(const QString &path, bool openExisting);
+  const QString &getPathToDB() const { return pathToDB; }
 
-    void updateComments(const std::vector<CommentModel::Comment>& comments);
-    void updateFileDescription(const QString& description);
-    void refreshData();
+  void updateComments(const std::vector<CommentModel::Comment> &comments);
+  void updateFileDescription(const QString &description);
+  void refreshData();
 
 #ifdef EXTENSION_ENABLED
-    void updateDependenciesInTimespan(const Timespan& span);
+  void updateDependenciesInTimespan(const Timespan &span);
 #endif
 
-    const GeneralInfo& getGeneralInfo() const { return generalInfo; }
-    const CommandLengths& getCommandLengths() const { return commandLengths; }
+  const GeneralInfo &getGeneralInfo() const { return generalInfo; }
+  const CommandLengths &getCommandLengths() const { return commandLengths; }
 
-    std::vector<std::shared_ptr<Transaction>>
-    getTransactionsWithCustomQuery(const QString& queryText);
-    std::vector<std::shared_ptr<Transaction>>
-    getTransactionsInTimespan(const Timespan& span, bool updateVisiblePhases = false);
-    std::shared_ptr<Transaction> getNextPrecharge(traceTime time);
-    std::shared_ptr<Transaction> getNextActivate(traceTime time);
-    std::shared_ptr<Transaction> getNextRefresh(traceTime time);
-    std::shared_ptr<Transaction> getNextCommand(traceTime time);
-    //     std::shared_ptr<Transaction> getNextPreb(ID currentTransactionId);
-    //     std::shared_ptr<Transaction> getNextActb(ID currentTransactionId);
-    //     std::shared_ptr<Transaction> getNextRefb(ID currentTransactionId);
+  std::vector<std::shared_ptr<Transaction>>
+  getTransactionsWithCustomQuery(const QString &queryText);
+  std::vector<std::shared_ptr<Transaction>>
+  getTransactionsInTimespan(const Timespan &span,
+                            bool updateVisiblePhases = false);
+  std::shared_ptr<Transaction> getNextPrecharge(traceTime time);
+  std::shared_ptr<Transaction> getNextActivate(traceTime time);
+  std::shared_ptr<Transaction> getNextRefresh(traceTime time);
+  std::shared_ptr<Transaction> getNextCommand(traceTime time);
+  //     std::shared_ptr<Transaction> getNextPreb(ID currentTransactionId);
+  //     std::shared_ptr<Transaction> getNextActb(ID currentTransactionId);
+  //     std::shared_ptr<Transaction> getNextRefb(ID currentTransactionId);
 
-    std::shared_ptr<Transaction> getTransactionByID(ID id);
-    ID getTransactionIDFromPhaseID(ID phaseID);
+  std::shared_ptr<Transaction> getTransactionByID(ID id);
+  ID getTransactionIDFromPhaseID(ID phaseID);
 
-    std::vector<CommentModel::Comment> getComments();
-    std::vector<CommentModel::Comment> getDebugMessagesInTimespan(const Timespan& span);
-    std::vector<CommentModel::Comment> getDebugMessagesInTimespan(const Timespan& span,
-                                                                  unsigned int limit);
+  std::vector<CommentModel::Comment> getComments();
+  std::vector<CommentModel::Comment>
+  getDebugMessagesInTimespan(const Timespan &span);
+  std::vector<CommentModel::Comment>
+  getDebugMessagesInTimespan(const Timespan &span, unsigned int limit);
 
-    bool checkDependencyTableExists();
+  bool checkDependencyTableExists();
 #ifdef EXTENSION_ENABLED
-    DependencyInfos getDependencyInfos(DependencyInfos::Type infoType);
+  DependencyInfos getDependencyInfos(DependencyInfos::Type infoType);
 #endif
-    QSqlDatabase getDatabase() const;
+  QSqlDatabase getDatabase() const;
 
 private:
-    QString pathToDB;
-    QSqlDatabase database;
-    GeneralInfo generalInfo;
-    CommandLengths commandLengths;
+  QString pathToDB;
+  QSqlDatabase database;
+  GeneralInfo generalInfo;
+  CommandLengths commandLengths;
 
-    QSqlQuery insertPhaseQuery;
-    QSqlQuery insertTransactionQuery;
-    QSqlQuery selectTransactionsByTimespan;
-    QSqlQuery selectTransactionById;
-    QSqlQuery selectDebugMessagesByTimespan;
-    QSqlQuery selectDebugMessagesByTimespanWithLimit;
-    QSqlQuery checkDependenciesExist;
-    QSqlQuery selectDependenciesByTimespan;
-    QSqlQuery selectDependencyTypePercentages;
-    QSqlQuery selectTimeDependencyPercentages;
-    QSqlQuery selectDelayedPhasePercentages;
-    QSqlQuery selectDependencyPhasePercentages;
+  QSqlQuery insertPhaseQuery;
+  QSqlQuery insertTransactionQuery;
+  QSqlQuery selectTransactionsByTimespan;
+  QSqlQuery selectTransactionById;
+  QSqlQuery selectDebugMessagesByTimespan;
+  QSqlQuery selectDebugMessagesByTimespanWithLimit;
+  QSqlQuery checkDependenciesExist;
+  QSqlQuery selectDependenciesByTimespan;
+  QSqlQuery selectDependencyTypePercentages;
+  QSqlQuery selectTimeDependencyPercentages;
+  QSqlQuery selectDelayedPhasePercentages;
+  QSqlQuery selectDependencyPhasePercentages;
 
-    TransactionQueryTexts queryTexts;
-    void prepareQueries();
-    void executeQuery(QSqlQuery query);
-    static QString queryToString(const QSqlQuery& query);
-    std::shared_ptr<Transaction> parseTransactionFromQuery(QSqlQuery& query);
-    std::vector<std::shared_ptr<Transaction>>
-    parseTransactionsFromQuery(QSqlQuery& query, bool updateVisiblePhases = false);
-    static std::vector<CommentModel::Comment> parseCommentsFromQuery(QSqlQuery& query);
+  TransactionQueryTexts queryTexts;
+  void prepareQueries();
+  void executeQuery(QSqlQuery query);
+  static QString queryToString(const QSqlQuery &query);
+  std::shared_ptr<Transaction> parseTransactionFromQuery(QSqlQuery &query);
+  std::vector<std::shared_ptr<Transaction>>
+  parseTransactionsFromQuery(QSqlQuery &query,
+                             bool updateVisiblePhases = false);
+  static std::vector<CommentModel::Comment>
+  parseCommentsFromQuery(QSqlQuery &query);
 
 #ifdef EXTENSION_ENABLED
-    void mUpdateDependenciesFromQuery(QSqlQuery& query);
-    static DependencyInfos parseDependencyInfos(QSqlQuery& query,
-                                                const DependencyInfos::Type infoType);
+  void mUpdateDependenciesFromQuery(QSqlQuery &query);
+  static DependencyInfos
+  parseDependencyInfos(QSqlQuery &query, const DependencyInfos::Type infoType);
 #endif
 
-    void executeScriptFile(const QString& fileName);
-    void dropAndCreateTables();
+  void executeScriptFile(const QString &fileName);
+  void dropAndCreateTables();
 
-    uint64_t getTraceLength();
-    uint64_t getNumberOfTransactions();
-    uint64_t getNumberOfPhases();
-    GeneralInfo getGeneralInfoFromDB();
-    CommandLengths getCommandLengthsFromDB();
-    QVariant getParameterFromTable(const std::string& parameter, const std::string& table);
+  uint64_t getTraceLength();
+  uint64_t getNumberOfTransactions();
+  uint64_t getNumberOfPhases();
+  GeneralInfo getGeneralInfoFromDB();
+  CommandLengths getCommandLengthsFromDB();
+  QVariant getParameterFromTable(const std::string &parameter,
+                                 const std::string &table);
 
-    std::map<unsigned int, std::shared_ptr<Phase>>
-        _visiblePhases; // Updated at parseTransactionsFromQuery
+  std::map<unsigned int, std::shared_ptr<Phase>>
+      _visiblePhases;  // Updated at parseTransactionsFromQuery
 
-    // At businessObjects/phasedependenciestracker.h
-    friend class PhaseDependenciesTracker;
+  // At businessObjects/phasedependenciestracker.h
+  friend class PhaseDependenciesTracker;
 };
 
-class sqlException : public std::exception
-{
+class sqlException : public std::exception {
 private:
-    std::string message;
+  std::string message;
 
 public:
-    sqlException(std::string message, std::string filename)
-    {
-        this->message = std::string("Error in file ") + filename + std::string(" ") + message;
-    }
-    const char* what() const noexcept override { return message.c_str(); }
+  sqlException(std::string message, std::string filename) {
+    this->message =
+        std::string("Error in file ") + filename + std::string(" ") + message;
+  }
+  const char *what() const noexcept override { return message.c_str(); }
 };
-#endif // TRACEDB_H
+#endif  // TRACEDB_H

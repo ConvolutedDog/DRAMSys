@@ -42,35 +42,33 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-namespace Ui
-{
+namespace Ui {
 class SelectMetrics;
 }
 
-class SelectMetrics : public QDialog
-{
-    Q_OBJECT
+class SelectMetrics : public QDialog {
+  Q_OBJECT
 
 public:
-    explicit SelectMetrics(QWidget* parent = 0);
-    ~SelectMetrics();
+  explicit SelectMetrics(QWidget *parent = 0);
+  ~SelectMetrics();
 
-    std::vector<QCheckBox*> metrics;
+  std::vector<QCheckBox *> metrics;
 
-    void setMetrics(std::vector<std::string> metrics);
+  void setMetrics(std::vector<std::string> metrics);
 
 Q_SIGNALS:
-    void getSelectedMetrics();
+  void getSelectedMetrics();
 
 private Q_SLOTS:
-    void on_okButton_clicked();
-    void on_selectAllButton_clicked();
-    void on_clearAllButton_clicked();
+  void on_okButton_clicked();
+  void on_selectAllButton_clicked();
+  void on_clearAllButton_clicked();
 
 private:
-    Ui::SelectMetrics* ui;
-    QVBoxLayout* layout;
-    bool isThereAnyMetricSelected();
+  Ui::SelectMetrics *ui;
+  QVBoxLayout *layout;
+  bool isThereAnyMetricSelected();
 };
 
-#endif // SELECTMETRICS_H
+#endif  // SELECTMETRICS_H

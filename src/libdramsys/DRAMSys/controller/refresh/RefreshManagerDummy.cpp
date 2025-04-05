@@ -37,17 +37,12 @@
 using namespace sc_core;
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-CommandTuple::Type RefreshManagerDummy::getNextCommand()
-{
-    return {Command::NOP, nullptr, SC_ZERO_TIME};
+CommandTuple::Type RefreshManagerDummy::getNextCommand() {
+  return {Command::NOP, nullptr, SC_ZERO_TIME};
 }
 
-sc_time RefreshManagerDummy::getTimeForNextTrigger()
-{
-    return scMaxTime;
-}
+sc_time RefreshManagerDummy::getTimeForNextTrigger() { return scMaxTime; }
 
-} // namespace DRAMSys
+}  // namespace DRAMSys

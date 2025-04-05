@@ -39,26 +39,26 @@
 
 #include <systemc>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class CheckerIF
-{
+class CheckerIF {
 protected:
-    CheckerIF(const CheckerIF&) = default;
-    CheckerIF(CheckerIF&&) = default;
-    CheckerIF& operator=(const CheckerIF&) = default;
-    CheckerIF& operator=(CheckerIF&&) = default;
+  CheckerIF(const CheckerIF &) = default;
+  CheckerIF(CheckerIF &&) = default;
+  CheckerIF &operator=(const CheckerIF &) = default;
+  CheckerIF &operator=(CheckerIF &&) = default;
 
 public:
-    CheckerIF() = default;
-    virtual ~CheckerIF() = default;
+  CheckerIF() = default;
+  virtual ~CheckerIF() = default;
 
-    [[nodiscard]] virtual sc_core::sc_time
-    timeToSatisfyConstraints(Command command, const tlm::tlm_generic_payload& payload) const = 0;
-    virtual void insert(Command command, const tlm::tlm_generic_payload& payload) = 0;
+  [[nodiscard]] virtual sc_core::sc_time
+  timeToSatisfyConstraints(Command command,
+                           const tlm::tlm_generic_payload &payload) const = 0;
+  virtual void insert(Command command,
+                      const tlm::tlm_generic_payload &payload) = 0;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // CHECKERIF_H
+#endif  // CHECKERIF_H

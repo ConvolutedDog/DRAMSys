@@ -1,11 +1,18 @@
-﻿AccessModifierOffset: '-4'
-AllowShortFunctionsOnASingleLine: InlineOnly
-AllowShortIfStatementsOnASingleLine: Never
-BinPackArguments: 'false'
-BinPackParameters: 'false'
-BreakBeforeBraces: Allman
-BreakConstructorInitializers: AfterColon
-ColumnLimit: '100'
-IndentWidth: '4'
-PackConstructorInitializers: CurrentLine
-PointerAlignment: Left
+﻿# We'll use defaults from the LLVM style.
+BasedOnStyle: LLVM
+IndentWidth: 2
+ColumnLimit: 80
+---
+Language: Cpp
+# Force pointers to the type for C++.
+DerivePointerAlignment: false
+PointerAlignment: Right
+AccessModifierOffset: -2
+AlignAfterOpenBracket: Align
+AlignArrayOfStructures: Left
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortCaseExpressionOnASingleLine: true
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
+SpacesBeforeTrailingComments: 2
+IndentCaseLabels: true

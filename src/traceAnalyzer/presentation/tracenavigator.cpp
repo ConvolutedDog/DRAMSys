@@ -45,26 +45,23 @@
 
 using namespace std;
 
-TraceNavigator::TraceNavigator(QString path, CommentModel* commentModel, QObject* parent) :
-    QObject(parent),
-    traceFile(path, true),
-    commentModel(commentModel),
-    changesToCommitExist(false)
-{
-    getCommentsFromDB();
+TraceNavigator::TraceNavigator(QString path, CommentModel *commentModel,
+                               QObject *parent)
+    : QObject(parent), traceFile(path, true), commentModel(commentModel),
+      changesToCommitExist(false) {
+  getCommentsFromDB();
 
-    QObject::connect(commentModel,
-                     &CommentModel::gotoCommentTriggered,
-                     this,
-                     [=](const QModelIndex& index)
-                     { navigateToTime(commentModel->getTimeFromIndex(index)); });
+  QObject::connect(commentModel, &CommentModel::gotoCommentTriggered, this,
+                   [=](const QModelIndex &index) {
+                     navigateToTime(commentModel->getTimeFromIndex(index));
+                   });
 
-    QObject::connect(
-        commentModel, &CommentModel::dataChanged, this, &TraceNavigator::traceFileModified);
-    QObject::connect(
-        commentModel, &CommentModel::rowsRemoved, this, &TraceNavigator::traceFileModified);
+  QObject::connect(commentModel, &CommentModel::dataChanged, this,
+                   &TraceNavigator::traceFileModified);
+  QObject::connect(commentModel, &CommentModel::rowsRemoved, this,
+                   &TraceNavigator::traceFileModified);
 
-    Transaction::setNumTransactions(GeneralTraceInfo().numberOfTransactions);
+  Transaction::setNumTransactions(GeneralTraceInfo().numberOfTransactions);
 }
 
 /* Navigation
@@ -72,45 +69,39 @@ TraceNavigator::TraceNavigator(QString path, CommentModel* commentModel, QObject
  *
  */
 
-void TraceNavigator::navigateToTime(traceTime time)
-{
-    if (time < 0)
-        time = 0;
-    else if (time > traceFile.getGeneralInfo().span.End())
-        time = traceFile.getGeneralInfo().span.End();
-    else
-    {
-        currentTraceTime = time;
-        Q_EMIT currentTraceTimeChanged();
-    }
+void TraceNavigator::navigateToTime(traceTime time) {
+  if (time < 0)
+    time = 0;
+  else if (time > traceFile.getGeneralInfo().span.End())
+    time = traceFile.getGeneralInfo().span.End();
+  else {
+    currentTraceTime = time;
+    Q_EMIT currentTraceTimeChanged();
+  }
 }
 
-void TraceNavigator::navigateToTransaction(ID id)
-{
-    navigateToTime(traceFile.getTransactionByID(id)->span.Begin());
+void TraceNavigator::navigateToTransaction(ID id) {
+  navigateToTime(traceFile.getTransactionByID(id)->span.Begin());
 }
 
 /* DB
  *
  */
 
-void TraceNavigator::commitChangesToDB()
-{
-    traceFile.updateComments(commentModel->getComments());
-    changesToCommitExist = false;
+void TraceNavigator::commitChangesToDB() {
+  traceFile.updateComments(commentModel->getComments());
+  changesToCommitExist = false;
 }
 
-void TraceNavigator::getCommentsFromDB()
-{
-    for (const auto& comment : traceFile.getComments())
-        commentModel->addComment(comment.time, comment.text);
+void TraceNavigator::getCommentsFromDB() {
+  for (const auto &comment : traceFile.getComments())
+    commentModel->addComment(comment.time, comment.text);
 }
 
-void TraceNavigator::refreshData()
-{
-    traceFile.refreshData();
-    clearSelectedTransactions();
-    navigateToTime(currentTraceTime);
+void TraceNavigator::refreshData() {
+  traceFile.refreshData();
+  clearSelectedTransactions();
+  navigateToTime(currentTraceTime);
 }
 
 /* Transaction Selection
@@ -118,105 +109,93 @@ void TraceNavigator::refreshData()
  *
  */
 
-void TraceNavigator::addSelectedTransactions(const vector<shared_ptr<Transaction>>& transactions)
-{
-    for (const auto &transaction : transactions)
-    {
-        selectedTransactions.push_back(transaction);
-    }
-    Q_EMIT selectedTransactionsChanged();
-}
-
-void TraceNavigator::addSelectedTransaction(const shared_ptr<Transaction>& transaction)
-{
+void TraceNavigator::addSelectedTransactions(
+    const vector<shared_ptr<Transaction>> &transactions) {
+  for (const auto &transaction : transactions) {
     selectedTransactions.push_back(transaction);
-    Q_EMIT selectedTransactionsChanged();
+  }
+  Q_EMIT selectedTransactionsChanged();
 }
 
-void TraceNavigator::addSelectedTransaction(ID id)
-{
-    shared_ptr<Transaction> transaction = TraceFile().getTransactionByID(id);
-    selectedTransactions.push_back(transaction);
-    Q_EMIT selectedTransactionsChanged();
+void TraceNavigator::addSelectedTransaction(
+    const shared_ptr<Transaction> &transaction) {
+  selectedTransactions.push_back(transaction);
+  Q_EMIT selectedTransactionsChanged();
 }
 
-void TraceNavigator::selectTransaction(ID id)
-{
-    clearSelectedTransactions();
-    addSelectedTransaction(id);
-    navigateToTransaction(id);
+void TraceNavigator::addSelectedTransaction(ID id) {
+  shared_ptr<Transaction> transaction = TraceFile().getTransactionByID(id);
+  selectedTransactions.push_back(transaction);
+  Q_EMIT selectedTransactionsChanged();
 }
 
-void TraceNavigator::selectTransaction(const shared_ptr<Transaction>& transaction)
-{
-    selectTransaction(transaction->id);
+void TraceNavigator::selectTransaction(ID id) {
+  clearSelectedTransactions();
+  addSelectedTransaction(id);
+  navigateToTransaction(id);
 }
 
-void TraceNavigator::selectNextTransaction()
-{
-    if (selectedTransactions.empty() ||
-        selectedTransactions.front()->id == traceFile.getGeneralInfo().numberOfTransactions)
-        selectFirstTransaction();
-    else
-        selectTransaction(selectedTransactions.front()->id + 1);
+void TraceNavigator::selectTransaction(
+    const shared_ptr<Transaction> &transaction) {
+  selectTransaction(transaction->id);
 }
 
-void TraceNavigator::selectPreviousTransaction()
-{
-    if (selectedTransactions.empty() || selectedTransactions.front()->id == 1)
-        selectLastTransaction();
-    else
-        selectTransaction(selectedTransactions.front()->id - 1);
+void TraceNavigator::selectNextTransaction() {
+  if (selectedTransactions.empty() ||
+      selectedTransactions.front()->id ==
+          traceFile.getGeneralInfo().numberOfTransactions)
+    selectFirstTransaction();
+  else
+    selectTransaction(selectedTransactions.front()->id + 1);
 }
 
-void TraceNavigator::selectFirstTransaction()
-{
-    selectTransaction(1);
+void TraceNavigator::selectPreviousTransaction() {
+  if (selectedTransactions.empty() || selectedTransactions.front()->id == 1)
+    selectLastTransaction();
+  else
+    selectTransaction(selectedTransactions.front()->id - 1);
 }
 
-void TraceNavigator::selectLastTransaction()
-{
-    selectTransaction(traceFile.getGeneralInfo().numberOfTransactions);
+void TraceNavigator::selectFirstTransaction() { selectTransaction(1); }
+
+void TraceNavigator::selectLastTransaction() {
+  selectTransaction(traceFile.getGeneralInfo().numberOfTransactions);
 }
 
-void TraceNavigator::selectNextRefresh(traceTime time)
-{
-    shared_ptr<Transaction> nextRefresh;
+void TraceNavigator::selectNextRefresh(traceTime time) {
+  shared_ptr<Transaction> nextRefresh;
 
-    nextRefresh = traceFile.getNextRefresh(time);
+  nextRefresh = traceFile.getNextRefresh(time);
 
-    if (nextRefresh)
-        selectTransaction(nextRefresh);
+  if (nextRefresh)
+    selectTransaction(nextRefresh);
 }
 
-void TraceNavigator::selectNextActivate(traceTime time)
-{
-    shared_ptr<Transaction> nextActivate;
+void TraceNavigator::selectNextActivate(traceTime time) {
+  shared_ptr<Transaction> nextActivate;
 
-    nextActivate = traceFile.getNextActivate(time);
+  nextActivate = traceFile.getNextActivate(time);
 
-    if (nextActivate)
-        selectTransaction(nextActivate);
+  if (nextActivate)
+    selectTransaction(nextActivate);
 }
 
-void TraceNavigator::selectNextPrecharge(traceTime time)
-{
-    shared_ptr<Transaction> nextPrecharge;
+void TraceNavigator::selectNextPrecharge(traceTime time) {
+  shared_ptr<Transaction> nextPrecharge;
 
-    nextPrecharge = traceFile.getNextPrecharge(time);
+  nextPrecharge = traceFile.getNextPrecharge(time);
 
-    if (nextPrecharge)
-        selectTransaction(nextPrecharge);
+  if (nextPrecharge)
+    selectTransaction(nextPrecharge);
 }
 
-void TraceNavigator::selectNextCommand(traceTime time)
-{
-    shared_ptr<Transaction> nextCommand;
+void TraceNavigator::selectNextCommand(traceTime time) {
+  shared_ptr<Transaction> nextCommand;
 
-    nextCommand = traceFile.getNextCommand(time);
+  nextCommand = traceFile.getNextCommand(time);
 
-    if (nextCommand)
-        selectTransaction(nextCommand);
+  if (nextCommand)
+    selectTransaction(nextCommand);
 }
 
 // void TraceNavigator::selectNextActb()
@@ -259,63 +238,51 @@ void TraceNavigator::selectNextCommand(traceTime time)
 //         selectTransaction(n);
 // }
 
-bool TraceNavigator::transactionIsSelected(const shared_ptr<Transaction>& transaction) const
-{
-    return transactionIsSelected(transaction->id);
+bool TraceNavigator::transactionIsSelected(
+    const shared_ptr<Transaction> &transaction) const {
+  return transactionIsSelected(transaction->id);
 }
 
-bool TraceNavigator::transactionIsSelected(ID id) const
-{
-    for (const auto& transaction : selectedTransactions)
-    {
-        if (transaction->id == id)
-            return true;
-    }
-    return false;
+bool TraceNavigator::transactionIsSelected(ID id) const {
+  for (const auto &transaction : selectedTransactions) {
+    if (transaction->id == id)
+      return true;
+  }
+  return false;
 }
 
-void TraceNavigator::clearSelectedTransactions()
-{
-    if (hasSelectedTransactions())
-    {
-        selectedTransactions.clear();
-        Q_EMIT selectedTransactionsChanged();
-    }
+void TraceNavigator::clearSelectedTransactions() {
+  if (hasSelectedTransactions()) {
+    selectedTransactions.clear();
+    Q_EMIT selectedTransactionsChanged();
+  }
 }
 
-bool TraceNavigator::hasSelectedTransactions()
-{
-    return !selectedTransactions.empty();
+bool TraceNavigator::hasSelectedTransactions() {
+  return !selectedTransactions.empty();
 }
 
-Timespan TraceNavigator::getSpanCoveredBySelectedTransaction()
-{
-    if (!hasSelectedTransactions())
-        return Timespan(0, 0);
+Timespan TraceNavigator::getSpanCoveredBySelectedTransaction() {
+  if (!hasSelectedTransactions())
+    return Timespan(0, 0);
 
-    traceTime begin = SelectedTransactions().at(0)->span.Begin();
-    traceTime end = SelectedTransactions().at(0)->span.End();
+  traceTime begin = SelectedTransactions().at(0)->span.Begin();
+  traceTime end = SelectedTransactions().at(0)->span.End();
 
-    for (const auto& transaction : selectedTransactions)
-    {
-        if (transaction->span.End() > end)
-            end = transaction->span.End();
-    }
+  for (const auto &transaction : selectedTransactions) {
+    if (transaction->span.End() > end)
+      end = transaction->span.End();
+  }
 
-    return Timespan(begin, end);
+  return Timespan(begin, end);
 }
 
-const CommentModel* TraceNavigator::getCommentModel() const
-{
-    return commentModel;
+const CommentModel *TraceNavigator::getCommentModel() const {
+  return commentModel;
 }
 
-bool TraceNavigator::existChangesToCommit() const
-{
-    return changesToCommitExist;
+bool TraceNavigator::existChangesToCommit() const {
+  return changesToCommitExist;
 }
 
-void TraceNavigator::traceFileModified()
-{
-    changesToCommitExist = true;
-}
+void TraceNavigator::traceFileModified() { changesToCommitExist = true; }

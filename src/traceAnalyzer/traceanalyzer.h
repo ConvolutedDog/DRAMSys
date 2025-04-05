@@ -46,58 +46,56 @@
 #include <QString>
 #include <vector>
 
-namespace Ui
-{
+namespace Ui {
 class TraceAnalyzer;
 }
 
 class TraceFileTab;
 
-class TraceAnalyzer : public QMainWindow
-{
-    Q_OBJECT
+class TraceAnalyzer : public QMainWindow {
+  Q_OBJECT
 
 public:
-    explicit TraceAnalyzer(QWidget* parent = nullptr);
-    explicit TraceAnalyzer(QSet<QString> paths, QWidget* parent = nullptr);
-    ~TraceAnalyzer();
+  explicit TraceAnalyzer(QWidget *parent = nullptr);
+  explicit TraceAnalyzer(QSet<QString> paths, QWidget *parent = nullptr);
+  ~TraceAnalyzer();
 
-    void setUpStatusBar();
+  void setUpStatusBar();
 
 protected:
-    void closeEvent(QCloseEvent* event) override;
+  void closeEvent(QCloseEvent *event) override;
 
 private:
-    TraceFileTab* createTraceFileTab(const QString& path);
-    void openTracefileTab(const QString& path);
-    void reloadTab(int index);
-    void closeTab(int index);
+  TraceFileTab *createTraceFileTab(const QString &path);
+  void openTracefileTab(const QString &path);
+  void reloadTab(int index);
+  void closeTab(int index);
 
-    QLabel* statusLabel;
-    QSet<QString> openedTraceFiles;
-    EvaluationTool evaluationTool;
-    PythonCaller pythonCaller;
+  QLabel *statusLabel;
+  QSet<QString> openedTraceFiles;
+  EvaluationTool evaluationTool;
+  PythonCaller pythonCaller;
 
 private Q_SLOTS:
-    void on_menuFile_aboutToShow();
-    void on_traceFileTabs_tabCloseRequested(int index);
+  void on_menuFile_aboutToShow();
+  void on_traceFileTabs_tabCloseRequested(int index);
 
-    void on_actionOpen_triggered();
-    void on_actionSave_triggered();
-    void on_actionSave_all_triggered();
-    void on_actionReload_triggered();
-    void on_actionReload_all_triggered();
-    void on_actionExportAsVCD_triggered();
-    void on_actionMetrics_triggered();
-    void on_actionClose_triggered();
-    void on_actionClose_all_triggered();
-    void on_actionAbout_triggered();
+  void on_actionOpen_triggered();
+  void on_actionSave_triggered();
+  void on_actionSave_all_triggered();
+  void on_actionReload_triggered();
+  void on_actionReload_all_triggered();
+  void on_actionExportAsVCD_triggered();
+  void on_actionMetrics_triggered();
+  void on_actionClose_triggered();
+  void on_actionClose_all_triggered();
+  void on_actionAbout_triggered();
 
 public Q_SLOTS:
-    void statusChanged(const QString& message);
+  void statusChanged(const QString &message);
 
 private:
-    Ui::TraceAnalyzer* ui;
+  Ui::TraceAnalyzer *ui;
 };
 
-#endif // TRACEANALYZER_H
+#endif  // TRACEANALYZER_H

@@ -36,51 +36,43 @@
 
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-BufferCounterShared::BufferCounterShared(unsigned requestBufferSize) :
-    requestBufferSize(requestBufferSize)
-{
-    numRequests = std::vector<unsigned>(1);
+BufferCounterShared::BufferCounterShared(unsigned requestBufferSize)
+    : requestBufferSize(requestBufferSize) {
+  numRequests = std::vector<unsigned>(1);
 }
 
-bool BufferCounterShared::hasBufferSpace(unsigned entries) const
-{
-    return (numRequests[0] + entries <= requestBufferSize);
+bool BufferCounterShared::hasBufferSpace(unsigned entries) const {
+  return (numRequests[0] + entries <= requestBufferSize);
 }
 
-void BufferCounterShared::storeRequest(const tlm_generic_payload& trans)
-{
-    numRequests[0]++;
-    if (trans.is_read())
-        numReadRequests++;
-    else
-        numWriteRequests++;
+void BufferCounterShared::storeRequest(const tlm_generic_payload &trans) {
+  numRequests[0]++;
+  if (trans.is_read())
+    numReadRequests++;
+  else
+    numWriteRequests++;
 }
 
-void BufferCounterShared::removeRequest(const tlm_generic_payload& trans)
-{
-    numRequests[0]--;
-    if (trans.is_read())
-        numReadRequests--;
-    else
-        numWriteRequests--;
+void BufferCounterShared::removeRequest(const tlm_generic_payload &trans) {
+  numRequests[0]--;
+  if (trans.is_read())
+    numReadRequests--;
+  else
+    numWriteRequests--;
 }
 
-const std::vector<unsigned>& BufferCounterShared::getBufferDepth() const
-{
-    return numRequests;
+const std::vector<unsigned> &BufferCounterShared::getBufferDepth() const {
+  return numRequests;
 }
 
-unsigned BufferCounterShared::getNumReadRequests() const
-{
-    return numReadRequests;
+unsigned BufferCounterShared::getNumReadRequests() const {
+  return numReadRequests;
 }
 
-unsigned BufferCounterShared::getNumWriteRequests() const
-{
-    return numWriteRequests;
+unsigned BufferCounterShared::getNumWriteRequests() const {
+  return numWriteRequests;
 }
 
-} // namespace DRAMSys
+}  // namespace DRAMSys

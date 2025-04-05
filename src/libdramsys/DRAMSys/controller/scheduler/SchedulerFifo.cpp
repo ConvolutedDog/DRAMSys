@@ -40,68 +40,63 @@
 
 using namespace tlm;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-SchedulerFifo::SchedulerFifo(const McConfig& config, const MemSpec& memSpec)
-{
-    buffer = ControllerVector<Bank, std::deque<tlm_generic_payload*>>(memSpec.banksPerChannel);
+SchedulerFifo::SchedulerFifo(const McConfig &config, const MemSpec &memSpec) {
+  buffer = ControllerVector<Bank, std::deque<tlm_generic_payload *>>(
+      memSpec.banksPerChannel);
 
-    if (config.schedulerBuffer == Config::SchedulerBufferType::Bankwise)
-        bufferCounter = std::make_unique<BufferCounterBankwise>(config.requestBufferSize,
-                                                                memSpec.banksPerChannel);
-    else if (config.schedulerBuffer == Config::SchedulerBufferType::ReadWrite)
-        bufferCounter = std::make_unique<BufferCounterReadWrite>(config.requestBufferSizeRead,
-                                                                 config.requestBufferSizeWrite);
-    else if (config.schedulerBuffer == Config::SchedulerBufferType::Shared)
-        bufferCounter = std::make_unique<BufferCounterShared>(config.requestBufferSize);
+  if (config.schedulerBuffer == Config::SchedulerBufferType::Bankwise)
+    bufferCounter = std::make_unique<BufferCounterBankwise>(
+        config.requestBufferSize, memSpec.banksPerChannel);
+  else if (config.schedulerBuffer == Config::SchedulerBufferType::ReadWrite)
+    bufferCounter = std::make_unique<BufferCounterReadWrite>(
+        config.requestBufferSizeRead, config.requestBufferSizeWrite);
+  else if (config.schedulerBuffer == Config::SchedulerBufferType::Shared)
+    bufferCounter =
+        std::make_unique<BufferCounterShared>(config.requestBufferSize);
 }
 
-bool SchedulerFifo::hasBufferSpace(unsigned entries) const
-{
-    return bufferCounter->hasBufferSpace(entries);
+bool SchedulerFifo::hasBufferSpace(unsigned entries) const {
+  return bufferCounter->hasBufferSpace(entries);
 }
 
-void SchedulerFifo::storeRequest(tlm_generic_payload& payload)
-{
-    buffer[ControllerExtension::getBank(payload)].push_back(&payload);
-    bufferCounter->storeRequest(payload);
+void SchedulerFifo::storeRequest(tlm_generic_payload &payload) {
+  buffer[ControllerExtension::getBank(payload)].push_back(&payload);
+  bufferCounter->storeRequest(payload);
 }
 
-void SchedulerFifo::removeRequest(tlm_generic_payload& payload)
-{
-    buffer[ControllerExtension::getBank(payload)].pop_front();
-    bufferCounter->removeRequest(payload);
+void SchedulerFifo::removeRequest(tlm_generic_payload &payload) {
+  buffer[ControllerExtension::getBank(payload)].pop_front();
+  bufferCounter->removeRequest(payload);
 }
 
-tlm_generic_payload* SchedulerFifo::getNextRequest(const BankMachine& bankMachine) const
-{
-    Bank bank = bankMachine.getBank();
-    if (!buffer[bank].empty())
-        return buffer[bank].front();
+tlm_generic_payload *
+SchedulerFifo::getNextRequest(const BankMachine &bankMachine) const {
+  Bank bank = bankMachine.getBank();
+  if (!buffer[bank].empty())
+    return buffer[bank].front();
 
-    return nullptr;
+  return nullptr;
 }
 
-bool SchedulerFifo::hasFurtherRowHit(Bank bank, Row row, [[maybe_unused]] tlm_command command) const
-{
-    if (buffer[bank].size() >= 2)
-    {
-        tlm_generic_payload& nextRequest = *buffer[bank][1];
-        if (ControllerExtension::getRow(nextRequest) == row)
-            return true;
-    }
-    return false;
+bool SchedulerFifo::hasFurtherRowHit(
+    Bank bank, Row row, [[maybe_unused]] tlm_command command) const {
+  if (buffer[bank].size() >= 2) {
+    tlm_generic_payload &nextRequest = *buffer[bank][1];
+    if (ControllerExtension::getRow(nextRequest) == row)
+      return true;
+  }
+  return false;
 }
 
-bool SchedulerFifo::hasFurtherRequest(Bank bank, [[maybe_unused]] tlm_command command) const
-{
-    return buffer[bank].size() >= 2;
+bool SchedulerFifo::hasFurtherRequest(
+    Bank bank, [[maybe_unused]] tlm_command command) const {
+  return buffer[bank].size() >= 2;
 }
 
-const std::vector<unsigned>& SchedulerFifo::getBufferDepth() const
-{
-    return bufferCounter->getBufferDepth();
+const std::vector<unsigned> &SchedulerFifo::getBufferDepth() const {
+  return bufferCounter->getBufferDepth();
 }
 
-} // namespace DRAMSys
+}  // namespace DRAMSys

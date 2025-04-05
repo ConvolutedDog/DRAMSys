@@ -45,30 +45,29 @@
 #include <tlm>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class SchedulerGrpFrFcfs final : public SchedulerIF
-{
+class SchedulerGrpFrFcfs final : public SchedulerIF {
 public:
-    explicit SchedulerGrpFrFcfs(const McConfig& config, const MemSpec& memSpec);
-    [[nodiscard]] bool hasBufferSpace(unsigned entries) const override;
-    void storeRequest(tlm::tlm_generic_payload& payload) override;
-    void removeRequest(tlm::tlm_generic_payload& payload) override;
-    [[nodiscard]] tlm::tlm_generic_payload*
-    getNextRequest(const BankMachine& bankMachine) const override;
-    [[nodiscard]] bool
-    hasFurtherRowHit(Bank bank, Row row, tlm::tlm_command command) const override;
-    [[nodiscard]] bool hasFurtherRequest(Bank bank, tlm::tlm_command command) const override;
-    [[nodiscard]] const std::vector<unsigned>& getBufferDepth() const override;
+  explicit SchedulerGrpFrFcfs(const McConfig &config, const MemSpec &memSpec);
+  [[nodiscard]] bool hasBufferSpace(unsigned entries) const override;
+  void storeRequest(tlm::tlm_generic_payload &payload) override;
+  void removeRequest(tlm::tlm_generic_payload &payload) override;
+  [[nodiscard]] tlm::tlm_generic_payload *
+  getNextRequest(const BankMachine &bankMachine) const override;
+  [[nodiscard]] bool hasFurtherRowHit(Bank bank, Row row,
+                                      tlm::tlm_command command) const override;
+  [[nodiscard]] bool hasFurtherRequest(Bank bank,
+                                       tlm::tlm_command command) const override;
+  [[nodiscard]] const std::vector<unsigned> &getBufferDepth() const override;
 
 private:
-    ControllerVector<Bank, std::list<tlm::tlm_generic_payload*>> readBuffer;
-    ControllerVector<Bank, std::list<tlm::tlm_generic_payload*>> writeBuffer;
-    tlm::tlm_command lastCommand = tlm::TLM_READ_COMMAND;
-    std::unique_ptr<BufferCounterIF> bufferCounter;
+  ControllerVector<Bank, std::list<tlm::tlm_generic_payload *>> readBuffer;
+  ControllerVector<Bank, std::list<tlm::tlm_generic_payload *>> writeBuffer;
+  tlm::tlm_command lastCommand = tlm::TLM_READ_COMMAND;
+  std::unique_ptr<BufferCounterIF> bufferCounter;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // SCHEDULERGRPFRFCFS_H
+#endif  // SCHEDULERGRPFRFCFS_H

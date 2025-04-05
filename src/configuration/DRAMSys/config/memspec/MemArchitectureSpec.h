@@ -40,17 +40,15 @@
 
 #include <unordered_map>
 
-namespace DRAMSys::Config
-{
+namespace DRAMSys::Config {
 
-struct MemArchitectureSpecType
-{
-    std::unordered_map<std::string, unsigned int> entries;
+struct MemArchitectureSpecType {
+  std::unordered_map<std::string, unsigned int> entries;
 };
 
-void to_json(json_t& j, const MemArchitectureSpecType& c);
-void from_json(const json_t& j, MemArchitectureSpecType& c);
+void to_json(json_t &j, const MemArchitectureSpecType &c);
+void from_json(const json_t &j, MemArchitectureSpecType &c);
 
-} // namespace DRAMSys::Config
+}  // namespace DRAMSys::Config
 
-#endif // DRAMSYSCONFIGURATION_MEMARCHITECTURESPEC_H
+#endif  // DRAMSYSCONFIGURATION_MEMARCHITECTURESPEC_H

@@ -42,27 +42,25 @@
 #include "presentation/tracenavigator.h"
 #include <QWidget>
 
-namespace Ui
-{
+namespace Ui {
 class QueryEditor;
 }
 
-class QueryEditor : public QWidget
-{
-    Q_OBJECT
+class QueryEditor : public QWidget {
+  Q_OBJECT
 
 public:
-    explicit QueryEditor(QWidget* parent = 0);
-    ~QueryEditor();
-    void init(TraceNavigator* _navigator);
+  explicit QueryEditor(QWidget *parent = 0);
+  ~QueryEditor();
+  void init(TraceNavigator *_navigator);
 
 private Q_SLOTS:
-    void on_executeQuery_clicked();
+  void on_executeQuery_clicked();
 
 private:
-    Ui::QueryEditor* ui;
-    TraceNavigator* navigator;
-    TransactionQueryTexts queryTexts;
+  Ui::QueryEditor *ui;
+  TraceNavigator *navigator;
+  TransactionQueryTexts queryTexts;
 };
 
-#endif // QUERYEDITOR_H
+#endif  // QUERYEDITOR_H

@@ -39,24 +39,19 @@
 #define TESTRESULT_H
 #include <QString>
 
-class TestResult
-{
+class TestResult {
 public:
-    TestResult(const QString& testName, bool passed, QString& message) :
-        testName(testName),
-        passed(passed),
-        message(message)
-    {
-    }
+  TestResult(const QString &testName, bool passed, QString &message)
+      : testName(testName), passed(passed), message(message) {}
 
-    QString getTestName() const { return testName; }
-    QString getMessage() const { return message; }
-    bool hasPassed() const { return passed; }
+  QString getTestName() const { return testName; }
+  QString getMessage() const { return message; }
+  bool hasPassed() const { return passed; }
 
 private:
-    QString testName;
-    bool passed;
-    QString message;
+  QString testName;
+  bool passed;
+  QString message;
 };
 
-#endif // TESTRESULT_H
+#endif  // TESTRESULT_H

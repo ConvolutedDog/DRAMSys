@@ -42,47 +42,43 @@
 #include <cmath>
 #include <systemc>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class RefreshManagerIF : public ManagerIF
-{
+class RefreshManagerIF : public ManagerIF {
 public:
-    virtual sc_core::sc_time getTimeForNextTrigger() = 0;
+  virtual sc_core::sc_time getTimeForNextTrigger() = 0;
 
 protected:
-    static sc_core::sc_time getTimeForFirstTrigger(const sc_core::sc_time& tCK,
-                                                   const sc_core::sc_time& refreshInterval,
-                                                   Rank rank,
-                                                   unsigned numberOfRanks)
-    {
-        // Calculate bit-reversal rank ID
-        auto rankID = static_cast<unsigned>(rank);
-        unsigned reverseRankID = 0;
-        unsigned rankBits = 0;
-        unsigned rankShift = numberOfRanks;
+  static sc_core::sc_time
+  getTimeForFirstTrigger(const sc_core::sc_time &tCK,
+                         const sc_core::sc_time &refreshInterval, Rank rank,
+                         unsigned numberOfRanks) {
+    // Calculate bit-reversal rank ID
+    auto rankID = static_cast<unsigned>(rank);
+    unsigned reverseRankID = 0;
+    unsigned rankBits = 0;
+    unsigned rankShift = numberOfRanks;
 
-        while (rankShift >>= 1)
-            rankBits++;
+    while (rankShift >>= 1)
+      rankBits++;
 
-        rankBits--;
+    rankBits--;
 
-        while (rankID != 0)
-        {
-            reverseRankID |= (rankID & 1) << rankBits;
-            rankID >>= 1;
-            rankBits--;
-        }
-
-        // Use bit-reversal order for refreshes on ranks
-        sc_core::sc_time timeForFirstTrigger =
-            refreshInterval - reverseRankID * (refreshInterval / numberOfRanks);
-        timeForFirstTrigger = std::ceil(timeForFirstTrigger / tCK) * tCK;
-
-        return timeForFirstTrigger;
+    while (rankID != 0) {
+      reverseRankID |= (rankID & 1) << rankBits;
+      rankID >>= 1;
+      rankBits--;
     }
+
+    // Use bit-reversal order for refreshes on ranks
+    sc_core::sc_time timeForFirstTrigger =
+        refreshInterval - reverseRankID * (refreshInterval / numberOfRanks);
+    timeForFirstTrigger = std::ceil(timeForFirstTrigger / tCK) * tCK;
+
+    return timeForFirstTrigger;
+  }
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // REFRESHMANAGERIF_H
+#endif  // REFRESHMANAGERIF_H

@@ -38,152 +38,142 @@
 
 using namespace sc_core;
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-CmdMuxOldest::CmdMuxOldest(const MemSpec& memSpec) : memSpec(memSpec)
-{
+CmdMuxOldest::CmdMuxOldest(const MemSpec &memSpec) : memSpec(memSpec) {}
+
+CommandTuple::Type
+CmdMuxOldest::selectCommand(const ReadyCommands &readyCommands) {
+  auto result = readyCommands.cend();
+  uint64_t lastPayloadID = UINT64_MAX;
+  uint64_t newPayloadID = 0;
+  sc_time lastTimestamp = scMaxTime;
+  sc_time newTimestamp;
+
+  for (auto it = readyCommands.cbegin(); it != readyCommands.cend(); it++) {
+    newTimestamp =
+        std::get<CommandTuple::Timestamp>(*it) +
+        memSpec.getCommandLength(std::get<CommandTuple::Command>(*it));
+    newPayloadID = ControllerExtension::getChannelPayloadID(
+        *std::get<CommandTuple::Payload>(*it));
+
+    if (newTimestamp < lastTimestamp) {
+      lastTimestamp = newTimestamp;
+      lastPayloadID = newPayloadID;
+      result = it;
+    } else if ((newTimestamp == lastTimestamp) &&
+               (newPayloadID < lastPayloadID)) {
+      lastPayloadID = newPayloadID;
+      result = it;
+    }
+  }
+
+  if (result != readyCommands.cend() &&
+      std::get<CommandTuple::Timestamp>(*result) == sc_time_stamp())
+    return *result;
+  return {Command::NOP, nullptr, scMaxTime};
 }
 
-CommandTuple::Type CmdMuxOldest::selectCommand(const ReadyCommands& readyCommands)
-{
-    auto result = readyCommands.cend();
-    uint64_t lastPayloadID = UINT64_MAX;
-    uint64_t newPayloadID = 0;
-    sc_time lastTimestamp = scMaxTime;
-    sc_time newTimestamp;
-
-    for (auto it = readyCommands.cbegin(); it != readyCommands.cend(); it++)
-    {
-        newTimestamp = std::get<CommandTuple::Timestamp>(*it) +
-                       memSpec.getCommandLength(std::get<CommandTuple::Command>(*it));
-        newPayloadID =
-            ControllerExtension::getChannelPayloadID(*std::get<CommandTuple::Payload>(*it));
-
-        if (newTimestamp < lastTimestamp)
-        {
-            lastTimestamp = newTimestamp;
-            lastPayloadID = newPayloadID;
-            result = it;
-        }
-        else if ((newTimestamp == lastTimestamp) && (newPayloadID < lastPayloadID))
-        {
-            lastPayloadID = newPayloadID;
-            result = it;
-        }
-    }
-
-    if (result != readyCommands.cend() &&
-        std::get<CommandTuple::Timestamp>(*result) == sc_time_stamp())
-        return *result;
-    return {Command::NOP, nullptr, scMaxTime};
+CmdMuxOldestRasCas::CmdMuxOldestRasCas(const MemSpec &memSpec)
+    : memSpec(memSpec) {
+  readyRasCommands.reserve(memSpec.banksPerChannel);
+  readyCasCommands.reserve(memSpec.banksPerChannel);
+  readyRasCasCommands.reserve(2);
 }
 
-CmdMuxOldestRasCas::CmdMuxOldestRasCas(const MemSpec& memSpec) : memSpec(memSpec)
-{
-    readyRasCommands.reserve(memSpec.banksPerChannel);
-    readyCasCommands.reserve(memSpec.banksPerChannel);
-    readyRasCasCommands.reserve(2);
+CommandTuple::Type
+CmdMuxOldestRasCas::selectCommand(const ReadyCommands &readyCommands) {
+  readyRasCommands.clear();
+  readyCasCommands.clear();
+
+  for (auto it : readyCommands) {
+    if (std::get<CommandTuple::Command>(it).isRasCommand())
+      readyRasCommands.emplace_back(it);
+    else
+      readyCasCommands.emplace_back(it);
+  }
+
+  auto result = readyCommands.cend();
+  auto resultRas = readyRasCommands.cend();
+  auto resultCas = readyCasCommands.cend();
+
+  uint64_t lastPayloadID = UINT64_MAX;
+  uint64_t newPayloadID = 0;
+  sc_time lastTimestamp = scMaxTime;
+  sc_time newTimestamp;
+
+  for (auto it = readyRasCommands.cbegin(); it != readyRasCommands.cend();
+       it++) {
+    newTimestamp =
+        std::get<CommandTuple::Timestamp>(*it) +
+        memSpec.getCommandLength(std::get<CommandTuple::Command>(*it));
+    newPayloadID = ControllerExtension::getChannelPayloadID(
+        *std::get<CommandTuple::Payload>(*it));
+
+    if (newTimestamp < lastTimestamp) {
+      lastTimestamp = newTimestamp;
+      lastPayloadID = newPayloadID;
+      resultRas = it;
+    } else if ((newTimestamp == lastTimestamp) &&
+               (newPayloadID < lastPayloadID)) {
+      lastPayloadID = newPayloadID;
+      resultRas = it;
+    }
+  }
+
+  lastPayloadID = UINT64_MAX;
+  lastTimestamp = scMaxTime;
+
+  for (auto it = readyCasCommands.cbegin(); it != readyCasCommands.cend();
+       it++) {
+    newTimestamp =
+        std::get<CommandTuple::Timestamp>(*it) +
+        memSpec.getCommandLength(std::get<CommandTuple::Command>(*it));
+    newPayloadID = ControllerExtension::getChannelPayloadID(
+        *std::get<CommandTuple::Payload>(*it));
+
+    if (newTimestamp < lastTimestamp) {
+      lastTimestamp = newTimestamp;
+      lastPayloadID = newPayloadID;
+      resultCas = it;
+    } else if ((newTimestamp == lastTimestamp) &&
+               (newPayloadID < lastPayloadID)) {
+      lastPayloadID = newPayloadID;
+      resultCas = it;
+    }
+  }
+
+  readyRasCasCommands.clear();
+
+  if (resultRas != readyRasCommands.cend())
+    readyRasCasCommands.emplace_back(*resultRas);
+  if (resultCas != readyCasCommands.cend())
+    readyRasCasCommands.emplace_back(*resultCas);
+
+  lastPayloadID = UINT64_MAX;
+  lastTimestamp = scMaxTime;
+
+  for (auto it = readyRasCasCommands.cbegin(); it != readyRasCasCommands.cend();
+       it++) {
+    newTimestamp = std::get<CommandTuple::Timestamp>(*it);
+    newPayloadID = ControllerExtension::getChannelPayloadID(
+        *std::get<CommandTuple::Payload>(*it));
+
+    if (newTimestamp < lastTimestamp) {
+      lastTimestamp = newTimestamp;
+      lastPayloadID = newPayloadID;
+      result = it;
+    } else if ((newTimestamp == lastTimestamp) &&
+               (newPayloadID < lastPayloadID)) {
+      lastPayloadID = newPayloadID;
+      result = it;
+    }
+  }
+
+  if (result != readyCommands.cend() &&
+      std::get<CommandTuple::Timestamp>(*result) == sc_time_stamp())
+    return *result;
+  return {Command::NOP, nullptr, scMaxTime};
 }
 
-CommandTuple::Type CmdMuxOldestRasCas::selectCommand(const ReadyCommands& readyCommands)
-{
-    readyRasCommands.clear();
-    readyCasCommands.clear();
-
-    for (auto it : readyCommands)
-    {
-        if (std::get<CommandTuple::Command>(it).isRasCommand())
-            readyRasCommands.emplace_back(it);
-        else
-            readyCasCommands.emplace_back(it);
-    }
-
-    auto result = readyCommands.cend();
-    auto resultRas = readyRasCommands.cend();
-    auto resultCas = readyCasCommands.cend();
-
-    uint64_t lastPayloadID = UINT64_MAX;
-    uint64_t newPayloadID = 0;
-    sc_time lastTimestamp = scMaxTime;
-    sc_time newTimestamp;
-
-    for (auto it = readyRasCommands.cbegin(); it != readyRasCommands.cend(); it++)
-    {
-        newTimestamp = std::get<CommandTuple::Timestamp>(*it) +
-                       memSpec.getCommandLength(std::get<CommandTuple::Command>(*it));
-        newPayloadID =
-            ControllerExtension::getChannelPayloadID(*std::get<CommandTuple::Payload>(*it));
-
-        if (newTimestamp < lastTimestamp)
-        {
-            lastTimestamp = newTimestamp;
-            lastPayloadID = newPayloadID;
-            resultRas = it;
-        }
-        else if ((newTimestamp == lastTimestamp) && (newPayloadID < lastPayloadID))
-        {
-            lastPayloadID = newPayloadID;
-            resultRas = it;
-        }
-    }
-
-    lastPayloadID = UINT64_MAX;
-    lastTimestamp = scMaxTime;
-
-    for (auto it = readyCasCommands.cbegin(); it != readyCasCommands.cend(); it++)
-    {
-        newTimestamp = std::get<CommandTuple::Timestamp>(*it) +
-                       memSpec.getCommandLength(std::get<CommandTuple::Command>(*it));
-        newPayloadID =
-            ControllerExtension::getChannelPayloadID(*std::get<CommandTuple::Payload>(*it));
-
-        if (newTimestamp < lastTimestamp)
-        {
-            lastTimestamp = newTimestamp;
-            lastPayloadID = newPayloadID;
-            resultCas = it;
-        }
-        else if ((newTimestamp == lastTimestamp) && (newPayloadID < lastPayloadID))
-        {
-            lastPayloadID = newPayloadID;
-            resultCas = it;
-        }
-    }
-
-    readyRasCasCommands.clear();
-
-    if (resultRas != readyRasCommands.cend())
-        readyRasCasCommands.emplace_back(*resultRas);
-    if (resultCas != readyCasCommands.cend())
-        readyRasCasCommands.emplace_back(*resultCas);
-
-    lastPayloadID = UINT64_MAX;
-    lastTimestamp = scMaxTime;
-
-    for (auto it = readyRasCasCommands.cbegin(); it != readyRasCasCommands.cend(); it++)
-    {
-        newTimestamp = std::get<CommandTuple::Timestamp>(*it);
-        newPayloadID =
-            ControllerExtension::getChannelPayloadID(*std::get<CommandTuple::Payload>(*it));
-
-        if (newTimestamp < lastTimestamp)
-        {
-            lastTimestamp = newTimestamp;
-            lastPayloadID = newPayloadID;
-            result = it;
-        }
-        else if ((newTimestamp == lastTimestamp) && (newPayloadID < lastPayloadID))
-        {
-            lastPayloadID = newPayloadID;
-            result = it;
-        }
-    }
-
-    if (result != readyCommands.cend() &&
-        std::get<CommandTuple::Timestamp>(*result) == sc_time_stamp())
-        return *result;
-    return {Command::NOP, nullptr, scMaxTime};
-}
-
-} // namespace DRAMSys
+}  // namespace DRAMSys

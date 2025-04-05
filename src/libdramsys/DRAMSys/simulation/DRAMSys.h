@@ -61,71 +61,74 @@
 #include <tlm_utils/multi_passthrough_initiator_socket.h>
 #include <tlm_utils/multi_passthrough_target_socket.h>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class DRAMSys : public sc_core::sc_module
-{
+class DRAMSys : public sc_core::sc_module {
 public:
-    tlm_utils::multi_passthrough_target_socket<DRAMSys> tSocket{"DRAMSys_tSocket"};
+  tlm_utils::multi_passthrough_target_socket<DRAMSys> tSocket{
+      "DRAMSys_tSocket"};
 
-    SC_HAS_PROCESS(DRAMSys);
-    DRAMSys(const sc_core::sc_module_name& name, const Config::Configuration& config);
+  SC_HAS_PROCESS(DRAMSys);
+  DRAMSys(const sc_core::sc_module_name &name,
+          const Config::Configuration &config);
 
-    const auto& getSimConfig() const { return simConfig; }
-    const auto& getMcConfig() const { return mcConfig; }
-    const auto& getMemSpec() const { return *memSpec; }
-    const auto& getAddressDecoder() const { return *addressDecoder; }
+  const auto &getSimConfig() const { return simConfig; }
+  const auto &getMcConfig() const { return mcConfig; }
+  const auto &getMemSpec() const { return *memSpec; }
+  const auto &getAddressDecoder() const { return *addressDecoder; }
 
-    /**
-     * Returns true if all memory controllers are in idle state.
-     */
-    [[nodiscard]] bool idle() const;
+  /**
+   * Returns true if all memory controllers are in idle state.
+   */
+  [[nodiscard]] bool idle() const;
 
-    /**
-     * Registers a callback that is called whenever a memory controller switches to the idle state.
-     * Check afterwards with idle() if all memory controllers are now idle.
-     */
-    void registerIdleCallback(const std::function<void()>& idleCallback);
+  /**
+   * Registers a callback that is called whenever a memory controller switches
+   * to the idle state. Check afterwards with idle() if all memory controllers
+   * are now idle.
+   */
+  void registerIdleCallback(const std::function<void()> &idleCallback);
 
 private:
-    static void logo();
-    static std::unique_ptr<const MemSpec> createMemSpec(const Config::MemSpec& memSpec);
-    static std::unique_ptr<Arbiter> createArbiter(const SimConfig& simConfig,
-                                                  const McConfig& mcConfig,
-                                                  const MemSpec& memSpec,
-                                                  const AddressDecoder& addressDecoder);
+  static void logo();
+  static std::unique_ptr<const MemSpec>
+  createMemSpec(const Config::MemSpec &memSpec);
+  static std::unique_ptr<Arbiter>
+  createArbiter(const SimConfig &simConfig, const McConfig &mcConfig,
+                const MemSpec &memSpec, const AddressDecoder &addressDecoder);
 
-    void end_of_simulation() override;
+  void end_of_simulation() override;
 
-    void setupDebugManager(const std::string& traceName) const;
-    void setupTlmRecorders(const std::string& traceName, const Config::Configuration& configLib);
+  void setupDebugManager(const std::string &traceName) const;
+  void setupTlmRecorders(const std::string &traceName,
+                         const Config::Configuration &configLib);
 
-    void report();
+  void report();
 
-    std::unique_ptr<const MemSpec> memSpec;
-    SimConfig simConfig;
-    McConfig mcConfig;
+  std::unique_ptr<const MemSpec> memSpec;
+  SimConfig simConfig;
+  McConfig mcConfig;
 
-    std::unique_ptr<AddressDecoder> addressDecoder;
+  std::unique_ptr<AddressDecoder> addressDecoder;
 
-    // TLM 2.0 Protocol Checkers
-    std::vector<std::unique_ptr<tlm_utils::tlm2_base_protocol_checker<>>> controllersTlmCheckers;
+  // TLM 2.0 Protocol Checkers
+  std::vector<std::unique_ptr<tlm_utils::tlm2_base_protocol_checker<>>>
+      controllersTlmCheckers;
 
-    // All transactions pass through the same arbiter
-    std::unique_ptr<Arbiter> arbiter;
+  // All transactions pass through the same arbiter
+  std::unique_ptr<Arbiter> arbiter;
 
-    // Each DRAM unit has a controller
-    std::vector<std::unique_ptr<Controller>> controllers;
+  // Each DRAM unit has a controller
+  std::vector<std::unique_ptr<Controller>> controllers;
 
-    // DRAM units
-    std::vector<std::unique_ptr<Dram>> drams;
+  // DRAM units
+  std::vector<std::unique_ptr<Dram>> drams;
 
-    // Transaction Recorders (one per channel).
-    // They generate the output databases.
-    std::vector<TlmRecorder> tlmRecorders;
+  // Transaction Recorders (one per channel).
+  // They generate the output databases.
+  std::vector<TlmRecorder> tlmRecorders;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // DRAMSYS_H
+#endif  // DRAMSYS_H

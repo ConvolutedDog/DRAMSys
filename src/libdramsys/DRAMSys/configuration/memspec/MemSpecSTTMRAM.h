@@ -41,52 +41,51 @@
 
 #include <systemc>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class MemSpecSTTMRAM final : public MemSpec
-{
+class MemSpecSTTMRAM final : public MemSpec {
 public:
-    explicit MemSpecSTTMRAM(const Config::MemSpec& memSpec);
+  explicit MemSpecSTTMRAM(const Config::MemSpec &memSpec);
 
-    // Memspec Variables:
-    const sc_core::sc_time tCKE;
-    const sc_core::sc_time tPD;
-    const sc_core::sc_time tCKESR;
-    const sc_core::sc_time tRAS;
-    const sc_core::sc_time tRC;
-    const sc_core::sc_time tRCD;
-    const sc_core::sc_time tRL;
-    const sc_core::sc_time tRTP;
-    const sc_core::sc_time tWL;
-    const sc_core::sc_time tWR;
-    const sc_core::sc_time tXP;
-    const sc_core::sc_time tXS;
-    const sc_core::sc_time tRP;
-    const sc_core::sc_time tDQSCK;
-    const sc_core::sc_time tCCD;
-    const sc_core::sc_time tFAW;
-    const sc_core::sc_time tRRD;
-    const sc_core::sc_time tWTR;
-    const sc_core::sc_time tXPDLL;
-    const sc_core::sc_time tXSDLL;
-    const sc_core::sc_time tAL;
-    const sc_core::sc_time tACTPDEN;
-    const sc_core::sc_time tPRPDEN;
-    const sc_core::sc_time tRTRS;
+  // Memspec Variables:
+  const sc_core::sc_time tCKE;
+  const sc_core::sc_time tPD;
+  const sc_core::sc_time tCKESR;
+  const sc_core::sc_time tRAS;
+  const sc_core::sc_time tRC;
+  const sc_core::sc_time tRCD;
+  const sc_core::sc_time tRL;
+  const sc_core::sc_time tRTP;
+  const sc_core::sc_time tWL;
+  const sc_core::sc_time tWR;
+  const sc_core::sc_time tXP;
+  const sc_core::sc_time tXS;
+  const sc_core::sc_time tRP;
+  const sc_core::sc_time tDQSCK;
+  const sc_core::sc_time tCCD;
+  const sc_core::sc_time tFAW;
+  const sc_core::sc_time tRRD;
+  const sc_core::sc_time tWTR;
+  const sc_core::sc_time tXPDLL;
+  const sc_core::sc_time tXSDLL;
+  const sc_core::sc_time tAL;
+  const sc_core::sc_time tACTPDEN;
+  const sc_core::sc_time tPRPDEN;
+  const sc_core::sc_time tRTRS;
 
-    // Currents and Voltages:
-    // TODO: to be completed
+  // Currents and Voltages:
+  // TODO: to be completed
 
-    [[nodiscard]] sc_core::sc_time
-    getExecutionTime(Command command, const tlm::tlm_generic_payload& payload) const override;
-    [[nodiscard]] TimeInterval
-    getIntervalOnDataStrobe(Command command,
-                            const tlm::tlm_generic_payload& payload) const override;
+  [[nodiscard]] sc_core::sc_time
+  getExecutionTime(Command command,
+                   const tlm::tlm_generic_payload &payload) const override;
+  [[nodiscard]] TimeInterval getIntervalOnDataStrobe(
+      Command command, const tlm::tlm_generic_payload &payload) const override;
 
-    [[nodiscard]] bool requiresMaskedWrite(const tlm::tlm_generic_payload& payload) const override;
+  [[nodiscard]] bool
+  requiresMaskedWrite(const tlm::tlm_generic_payload &payload) const override;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // MEMSPECSTTMRAM_H
+#endif  // MEMSPECSTTMRAM_H

@@ -44,23 +44,19 @@
 #include <QColor>
 #include <stdint.h>
 
-enum ColorName
-{
-    Default,
-    HSV15
-};
+enum ColorName { Default, HSV15 };
 
-class ColorGenerator
-{
+class ColorGenerator {
 private:
-    ColorGenerator() = delete;
+  ColorGenerator() = delete;
 
-    static ColorDefault cDefault;
-    static ColorHSV15 cHSV15;
+  static ColorDefault cDefault;
+  static ColorHSV15 cHSV15;
 
 public:
-    static QColor getColor(unsigned int i, ColorName color = ColorName::Default);
-    static QColor getRainbowColored(unsigned int i, ColorName color = ColorName::Default);
+  static QColor getColor(unsigned int i, ColorName color = ColorName::Default);
+  static QColor getRainbowColored(unsigned int i,
+                                  ColorName color = ColorName::Default);
 };
 
-#endif // RANDOMCOLORGENERATOR_H
+#endif  // RANDOMCOLORGENERATOR_H

@@ -39,18 +39,18 @@
 
 #include <systemc>
 
-class RowHammer : public RequestProducer
-{
+class RowHammer : public RequestProducer {
 public:
-    RowHammer(uint64_t numRequests, uint64_t rowIncrement, unsigned int dataLength);
+  RowHammer(uint64_t numRequests, uint64_t rowIncrement,
+            unsigned int dataLength);
 
-    Request nextRequest() override;
-    uint64_t totalRequests() override { return numberOfRequests; }
+  Request nextRequest() override;
+  uint64_t totalRequests() override { return numberOfRequests; }
 
-    const uint64_t numberOfRequests;
-    const unsigned int dataLength;
-    const uint64_t rowIncrement;
+  const uint64_t numberOfRequests;
+  const unsigned int dataLength;
+  const uint64_t rowIncrement;
 
-    uint64_t generatedRequests = 0;
-    uint64_t currentAddress = 0x00;
+  uint64_t generatedRequests = 0;
+  uint64_t currentAddress = 0x00;
 };

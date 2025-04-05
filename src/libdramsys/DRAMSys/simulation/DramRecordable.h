@@ -46,45 +46,41 @@
 #include <systemc>
 #include <tlm>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class DramRecordable : public Dram
-{
+class DramRecordable : public Dram {
 public:
-    DramRecordable(const sc_core::sc_module_name& name,
-                   const SimConfig& simConfig,
-                   const MemSpec& memSpec,
-                   TlmRecorder& tlmRecorder);
-    SC_HAS_PROCESS(DramRecordable);
+  DramRecordable(const sc_core::sc_module_name &name,
+                 const SimConfig &simConfig, const MemSpec &memSpec,
+                 TlmRecorder &tlmRecorder);
+  SC_HAS_PROCESS(DramRecordable);
 
-    void reportPower() override;
+  void reportPower() override;
 
 private:
-    tlm::tlm_sync_enum nb_transport_fw(tlm::tlm_generic_payload& trans,
-                                       tlm::tlm_phase& phase,
-                                       sc_core::sc_time& delay) override;
+  tlm::tlm_sync_enum nb_transport_fw(tlm::tlm_generic_payload &trans,
+                                     tlm::tlm_phase &phase,
+                                     sc_core::sc_time &delay) override;
 
-    TlmRecorder& tlmRecorder;
+  TlmRecorder &tlmRecorder;
 
-    sc_core::sc_time powerWindowSize;
+  sc_core::sc_time powerWindowSize;
 
-    // When working with floats, we have to decide ourselves what is an
-    // acceptable definition for "equal". Here the number is compared with a
-    // suitable error margin (0.00001).
-    static bool isEqual(double a, double b, const double epsilon = 1e-05)
-    {
-        return std::fabs(a - b) < epsilon;
-    }
+  // When working with floats, we have to decide ourselves what is an
+  // acceptable definition for "equal". Here the number is compared with a
+  // suitable error margin (0.00001).
+  static bool isEqual(double a, double b, const double epsilon = 1e-05) {
+    return std::fabs(a - b) < epsilon;
+  }
 
 #ifdef DRAMPOWER
-    // This Thread is only triggered when Power Simulation is enabled.
-    // It estimates the current average power which will be stored in the trace database for
-    // visualization purposes.
-    void powerWindow();
+  // This Thread is only triggered when Power Simulation is enabled.
+  // It estimates the current average power which will be stored in the trace
+  // database for visualization purposes.
+  void powerWindow();
 #endif
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // DRAMRECORDABLE_H
+#endif  // DRAMRECORDABLE_H

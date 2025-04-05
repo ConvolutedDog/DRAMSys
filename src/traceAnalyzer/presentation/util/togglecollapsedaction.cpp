@@ -35,32 +35,30 @@
 
 #include "togglecollapsedaction.h"
 
-ToggleCollapsedAction::ToggleCollapsedAction(QObject* parent) : QAction(parent)
-{
-    updateCollapsedState(currentCollapsedState);
+ToggleCollapsedAction::ToggleCollapsedAction(QObject *parent)
+    : QAction(parent) {
+  updateCollapsedState(currentCollapsedState);
 }
 
 void ToggleCollapsedAction::updateCollapsedState(
-    ToggleCollapsedAction::CollapsedState collapsedState)
-{
-    switch (collapsedState)
-    {
+    ToggleCollapsedAction::CollapsedState collapsedState) {
+  switch (collapsedState) {
     case CollapsedState::Expanded:
     case CollapsedState::Mixed:
-        actionText = "Collapse all ranks";
-        collapseAction = CollapseAction::CollapseAllRanks;
-        break;
+      actionText = "Collapse all ranks";
+      collapseAction = CollapseAction::CollapseAllRanks;
+      break;
 
     case CollapsedState::Collapsed:
-        actionText = "Expand all ranks";
-        collapseAction = CollapseAction::ExpandAllRanks;
-        break;
-    }
+      actionText = "Expand all ranks";
+      collapseAction = CollapseAction::ExpandAllRanks;
+      break;
+  }
 
-    this->setText(actionText);
+  this->setText(actionText);
 }
 
-ToggleCollapsedAction::CollapseAction ToggleCollapsedAction::getCollapseAction() const
-{
-    return collapseAction;
+ToggleCollapsedAction::CollapseAction
+ToggleCollapsedAction::getCollapseAction() const {
+  return collapseAction;
 }

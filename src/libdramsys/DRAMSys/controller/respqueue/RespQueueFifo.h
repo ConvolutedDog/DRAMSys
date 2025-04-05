@@ -42,21 +42,20 @@
 #include <tlm>
 #include <utility>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class RespQueueFifo final : public RespQueueIF
-{
+class RespQueueFifo final : public RespQueueIF {
 public:
-    void insertPayload(tlm::tlm_generic_payload* payload, sc_core::sc_time strobeEnd) override;
-    tlm::tlm_generic_payload* nextPayload() override;
-    [[nodiscard]] sc_core::sc_time getTriggerTime() const override;
+  void insertPayload(tlm::tlm_generic_payload *payload,
+                     sc_core::sc_time strobeEnd) override;
+  tlm::tlm_generic_payload *nextPayload() override;
+  [[nodiscard]] sc_core::sc_time getTriggerTime() const override;
 
 private:
-    std::queue<std::pair<tlm::tlm_generic_payload*, sc_core::sc_time>> buffer;
-    const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
+  std::queue<std::pair<tlm::tlm_generic_payload *, sc_core::sc_time>> buffer;
+  const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // RESPQUEUEFIFO_H
+#endif  // RESPQUEUEFIFO_H

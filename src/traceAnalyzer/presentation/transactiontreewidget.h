@@ -43,41 +43,40 @@
 #include <QTreeWidget>
 #include <iostream>
 
-class TransactionTreeWidget : public QTreeWidget
-{
+class TransactionTreeWidget : public QTreeWidget {
 
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    explicit TransactionTreeWidget(QWidget* parent);
+  explicit TransactionTreeWidget(QWidget *parent);
 
-    void AppendTransaction(const std::shared_ptr<Transaction>& transaction);
-    virtual void init(TraceNavigator* _navigator);
+  void AppendTransaction(const std::shared_ptr<Transaction> &transaction);
+  virtual void init(TraceNavigator *_navigator);
 
 public Q_SLOTS:
-    void ContextMenuRequested(QPoint point);
+  void ContextMenuRequested(QPoint point);
 
 protected:
-    TraceNavigator* navigator;
+  TraceNavigator *navigator;
 
 private:
-    bool isInitialized;
-    QAction* goToTransaction;
+  bool isInitialized;
+  QAction *goToTransaction;
 
-    class TransactionTreeItem : public QTreeWidgetItem
-    {
-    public:
-        static constexpr int transactionTreeItemType = 1001;
-        TransactionTreeItem(QTreeWidget* parent,
-                            const std::shared_ptr<Transaction>& trans,
-                            const GeneralInfo& generalInfo);
-        ID Id() const { return id; }
+  class TransactionTreeItem : public QTreeWidgetItem {
+  public:
+    static constexpr int transactionTreeItemType = 1001;
+    TransactionTreeItem(QTreeWidget *parent,
+                        const std::shared_ptr<Transaction> &trans,
+                        const GeneralInfo &generalInfo);
+    ID Id() const { return id; }
 
-    private:
-        ID id;
-        static void AppendTimespan(QTreeWidgetItem* parent, const Timespan& timespan);
-        static void AppendPhase(QTreeWidgetItem* parent, const Phase& phase);
-    };
+  private:
+    ID id;
+    static void AppendTimespan(QTreeWidgetItem *parent,
+                               const Timespan &timespan);
+    static void AppendPhase(QTreeWidgetItem *parent, const Phase &phase);
+  };
 };
 
-#endif // TRANSACTIONTREEWIDGET_H
+#endif  // TRANSACTIONTREEWIDGET_H

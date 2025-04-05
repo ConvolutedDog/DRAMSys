@@ -48,80 +48,63 @@
 #include <QString>
 #include <map>
 
-enum class ColorGrouping
-{
-    PhaseType,
-    Transaction,
-    Thread,
-    RainbowTransaction
-};
+enum class ColorGrouping { PhaseType, Transaction, Thread, RainbowTransaction };
 
 class TracePlotLineDataSource;
 
-enum class DependencyOption
-{
-    Disabled,
-    Selected,
-    All
+enum class DependencyOption { Disabled, Selected, All };
+
+enum class DependencyTextOption { Enabled, Disabled };
+
+struct DependencyOptions {
+  DependencyOption draw;
+  DependencyTextOption text;
 };
 
-enum class DependencyTextOption
-{
-    Enabled,
-    Disabled
-};
-
-struct DependencyOptions
-{
-    DependencyOption draw;
-    DependencyTextOption text;
-};
-
-class TraceDrawingProperties : public QObject
-{
-    Q_OBJECT
+class TraceDrawingProperties : public QObject {
+  Q_OBJECT
 
 public:
-    bool drawText;
-    bool drawBorder;
-    DependencyOptions drawDependenciesOption;
-    ColorGrouping colorGrouping;
-    QColor textColor;
+  bool drawText;
+  bool drawBorder;
+  DependencyOptions drawDependenciesOption;
+  ColorGrouping colorGrouping;
+  QColor textColor;
 
-    unsigned int numberOfRanks = 1;
-    unsigned int numberOfBankGroups = 1;
-    unsigned int numberOfBanks = 1;
-    unsigned int banksPerRank = 1;
-    unsigned int groupsPerRank = 1;
-    unsigned int banksPerGroup = 1;
-    unsigned int per2BankOffset = 0;
+  unsigned int numberOfRanks = 1;
+  unsigned int numberOfBankGroups = 1;
+  unsigned int numberOfBanks = 1;
+  unsigned int banksPerRank = 1;
+  unsigned int groupsPerRank = 1;
+  unsigned int banksPerGroup = 1;
+  unsigned int per2BankOffset = 0;
 
-    TraceDrawingProperties(bool drawText = true,
-                           bool drawBorder = true,
-                           DependencyOptions drawDependenciesOption =
-                               {DependencyOption::Disabled, DependencyTextOption::Enabled},
-                           ColorGrouping colorGrouping = ColorGrouping::PhaseType);
+  TraceDrawingProperties(
+      bool drawText = true, bool drawBorder = true,
+      DependencyOptions drawDependenciesOption =
+          {DependencyOption::Disabled, DependencyTextOption::Enabled},
+      ColorGrouping colorGrouping = ColorGrouping::PhaseType);
 
-    void init(TracePlotLineDataSource* tracePlotLineDataSource);
-    void updateLabels();
+  void init(TracePlotLineDataSource *tracePlotLineDataSource);
+  void updateLabels();
 
-    unsigned int getNumberOfDisplayedLines() const;
+  unsigned int getNumberOfDisplayedLines() const;
 
-    const std::vector<std::shared_ptr<TracePlotLineDataSource::TracePlotLine>>&
-    getTracePlotLines() const
-    {
-        return tracePlotLineDataSource->getTracePlotLines();
-    }
+  const std::vector<std::shared_ptr<TracePlotLineDataSource::TracePlotLine>> &
+  getTracePlotLines() const {
+    return tracePlotLineDataSource->getTracePlotLines();
+  }
 
-    std::shared_ptr<QHash<int, QString>> getLabels() const;
+  std::shared_ptr<QHash<int, QString>> getLabels() const;
 
 Q_SIGNALS:
-    void labelsUpdated();
+  void labelsUpdated();
 
 private:
-    std::shared_ptr<QHash<int, QString>> labels = std::make_shared<QHash<int, QString>>();
+  std::shared_ptr<QHash<int, QString>> labels =
+      std::make_shared<QHash<int, QString>>();
 
-    TracePlotLineDataSource* tracePlotLineDataSource;
+  TracePlotLineDataSource *tracePlotLineDataSource;
 };
 
-#endif // TRACECOLLECTIONDRAWINGPROPERTIES_H
+#endif  // TRACECOLLECTIONDRAWINGPROPERTIES_H

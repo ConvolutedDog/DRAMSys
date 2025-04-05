@@ -45,34 +45,33 @@
 #include <tlm>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class SchedulerGrpFrFcfsWm final : public SchedulerIF
-{
+class SchedulerGrpFrFcfsWm final : public SchedulerIF {
 public:
-    explicit SchedulerGrpFrFcfsWm(const McConfig& config, const MemSpec& memSpec);
-    [[nodiscard]] bool hasBufferSpace(unsigned entries) const override;
-    void storeRequest(tlm::tlm_generic_payload& payload) override;
-    void removeRequest(tlm::tlm_generic_payload& payload) override;
-    [[nodiscard]] tlm::tlm_generic_payload*
-    getNextRequest(const BankMachine& bankMachine) const override;
-    [[nodiscard]] bool
-    hasFurtherRowHit(Bank bank, Row row, tlm::tlm_command command) const override;
-    [[nodiscard]] bool hasFurtherRequest(Bank bank, tlm::tlm_command command) const override;
-    [[nodiscard]] const std::vector<unsigned>& getBufferDepth() const override;
+  explicit SchedulerGrpFrFcfsWm(const McConfig &config, const MemSpec &memSpec);
+  [[nodiscard]] bool hasBufferSpace(unsigned entries) const override;
+  void storeRequest(tlm::tlm_generic_payload &payload) override;
+  void removeRequest(tlm::tlm_generic_payload &payload) override;
+  [[nodiscard]] tlm::tlm_generic_payload *
+  getNextRequest(const BankMachine &bankMachine) const override;
+  [[nodiscard]] bool hasFurtherRowHit(Bank bank, Row row,
+                                      tlm::tlm_command command) const override;
+  [[nodiscard]] bool hasFurtherRequest(Bank bank,
+                                       tlm::tlm_command command) const override;
+  [[nodiscard]] const std::vector<unsigned> &getBufferDepth() const override;
 
 private:
-    void evaluateWriteMode();
+  void evaluateWriteMode();
 
-    ControllerVector<Bank, std::list<tlm::tlm_generic_payload*>> readBuffer;
-    ControllerVector<Bank, std::list<tlm::tlm_generic_payload*>> writeBuffer;
-    std::unique_ptr<BufferCounterIF> bufferCounter;
-    const unsigned lowWatermark;
-    const unsigned highWatermark;
-    bool writeMode = false;
+  ControllerVector<Bank, std::list<tlm::tlm_generic_payload *>> readBuffer;
+  ControllerVector<Bank, std::list<tlm::tlm_generic_payload *>> writeBuffer;
+  std::unique_ptr<BufferCounterIF> bufferCounter;
+  const unsigned lowWatermark;
+  const unsigned highWatermark;
+  bool writeMode = false;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // SCHEDULERGRPFRFCFSWM_H
+#endif  // SCHEDULERGRPFRFCFSWM_H

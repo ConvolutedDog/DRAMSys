@@ -38,34 +38,27 @@
 #include "Initiator.h"
 #include "request/RequestIssuer.h"
 
-template <typename Producer> class SimpleInitiator : public Initiator
-{
+template <typename Producer> class SimpleInitiator : public Initiator {
 public:
-    SimpleInitiator(sc_core::sc_module_name const& name,
-                    MemoryManager& memoryManager,
-                    sc_core::sc_time interfaceClk,
-                    std::optional<unsigned int> maxPendingReadRequests,
-                    std::optional<unsigned int> maxPendingWriteRequests,
-                    std::function<void()> transactionFinished,
-                    std::function<void()> terminate,
-                    Producer&& producer) :
-        producer(std::forward<Producer>(producer)),
+  SimpleInitiator(sc_core::sc_module_name const &name,
+                  MemoryManager &memoryManager, sc_core::sc_time interfaceClk,
+                  std::optional<unsigned int> maxPendingReadRequests,
+                  std::optional<unsigned int> maxPendingWriteRequests,
+                  std::function<void()> transactionFinished,
+                  std::function<void()> terminate, Producer &&producer)
+      : producer(std::forward<Producer>(producer)),
         issuer(
-            name,
-            memoryManager,
-            interfaceClk,
-            maxPendingReadRequests,
+            name, memoryManager, interfaceClk, maxPendingReadRequests,
             maxPendingWriteRequests,
             [this] { return this->producer.nextRequest(); },
-            std::move(transactionFinished),
-            std::move(terminate))
-    {
-    }
+            std::move(transactionFinished), std::move(terminate)) {}
 
-    void bind(tlm_utils::multi_target_base<>& target) override { issuer.iSocket.bind(target); }
-    uint64_t totalRequests() override { return producer.totalRequests(); };
+  void bind(tlm_utils::multi_target_base<> &target) override {
+    issuer.iSocket.bind(target);
+  }
+  uint64_t totalRequests() override { return producer.totalRequests(); };
 
 private:
-    Producer producer;
-    RequestIssuer issuer;
+  Producer producer;
+  RequestIssuer issuer;
 };

@@ -37,24 +37,23 @@
 
 #include "DRAMSys/controller/Command.h"
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class CmdMuxIF
-{
+class CmdMuxIF {
 protected:
-    CmdMuxIF(const CmdMuxIF&) = default;
-    CmdMuxIF(CmdMuxIF&&) = default;
-    CmdMuxIF& operator=(const CmdMuxIF&) = default;
-    CmdMuxIF& operator=(CmdMuxIF&&) = default;
+  CmdMuxIF(const CmdMuxIF &) = default;
+  CmdMuxIF(CmdMuxIF &&) = default;
+  CmdMuxIF &operator=(const CmdMuxIF &) = default;
+  CmdMuxIF &operator=(CmdMuxIF &&) = default;
 
 public:
-    CmdMuxIF() = default;
-    virtual ~CmdMuxIF() = default;
+  CmdMuxIF() = default;
+  virtual ~CmdMuxIF() = default;
 
-    virtual CommandTuple::Type selectCommand(const ReadyCommands& readyCommands) = 0;
+  virtual CommandTuple::Type
+  selectCommand(const ReadyCommands &readyCommands) = 0;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // CMDMUXIF_H
+#endif  // CMDMUXIF_H

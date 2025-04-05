@@ -40,29 +40,24 @@
 #include <optional>
 #include <random>
 
-class RandomProducer : public RequestProducer
-{
+class RandomProducer : public RequestProducer {
 public:
-    RandomProducer(uint64_t numRequests,
-                   std::optional<uint64_t> seed,
-                   double rwRatio,
-                   std::optional<uint64_t> minAddress,
-                   std::optional<uint64_t> maxAddress,
-                   uint64_t memorySize,
-                   unsigned int dataLength,
-                   unsigned int dataAlignment);
+  RandomProducer(uint64_t numRequests, std::optional<uint64_t> seed,
+                 double rwRatio, std::optional<uint64_t> minAddress,
+                 std::optional<uint64_t> maxAddress, uint64_t memorySize,
+                 unsigned int dataLength, unsigned int dataAlignment);
 
-    Request nextRequest() override;
+  Request nextRequest() override;
 
-    uint64_t totalRequests() override { return numberOfRequests; }
+  uint64_t totalRequests() override { return numberOfRequests; }
 
-    const uint64_t numberOfRequests;
-    const uint64_t seed;
-    const double rwRatio;
-    const unsigned int dataLength;
-    const unsigned int dataAlignment;
+  const uint64_t numberOfRequests;
+  const uint64_t seed;
+  const double rwRatio;
+  const unsigned int dataLength;
+  const unsigned int dataAlignment;
 
-    std::default_random_engine randomGenerator;
-    std::uniform_real_distribution<double> readWriteDistribution{0.0, 1.0};
-    std::uniform_int_distribution<uint64_t> randomAddressDistribution;
+  std::default_random_engine randomGenerator;
+  std::uniform_real_distribution<double> readWriteDistribution{0.0, 1.0};
+  std::uniform_int_distribution<uint64_t> randomAddressDistribution;
 };

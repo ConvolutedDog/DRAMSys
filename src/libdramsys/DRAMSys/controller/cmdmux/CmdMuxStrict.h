@@ -38,36 +38,33 @@
 #include "DRAMSys/configuration/memspec/MemSpec.h"
 #include "DRAMSys/controller/cmdmux/CmdMuxIF.h"
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class CmdMuxStrict : public CmdMuxIF
-{
+class CmdMuxStrict : public CmdMuxIF {
 public:
-    explicit CmdMuxStrict(const MemSpec& memSpec);
-    CommandTuple::Type selectCommand(const ReadyCommands& readyCommands) override;
+  explicit CmdMuxStrict(const MemSpec &memSpec);
+  CommandTuple::Type selectCommand(const ReadyCommands &readyCommands) override;
 
 private:
-    uint64_t nextPayloadID = 1;
-    const MemSpec& memSpec;
-    const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
+  uint64_t nextPayloadID = 1;
+  const MemSpec &memSpec;
+  const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
 };
 
-class CmdMuxStrictRasCas : public CmdMuxIF
-{
+class CmdMuxStrictRasCas : public CmdMuxIF {
 public:
-    explicit CmdMuxStrictRasCas(const MemSpec& memSpec);
-    CommandTuple::Type selectCommand(const ReadyCommands& readyCommands) override;
+  explicit CmdMuxStrictRasCas(const MemSpec &memSpec);
+  CommandTuple::Type selectCommand(const ReadyCommands &readyCommands) override;
 
 private:
-    uint64_t nextPayloadID = 1;
-    const MemSpec& memSpec;
-    ReadyCommands readyRasCommands;
-    ReadyCommands readyCasCommands;
-    ReadyCommands readyRasCasCommands;
-    const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
+  uint64_t nextPayloadID = 1;
+  const MemSpec &memSpec;
+  ReadyCommands readyRasCommands;
+  ReadyCommands readyCasCommands;
+  ReadyCommands readyRasCasCommands;
+  const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // CMDMUXSTRICT_H
+#endif  // CMDMUXSTRICT_H

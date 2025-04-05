@@ -46,75 +46,70 @@
 #include <systemc>
 #include <tlm>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class BankMachine : public ManagerIF
-{
+class BankMachine : public ManagerIF {
 public:
-    CommandTuple::Type getNextCommand() override;
-    void update(Command command) override;
-    void block();
+  CommandTuple::Type getNextCommand() override;
+  void update(Command command) override;
+  void block();
 
-    [[nodiscard]] Rank getRank() const;
-    [[nodiscard]] BankGroup getBankGroup() const;
-    [[nodiscard]] Bank getBank() const;
-    [[nodiscard]] Row getOpenRow() const;
-    [[nodiscard]] bool isIdle() const;
-    [[nodiscard]] bool isActivated() const;
-    [[nodiscard]] bool isPrecharged() const;
-    [[nodiscard]] uint64_t getRefreshManagementCounter() const;
+  [[nodiscard]] Rank getRank() const;
+  [[nodiscard]] BankGroup getBankGroup() const;
+  [[nodiscard]] Bank getBank() const;
+  [[nodiscard]] Row getOpenRow() const;
+  [[nodiscard]] bool isIdle() const;
+  [[nodiscard]] bool isActivated() const;
+  [[nodiscard]] bool isPrecharged() const;
+  [[nodiscard]] uint64_t getRefreshManagementCounter() const;
 
 protected:
-    enum class State
-    {
-        Precharged,
-        Activated
-    } state = State::Precharged;
-    BankMachine(const McConfig& config, const MemSpec& memSpec, const SchedulerIF& scheduler, Bank bank);
-    const MemSpec& memSpec;
-    tlm::tlm_generic_payload* currentPayload = nullptr;
-    const SchedulerIF& scheduler;
-    Command nextCommand = Command::NOP;
-    Row openRow = Row(0);
-    const Bank bank;
-    const BankGroup bankgroup;
-    const Rank rank;
-    bool blocked = false;
-    bool sleeping = false;
-    unsigned refreshManagementCounter = 0;
-    const bool refreshManagement = false;
-    bool keepTrans = false;
+  enum class State { Precharged, Activated } state = State::Precharged;
+  BankMachine(const McConfig &config, const MemSpec &memSpec,
+              const SchedulerIF &scheduler, Bank bank);
+  const MemSpec &memSpec;
+  tlm::tlm_generic_payload *currentPayload = nullptr;
+  const SchedulerIF &scheduler;
+  Command nextCommand = Command::NOP;
+  Row openRow = Row(0);
+  const Bank bank;
+  const BankGroup bankgroup;
+  const Rank rank;
+  bool blocked = false;
+  bool sleeping = false;
+  unsigned refreshManagementCounter = 0;
+  const bool refreshManagement = false;
+  bool keepTrans = false;
 };
 
-class BankMachineOpen final : public BankMachine
-{
+class BankMachineOpen final : public BankMachine {
 public:
-    BankMachineOpen(const McConfig& config, const MemSpec& memSpec, const SchedulerIF& scheduler, Bank bank);
-    void evaluate() override;
+  BankMachineOpen(const McConfig &config, const MemSpec &memSpec,
+                  const SchedulerIF &scheduler, Bank bank);
+  void evaluate() override;
 };
 
-class BankMachineClosed final : public BankMachine
-{
+class BankMachineClosed final : public BankMachine {
 public:
-    BankMachineClosed(const McConfig& config, const MemSpec& memSpec, const SchedulerIF& scheduler, Bank bank);
-    void evaluate() override;
+  BankMachineClosed(const McConfig &config, const MemSpec &memSpec,
+                    const SchedulerIF &scheduler, Bank bank);
+  void evaluate() override;
 };
 
-class BankMachineOpenAdaptive final : public BankMachine
-{
+class BankMachineOpenAdaptive final : public BankMachine {
 public:
-    BankMachineOpenAdaptive(const McConfig& config, const MemSpec& memSpec, const SchedulerIF& scheduler, Bank bank);
-    void evaluate() override;
+  BankMachineOpenAdaptive(const McConfig &config, const MemSpec &memSpec,
+                          const SchedulerIF &scheduler, Bank bank);
+  void evaluate() override;
 };
 
-class BankMachineClosedAdaptive final : public BankMachine
-{
+class BankMachineClosedAdaptive final : public BankMachine {
 public:
-    BankMachineClosedAdaptive(const McConfig& config, const MemSpec& memSpec, const SchedulerIF& scheduler, Bank bank);
-    void evaluate() override;
+  BankMachineClosedAdaptive(const McConfig &config, const MemSpec &memSpec,
+                            const SchedulerIF &scheduler, Bank bank);
+  void evaluate() override;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // BANKMACHINE_H
+#endif  // BANKMACHINE_H

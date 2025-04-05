@@ -45,33 +45,26 @@
 #include <tuple>
 
 using namespace std;
-int TracePlotItem::rtti() const
-{
-    return QwtPlotItem::Rtti_PlotUserItem;
+int TracePlotItem::rtti() const { return QwtPlotItem::Rtti_PlotUserItem; }
+
+void TracePlotItem::draw(QPainter *painter, const QwtScaleMap &xMap,
+                         const QwtScaleMap &yMap,
+                         const QRectF &canvasRect) const {
+  for (const auto &transaction : transactions) {
+    bool highlight = navigator.transactionIsSelected(transaction);
+    transaction->draw(painter, xMap, yMap, canvasRect, highlight,
+                      drawingProperties);
+  }
 }
 
-void TracePlotItem::draw(QPainter* painter,
-                         const QwtScaleMap& xMap,
-                         const QwtScaleMap& yMap,
-                         const QRectF& canvasRect) const
-{
-    for (const auto& transaction : transactions)
-    {
-        bool highlight = navigator.transactionIsSelected(transaction);
-        transaction->draw(painter, xMap, yMap, canvasRect, highlight, drawingProperties);
-    }
-}
+vector<shared_ptr<Transaction>>
+TracePlotItem::getSelectedTransactions(Timespan timespan, double yVal) {
+  vector<shared_ptr<Transaction>> result;
 
-vector<shared_ptr<Transaction>> TracePlotItem::getSelectedTransactions(Timespan timespan,
-                                                                       double yVal)
-{
-    vector<shared_ptr<Transaction>> result;
+  for (const auto &transaction : transactions) {
+    if (transaction->isSelected(timespan, yVal, drawingProperties))
+      result.push_back(transaction);
+  }
 
-    for (const auto& transaction : transactions)
-    {
-        if (transaction->isSelected(timespan, yVal, drawingProperties))
-            result.push_back(transaction);
-    }
-
-    return result;
+  return result;
 }

@@ -46,39 +46,33 @@
 #include <systemc>
 #include <tlm>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class TimeInterval
-{
+class TimeInterval {
 public:
-    sc_core::sc_time start, end;
-    TimeInterval() : start(sc_core::SC_ZERO_TIME), end(sc_core::SC_ZERO_TIME) {}
-    TimeInterval(const sc_core::sc_time& start, const sc_core::sc_time& end) :
-        start(start),
-        end(end)
-    {
-    }
+  sc_core::sc_time start, end;
+  TimeInterval() : start(sc_core::SC_ZERO_TIME), end(sc_core::SC_ZERO_TIME) {}
+  TimeInterval(const sc_core::sc_time &start, const sc_core::sc_time &end)
+      : start(start), end(end) {}
 
-    [[nodiscard]] sc_core::sc_time getLength() const;
-    [[nodiscard]] bool timeIsInInterval(const sc_core::sc_time& time) const;
-    [[nodiscard]] bool intersects(const TimeInterval& other) const;
+  [[nodiscard]] sc_core::sc_time getLength() const;
+  [[nodiscard]] bool timeIsInInterval(const sc_core::sc_time &time) const;
+  [[nodiscard]] bool intersects(const TimeInterval &other) const;
 };
 
 constexpr const std::string_view headline =
-    "===========================================================================";
+    "=========================================================================="
+    "=";
 
-std::string getPhaseName(const tlm::tlm_phase& phase);
+std::string getPhaseName(const tlm::tlm_phase &phase);
 
-void setUpDummy(tlm::tlm_generic_payload& payload,
-                uint64_t channelPayloadID,
-                Rank rank = Rank(0),
-                BankGroup bankGroup = BankGroup(0),
+void setUpDummy(tlm::tlm_generic_payload &payload, uint64_t channelPayloadID,
+                Rank rank = Rank(0), BankGroup bankGroup = BankGroup(0),
                 Bank bank = Bank(0));
 
 bool isFullCycle(sc_core::sc_time time, sc_core::sc_time cycleTime);
 sc_core::sc_time alignAtNext(sc_core::sc_time time, sc_core::sc_time alignment);
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // UTILS_H
+#endif  // UTILS_H

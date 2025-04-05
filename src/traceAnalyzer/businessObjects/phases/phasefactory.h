@@ -45,22 +45,15 @@
 
 class TraceDB;
 
-class PhaseFactory
-{
+class PhaseFactory {
 public:
-    PhaseFactory() = delete;
-    static std::shared_ptr<Phase> createPhase(ID id,
-                                              const QString& dbPhaseName,
-                                              Timespan span,
-                                              Timespan spanOnDataStrobe,
-                                              unsigned int rank,
-                                              unsigned int bankGroup,
-                                              unsigned int bank,
-                                              unsigned int row,
-                                              unsigned int column,
-                                              unsigned int burstLength,
-                                              const std::shared_ptr<Transaction>& trans,
-                                              TraceDB& database);
+  PhaseFactory() = delete;
+  static std::shared_ptr<Phase>
+  createPhase(ID id, const QString &dbPhaseName, Timespan span,
+              Timespan spanOnDataStrobe, unsigned int rank,
+              unsigned int bankGroup, unsigned int bank, unsigned int row,
+              unsigned int column, unsigned int burstLength,
+              const std::shared_ptr<Transaction> &trans, TraceDB &database);
 };
 
-#endif // PHASEFACTORY_H
+#endif  // PHASEFACTORY_H

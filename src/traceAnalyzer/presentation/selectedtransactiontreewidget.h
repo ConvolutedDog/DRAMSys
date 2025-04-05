@@ -39,22 +39,18 @@
 #define SELECTEDTRANSACTIONTREEWIDGET_H
 #include "transactiontreewidget.h"
 
-class SelectedTransactionTreeWidget : public TransactionTreeWidget
-{
-    Q_OBJECT
+class SelectedTransactionTreeWidget : public TransactionTreeWidget {
+  Q_OBJECT
 
-    bool isInitialized;
+  bool isInitialized;
 
 public:
-    SelectedTransactionTreeWidget(QWidget* parent = 0) :
-        TransactionTreeWidget(parent),
-        isInitialized(false)
-    {
-    }
-    virtual void init(TraceNavigator* navigator);
+  SelectedTransactionTreeWidget(QWidget *parent = 0)
+      : TransactionTreeWidget(parent), isInitialized(false) {}
+  virtual void init(TraceNavigator *navigator);
 
 public Q_SLOTS:
-    void selectedTransactionsChanged();
+  void selectedTransactionsChanged();
 };
 
-#endif // SELECTEDTRANSACTIONTREEWIDGET_H
+#endif  // SELECTEDTRANSACTIONTREEWIDGET_H

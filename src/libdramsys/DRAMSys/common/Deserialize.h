@@ -38,23 +38,21 @@
 
 #include <istream>
 
-namespace DRAMSys
-{
-class Deserialize
-{
+namespace DRAMSys {
+class Deserialize {
 protected:
-    Deserialize() = default;
-    Deserialize(const Deserialize&) = default;
-    Deserialize(Deserialize&&) = default;
-    Deserialize& operator=(const Deserialize&) = default;
-    Deserialize& operator=(Deserialize&&) = default;
+  Deserialize() = default;
+  Deserialize(const Deserialize &) = default;
+  Deserialize(Deserialize &&) = default;
+  Deserialize &operator=(const Deserialize &) = default;
+  Deserialize &operator=(Deserialize &&) = default;
 
 public:
-    virtual ~Deserialize() = default;
+  virtual ~Deserialize() = default;
 
-    virtual void deserialize(std::istream& stream) = 0;
+  virtual void deserialize(std::istream &stream) = 0;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
 #endif

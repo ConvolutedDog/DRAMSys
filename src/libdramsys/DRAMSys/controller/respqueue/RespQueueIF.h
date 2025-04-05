@@ -38,26 +38,25 @@
 #include <systemc>
 #include <tlm>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class RespQueueIF
-{
+class RespQueueIF {
 protected:
-    RespQueueIF(const RespQueueIF&) = default;
-    RespQueueIF(RespQueueIF&&) = default;
-    RespQueueIF& operator=(const RespQueueIF&) = default;
-    RespQueueIF& operator=(RespQueueIF&&) = default;
+  RespQueueIF(const RespQueueIF &) = default;
+  RespQueueIF(RespQueueIF &&) = default;
+  RespQueueIF &operator=(const RespQueueIF &) = default;
+  RespQueueIF &operator=(RespQueueIF &&) = default;
 
 public:
-    RespQueueIF() = default;
-    virtual ~RespQueueIF() = default;
+  RespQueueIF() = default;
+  virtual ~RespQueueIF() = default;
 
-    virtual void insertPayload(tlm::tlm_generic_payload* payload, sc_core::sc_time strobeEnd) = 0;
-    virtual tlm::tlm_generic_payload* nextPayload() = 0;
-    [[nodiscard]] virtual sc_core::sc_time getTriggerTime() const = 0;
+  virtual void insertPayload(tlm::tlm_generic_payload *payload,
+                             sc_core::sc_time strobeEnd) = 0;
+  virtual tlm::tlm_generic_payload *nextPayload() = 0;
+  [[nodiscard]] virtual sc_core::sc_time getTriggerTime() const = 0;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // RESPQUEUEIF_H
+#endif  // RESPQUEUEIF_H

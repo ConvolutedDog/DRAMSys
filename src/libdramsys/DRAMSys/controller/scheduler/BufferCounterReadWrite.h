@@ -40,27 +40,25 @@
 #include <tlm>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
-class BufferCounterReadWrite final : public BufferCounterIF
-{
+class BufferCounterReadWrite final : public BufferCounterIF {
 public:
-    explicit BufferCounterReadWrite(unsigned requestBufferSizeRead,
-                                    unsigned requestBufferSizeWrite);
-    [[nodiscard]] bool hasBufferSpace(unsigned entries) const override;
-    void storeRequest(const tlm::tlm_generic_payload& trans) override;
-    void removeRequest(const tlm::tlm_generic_payload& trans) override;
-    [[nodiscard]] const std::vector<unsigned>& getBufferDepth() const override;
-    [[nodiscard]] unsigned getNumReadRequests() const override;
-    [[nodiscard]] unsigned getNumWriteRequests() const override;
+  explicit BufferCounterReadWrite(unsigned requestBufferSizeRead,
+                                  unsigned requestBufferSizeWrite);
+  [[nodiscard]] bool hasBufferSpace(unsigned entries) const override;
+  void storeRequest(const tlm::tlm_generic_payload &trans) override;
+  void removeRequest(const tlm::tlm_generic_payload &trans) override;
+  [[nodiscard]] const std::vector<unsigned> &getBufferDepth() const override;
+  [[nodiscard]] unsigned getNumReadRequests() const override;
+  [[nodiscard]] unsigned getNumWriteRequests() const override;
 
 private:
-    const unsigned requestBufferSizeRead;
-    const unsigned requestBufferSizeWrite;
-    std::vector<unsigned> numReadWriteRequests;
+  const unsigned requestBufferSizeRead;
+  const unsigned requestBufferSizeWrite;
+  std::vector<unsigned> numReadWriteRequests;
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // BUFFERCOUNTERREADWRITE_H
+#endif  // BUFFERCOUNTERREADWRITE_H

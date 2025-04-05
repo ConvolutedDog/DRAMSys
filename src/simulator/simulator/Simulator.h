@@ -43,30 +43,30 @@
 
 static constexpr std::string_view TRACE_DIRECTORY = "traces";
 
-class Simulator
-{
+class Simulator {
 public:
-    Simulator(DRAMSys::Config::Configuration configuration,
-              std::filesystem::path resourceDirectory);
+  Simulator(DRAMSys::Config::Configuration configuration,
+            std::filesystem::path resourceDirectory);
 
-    void run();
+  void run();
 
 private:
-    std::unique_ptr<Initiator> instantiateInitiator(const DRAMSys::Config::Initiator& initiator);
+  std::unique_ptr<Initiator>
+  instantiateInitiator(const DRAMSys::Config::Initiator &initiator);
 
-    const bool storageEnabled;
-    MemoryManager memoryManager;
+  const bool storageEnabled;
+  MemoryManager memoryManager;
 
-    DRAMSys::Config::Configuration configuration;
-    std::filesystem::path resourceDirectory;
+  DRAMSys::Config::Configuration configuration;
+  std::filesystem::path resourceDirectory;
 
-    std::unique_ptr<DRAMSys::DRAMSys> dramSys;
-    std::vector<std::unique_ptr<Initiator>> initiators;
+  std::unique_ptr<DRAMSys::DRAMSys> dramSys;
+  std::vector<std::unique_ptr<Initiator>> initiators;
 
-    std::function<void()> terminateInitiator;
-    std::function<void()> finishTransaction;
+  std::function<void()> terminateInitiator;
+  std::function<void()> finishTransaction;
 
-    unsigned int terminatedInitiators = 0;
-    uint64_t totalTransactions{};
-    uint64_t transactionsFinished = 0;
+  unsigned int terminatedInitiators = 0;
+  uint64_t totalTransactions{};
+  uint64_t transactionsFinished = 0;
 };

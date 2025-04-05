@@ -42,26 +42,24 @@
 
 using namespace std;
 
-void ClkGrid::updateScaleDiv(const QwtScaleDiv& xMap, const QwtScaleDiv& yMap)
-{
-    QwtScaleDiv scaleDiv;
-    scaleDiv.setInterval(xMap.interval());
+void ClkGrid::updateScaleDiv(const QwtScaleDiv &xMap, const QwtScaleDiv &yMap) {
+  QwtScaleDiv scaleDiv;
+  scaleDiv.setInterval(xMap.interval());
 
-    double min = xMap.interval().minValue();
-    double max = xMap.interval().maxValue();
+  double min = xMap.interval().minValue();
+  double max = xMap.interval().maxValue();
 
-    if (min > max)
-        qSwap(min, max);
+  if (min > max)
+    qSwap(min, max);
 
-    if ((max - min) < maxVisibility)
-    {
-        min = static_cast<long long>(min / clkPeriod) * clkPeriod;
-        QList<double> ticks;
-        for (double tick = min; tick <= max; tick += clkPeriod)
-            ticks += tick;
+  if ((max - min) < maxVisibility) {
+    min = static_cast<long long>(min / clkPeriod) * clkPeriod;
+    QList<double> ticks;
+    for (double tick = min; tick <= max; tick += clkPeriod)
+      ticks += tick;
 
-        scaleDiv.setTicks(QwtScaleDiv::MajorTick, ticks);
-    }
+    scaleDiv.setTicks(QwtScaleDiv::MajorTick, ticks);
+  }
 
-    QwtPlotGrid::updateScaleDiv(scaleDiv, yMap);
+  QwtPlotGrid::updateScaleDiv(scaleDiv, yMap);
 }

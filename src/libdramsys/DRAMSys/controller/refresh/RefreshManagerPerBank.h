@@ -36,8 +36,8 @@
 #define REFRESHMANAGERPERBANK_H
 
 #include "DRAMSys/configuration/memspec/MemSpec.h"
-#include "DRAMSys/controller/checker/CheckerIF.h"
 #include "DRAMSys/controller/McConfig.h"
+#include "DRAMSys/controller/checker/CheckerIF.h"
 #include "DRAMSys/controller/refresh/RefreshManagerIF.h"
 
 #include <list>
@@ -46,52 +46,45 @@
 #include <unordered_map>
 #include <vector>
 
-namespace DRAMSys
-{
+namespace DRAMSys {
 
 class BankMachine;
 class PowerDownManagerIF;
 
-class RefreshManagerPerBank final : public RefreshManagerIF
-{
+class RefreshManagerPerBank final : public RefreshManagerIF {
 public:
-    RefreshManagerPerBank(const McConfig& config,
-                          const MemSpec& memSpec,
-                          ControllerVector<Bank, BankMachine*>& bankMachinesOnRank,
-                          PowerDownManagerIF& powerDownManager,
-                          Rank rank);
+  RefreshManagerPerBank(
+      const McConfig &config, const MemSpec &memSpec,
+      ControllerVector<Bank, BankMachine *> &bankMachinesOnRank,
+      PowerDownManagerIF &powerDownManager, Rank rank);
 
-    CommandTuple::Type getNextCommand() override;
-    void evaluate() override;
-    void update(Command command) override;
-    sc_core::sc_time getTimeForNextTrigger() override;
+  CommandTuple::Type getNextCommand() override;
+  void evaluate() override;
+  void update(Command command) override;
+  sc_core::sc_time getTimeForNextTrigger() override;
 
 private:
-    enum class State
-    {
-        Regular,
-        Pulledin
-    } state = State::Regular;
-    const MemSpec& memSpec;
-    PowerDownManagerIF& powerDownManager;
-    std::unordered_map<BankMachine*, tlm::tlm_generic_payload> refreshPayloads;
-    sc_core::sc_time timeForNextTrigger = sc_core::sc_max_time();
-    Command nextCommand = Command::NOP;
+  enum class State { Regular, Pulledin } state = State::Regular;
+  const MemSpec &memSpec;
+  PowerDownManagerIF &powerDownManager;
+  std::unordered_map<BankMachine *, tlm::tlm_generic_payload> refreshPayloads;
+  sc_core::sc_time timeForNextTrigger = sc_core::sc_max_time();
+  Command nextCommand = Command::NOP;
 
-    std::list<BankMachine*> remainingBankMachines;
-    std::list<BankMachine*> allBankMachines;
-    std::list<BankMachine*>::iterator currentIterator;
+  std::list<BankMachine *> remainingBankMachines;
+  std::list<BankMachine *> allBankMachines;
+  std::list<BankMachine *>::iterator currentIterator;
 
-    int flexibilityCounter = 0;
-    const int maxPostponed;
-    const int maxPulledin;
+  int flexibilityCounter = 0;
+  const int maxPostponed;
+  const int maxPulledin;
 
-    bool sleeping = false;
-    bool skipSelection = false;
+  bool sleeping = false;
+  bool skipSelection = false;
 
-    const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
+  const sc_core::sc_time scMaxTime = sc_core::sc_max_time();
 };
 
-} // namespace DRAMSys
+}  // namespace DRAMSys
 
-#endif // REFRESHMANAGERPERBANK_H
+#endif  // REFRESHMANAGERPERBANK_H
