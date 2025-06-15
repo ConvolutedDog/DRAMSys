@@ -42,6 +42,12 @@
 
 namespace DRAMSys::Config {
 
+/// @brief Address mapping configuration, which defines the mapping of the address entries
+/// to the physical address space.
+/// @details HBM2: BYTE_BIT, COLUMN_BIT, ROW_BIT, BANK_BIT, BANKGROUP_BIT, STACK_BIT, PSEUDOCHANNEL_BIT.
+///          DDR3: BYTE_BIT, COLUMN_BIT, ROW_BIT, BANK_BIT.
+///          DDR4: BYTE_BIT, COLUMN_BIT, ROW_BIT, BANK_BIT, BANKGROUP_BIT.
+///          LPDDR4: BYTE_BIT, COLUMN_BIT, ROW_BIT, BANK_BIT.
 struct AddressMapping {
   static constexpr std::string_view KEY = "addressmapping";
   static constexpr std::string_view SUB_DIR = "addressmapping";

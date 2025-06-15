@@ -43,6 +43,8 @@
 
 namespace DRAMSys::Config {
 
+/// @brief Different types of Traffic Initiator, used to describe the module
+/// type of generating memory access.
 enum class TrafficInitiatorType { Player, Generator, Hammer, Invalid = -1 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(TrafficInitiatorType,
